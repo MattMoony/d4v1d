@@ -1,15 +1,22 @@
+import os
 from time import sleep
 from selenium import webdriver
+import lib.misc
 
 def login():
-    driver = webdriver.Firefox()
-    driver.get('https://www.instagram.com/accounts/login')
-    curl = driver.current_url
-    while driver.current_url == curl:
-        sleep(1)
-    cookies = driver.get_cookies()
-    driver.quit()
-    return { c['name']: c for c in list(map(conv_cookie, cookies)) }
+    try:
+        driver = webdriver.Firefox()
+        driver.get('https://www.instagram.com/accounts/login')
+        curl = driver.current_url
+        while driver.current_url == curl:
+            input(' Are you done? [PRESS ENTER] ')
+            # sleep(1)
+        cookies = driver.get_cookies()
+        driver.quit()
+        return { c['name']: c for c in list(map(conv_cookie, cookies)) }
+    except Exception:
+        lib.misc.print_wrn('Login', 'Unable to retrieve cookies ... ')
+        return { }
 
 def conv_cookie(c):
     allowed = [ 

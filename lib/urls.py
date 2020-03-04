@@ -1,0 +1,6 @@
+LOGIN = 'https://i.instagram.com/api/v1/accounts/login/'
+FOLLOWERS = 'https://i.instagram.com/api/v1/friendships/{}/followers/'
+FOLLOWING = 'https://i.instagram.com/api/v1/friendships/{}/following/'
+MEDIA = 'https://i.instagram.com/api/v1/feed/user/{}/'
+INFO = 'https://i.instagram.com/api/v1/users/{}/info/'
+PUBLIC_INFO = 'https://www.instagram.com/{}/?__a=1'
