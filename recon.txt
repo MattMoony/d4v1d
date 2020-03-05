@@ -1,0 +1,105 @@
+// ----- //
+// GUEST //
+// ----- //
+
+// stories, etc. 
+https://www.instagram.com/graphql/query/?query_hash=e74d51c10ecc0fe6250a295b9bb9db74&variables={
+	"user_id":"19318909",
+	"include_chaining":false,
+	"include_reel":false,
+	"include_suggested_users":false,
+	"include_logged_out_extras":true,
+	"include_highlight_reels":true,
+	"include_related_profiles":true
+}
+
+// all media
+https://www.instagram.com/graphql/query/?query_hash=e769aa130647d2354c40ea6a439bfc08&variables={
+	"id":"19318909",
+	"first":12,
+	"after":"QVFCbDdYb2FPU3VVTldMbVMwM0l0RkI4bThkTDRDMWduSERnNDBJZTNZVUhBR3VxZUdCRDJhT0owZFRTS2lMS0N4bUJaM0VOMnRpaDNFUTNTQ3prbWdncw=="
+}
+
+// detailed post info 
+https://www.instagram.com/graphql/query/?query_hash=ea0f07e73ad28955150d066bd22ef843&variables={
+	"shortcode":"B10oC99IhJN",
+	"child_comment_count":3,
+	"fetch_comment_count":40,
+	"parent_comment_count":24,
+	"has_threaded_comments":true
+}
+
+// post liked by info
+https://www.instagram.com/graphql/query/?query_hash=d5d763b1e2acf209d62d22d184488e57&variables={
+	"shortcode":"B10oC99IhJN",
+	"include_reel":true,
+	"first":24
+}
+
+// get post comments
+https://www.instagram.com/graphql/query/?query_hash=bc3296d1ce80a24b1b6e40b1e72903f5&variables={
+	"shortcode":"B7CCo7wASLz",
+	"first":12,
+	"after":"QVFBc0Zualh0TUx2NUU0OFFlaTNGeVBJZF9xWl9Xc1hNclpKZnVTSUU5NmQzc1hkMHhkVUNMR1FYSnhJU2E0cnItVDI3R3VGVUdueHcxQlAtdm5qU0M5Tg=="
+}
+
+
+
+
+
+// ----------- //
+// LOGGED - IN //
+// ----------- //
+
+//
+https://www.instagram.com/graphql/query/?query_hash=5931dcfc7f4fb5b410e38269227fa0e8&variables={
+	"only_stories":true,
+	"stories_prefetch":true,
+	"stories_video_dash_manifest":false
+}
+
+// timeline
+https://www.instagram.com/graphql/query/?query_hash=6b838488258d7a4820e48d209ef79eb1&variables={
+	"has_threaded_comments":true
+}
+
+// post stats?
+https://www.instagram.com/graphql/query/?query_hash=0f318e8cfff9cc9ef09f88479ff571fb&variables={
+	"id":"1417718197"
+}
+
+// following
+https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables={
+	"id":"19318909",
+	"include_reel":true,
+	"fetch_mutual":false,
+	"first":24
+}
+https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables=%7B%22id%22%3A%2219318909%22%2C%22include_reel%22%3Atrue%2C%22fetch_mutual%22%3Afalse%2C%22first%22%3A24%7D
+
+// followers
+https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables={
+	"id":"19318909",
+	"include_reel":true,
+	"fetch_mutual":true,
+	"first":24
+}
+https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables=%7B%22id%22%3A%2219318909%22%2C%22include_reel%22%3Atrue%2C%22fetch_mutual%22%3Atrue%2C%22first%22%3A24%7D
+
+// stories (actual content), ...
+https://www.instagram.com/graphql/query/?query_hash=ba71ba2fcb5655e7e2f37b05aec0ff98&variables={
+	"reel_ids":[],
+	"tag_names":[],
+	"location_ids":[],
+	"highlight_reel_ids":[
+		"17991138781233601",
+		"18006667786165744",
+		"18005207839050522"
+	],
+	"precomposed_overlay":false,
+	"show_story_viewer_list":true,
+	"story_viewer_fetch_count":50,
+	"story_viewer_cursor":"",
+	"stories_video_dash_manifest":false
+}
+https://www.instagram.com/graphql/query/?query_hash=ba71ba2fcb5655e7e2f37b05aec0ff98&variables=%7B%22reel_ids%22%3A%5B%5D%2C%22tag_names%22%3A%5B%5D%2C%22location_ids%22%3A%5B%5D%2C%22highlight_reel_ids%22%3A%5B%2217991138781233601%22%2C%2218006667786165744%22%2C%2218005207839050522%22%5D%2C%22precomposed_overlay%22%3Afalse%2C%22show_story_viewer_list%22%3Atrue%2C%22story_viewer_fetch_count%22%3A50%2C%22story_viewer_cursor%22%3A%22%22%2C%22stories_video_dash_manifest%22%3Afalse%7D

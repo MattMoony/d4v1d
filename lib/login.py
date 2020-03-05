@@ -1,7 +1,7 @@
 import os
 from time import sleep
 from selenium import webdriver
-import lib.misc
+from lib import misc
 
 def login():
     try:
@@ -15,7 +15,7 @@ def login():
         driver.quit()
         return { c['name']: c for c in list(map(conv_cookie, cookies)) }
     except Exception:
-        lib.misc.print_wrn('Login', 'Unable to retrieve cookies ... ')
+        misc.print_wrn('Login', 'Unable to retrieve cookies ... ')
         return { }
 
 def conv_cookie(c):

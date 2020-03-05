@@ -1,6 +1,7 @@
 LOGIN = 'https://i.instagram.com/api/v1/accounts/login/'
 FOLLOWERS = 'https://i.instagram.com/api/v1/friendships/{}/followers/'
 FOLLOWING = 'https://i.instagram.com/api/v1/friendships/{}/following/'
-MEDIA = 'https://i.instagram.com/api/v1/feed/user/{}/'
+# MEDIA = 'https://i.instagram.com/api/v1/feed/user/{}/'
+MEDIA = 'https://www.instagram.com/graphql/query/?query_hash=e769aa130647d2354c40ea6a439bfc08&variables={}'
 INFO = 'https://i.instagram.com/api/v1/users/{}/info/'
 PUBLIC_INFO = 'https://www.instagram.com/{}/?__a=1'
