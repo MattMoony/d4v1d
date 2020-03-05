@@ -43,6 +43,12 @@ https://www.instagram.com/graphql/query/?query_hash=bc3296d1ce80a24b1b6e40b1e729
 	"after":"QVFBc0Zualh0TUx2NUU0OFFlaTNGeVBJZF9xWl9Xc1hNclpKZnVTSUU5NmQzc1hkMHhkVUNMR1FYSnhJU2E0cnItVDI3R3VGVUdueHcxQlAtdm5qU0M5Tg=="
 }
 
+// get photos user is tagged in
+https://www.instagram.com/graphql/query/?query_hash=ff260833edf142911047af6024eb634a&variables={
+	"id":"19318909", 
+	"first":12
+}
+
 
 
 

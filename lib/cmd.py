@@ -1,4 +1,4 @@
-import os, argparse, traceback, datetime
+import os, argparse, traceback, datetime, time, json
 from lib import misc, bot, api, params
 from selenium import webdriver
 import colorama as cm
@@ -84,10 +84,52 @@ def get(*args):
     if len(args) < 2:
         misc.print_err(args[0], 'Missing arguments "{} <opt.>"'.format(args[0]))
         return FAILURE
+    elif args[1] in ('v', 'overview'):
+        parser = ArgumentParser()
+        parser.add_argument('user', help='Specifies the target username ... ')
+        try:
+            args = parser.parse_args(args[2:])
+            misc.print_dict('Overview: {}'.format(args.user), { k.title().replace('_', ' '): v for k, v in api.get_user_overview(args.user, headers=__bot.headers if __bot else {}).items()})
+        except argparse.ArgumentError:
+            return FAILURE
     elif args[1] in ('o', 'followers'):
-        pass
+        if not __bot:
+            print(' You need to be logged in!')
+            return FAILURE
+        parser = ArgumentParser()
+        parser.add_argument('user', help='Specifies the target username ... ')
+        parser.add_argument('-d', '--dest', help='Specifies the output directory ...', default=None)
+        try:
+            args = parser.parse_args(args[2:])
+            args.dest = args.dest or os.path.abspath(os.path.join(params.TMP_PATH, '{}/o{}'.format(args.user, str(time.time()))))
+            if not os.path.isdir(args.dest):
+                os.makedirs(args.dest)
+            fs = __bot.get_followers(api.get_userid(args.user))
+            p = os.path.abspath(os.path.join(args.dest, 'followers.json'))
+            print(' Storing in "%s" ... ' % p)
+            with open(p, 'w') as f:
+                json.dump(fs, f, indent=4, sort_keys=True)
+        except argparse.ArgumentError:
+            return FAILURE
     elif args[1] in ('i', 'following'):
-        pass
+        if not __bot:
+            print(' You need to be logged in!')
+            return FAILURE
+        parser = ArgumentParser()
+        parser.add_argument('user', help='Specifies the target username ... ')
+        parser.add_argument('-d', '--dest', help='Specifies the output directory ...', default=None)
+        try:
+            args = parser.parse_args(args[2:])
+            args.dest = args.dest or os.path.abspath(os.path.join(params.TMP_PATH, '{}/i{}'.format(args.user, str(time.time()))))
+            if not os.path.isdir(args.dest):
+                os.makedirs(args.dest)
+            fs = __bot.get_following(api.get_userid(args.user))
+            p = os.path.abspath(os.path.join(args.dest, 'following.json'))
+            print(' Storing in "%s" ... ' % p)
+            with open(p, 'w') as f:
+                json.dump(fs, f, indent=4, sort_keys=True)
+        except argparse.ArgumentError:
+            return FAILURE
     elif args[1] in ('m', 'media'):
         parser = ArgumentParser()
         parser.add_argument('user', help='Specifies the target username ... ')
@@ -96,7 +138,6 @@ def get(*args):
             args = parser.parse_args(args[2:])
             api.get_media(args.user, args.dest, __bot.session if __bot else None)
         except argparse.ArgumentError:
-            print('exception ... ')
             return FAILURE
 
     elif args[1] in ('?', 'help'):
@@ -128,10 +169,21 @@ def ls(*args):
         print(' {}{}{}{}{}{}'.format(cm.Style.BRIGHT, cm.Fore.LIGHTGREEN_EX, u, '' if len(args) == 2 and args[1] in ('u', 'users') else ':', 
                                      cm.Fore.RESET, cm.Style.RESET_ALL))
         ds = [d for d in os.listdir(os.path.join(params.TMP_PATH, u)) if os.path.isdir(os.path.join(params.TMP_PATH, u, d))]
-        if len(args) < 2 or args[1] in ('m', 'media'):
+        mgs = list(filter(lambda d: d.startswith('m'), ds))
+        ogs = list(filter(lambda d: d.startswith('o'), ds))
+        igs = list(filter(lambda d: d.startswith('i'), ds))
+        if (len(args) < 2 or args[1] in ('m', 'media')) and len(mgs) > 0:
             print(' \tMedia: ')
-            for mg in filter(lambda d: d.startswith('m'), ds):
+            for mg in mgs:
                 print(' \t  -> Grab: %s' % datetime.datetime.fromtimestamp(float(mg[1:])).isoformat())
+        if (len(args) < 2 or args[1] in ('o', 'followers')) and len(ogs) > 0:
+            print(' \tFollowers: ')
+            for og in ogs:
+                print(' \t  -> Grab: %s' % datetime.datetime.fromtimestamp(float(og[1:])).isoformat())
+        if (len(args) < 2 or args[1] in ('i', 'following')) and len(igs) > 0:
+            print(' \tFollowing: ')
+            for ig in igs:
+                print(' \t  -> Grab: %s' % datetime.datetime.fromtimestamp(float(ig[1:])).isoformat())
     return SUCCESS
 
 def he(*args):
@@ -196,6 +248,7 @@ HELP = {
     'get, dump': {
         'desc': 'Retrieve Instagram information',
         'opts': {
+            'v, overview': 'Get a compact overview of a user\'s account',
             'o, followers': 'Get a list of all people that a certain user follows',
             'i, following': 'Get a list of all people that follow a certain user',
             'm, media': 'Download all the media a certain user has uploaded',
@@ -210,6 +263,8 @@ HELP = {
         'opts': {
             'm, media': 'List all downloaded media',
             'u, users': 'List all scraped users',
+            'o, followers': 'List all scraped followers',
+            'i, following': 'List all scraped following',
             '?, help': 'Display this help',
         },
     },

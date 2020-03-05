@@ -44,13 +44,20 @@ class Bot(object):
 
     # -- USEABLE -------------------------------------------------------------- #
 
+    def get_following(self, userid=None, nxmi=None):
+        if not userid:
+            userid = self.cookies['ds_user_id']['value']
+        res = self.session.get(urls.FOLLOWING.format(userid)+('?max_id={}'.format(nxmi) if nxmi else ''), headers=self.headers).json()
+        if 'big_list' in res.keys() and res['big_list']:
+            return [*self.get_following(userid, res['next_max_id']), *res['users']]
+        return res['users'] if 'users' in res.keys() else []
+        
     def get_followers(self, userid=None, nxmi=None):
         if not userid:
             userid = self.cookies['ds_user_id']['value']
         res = self.session.get(urls.FOLLOWERS.format(userid)+('?max_id={}'.format(nxmi) if nxmi else ''), headers=self.headers).json()
         if 'big_list' in res.keys() and res['big_list']:
             return [*self.get_followers(userid, res['next_max_id']), *res['users']]
-        print(res)
         return res['users'] if 'users' in res.keys() else []
 
     def get_follower_nodes(self, username, d=2):

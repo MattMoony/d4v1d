@@ -7,6 +7,29 @@ SAFE_PAUSE = 2
 def get_user_info(username, headers={}):
     return req.get(urls.PUBLIC_INFO.format(username), headers=headers or gen_headers()).json()
 
+def get_user_overview(username, **kwargs):
+    res = get_user_info(username, **kwargs)['graphql']['user']
+    return {
+        'id': res['id'],
+        'username': username,
+        'full_name': res['full_name'],
+        'external_url': res['external_url'],
+        'followers': res['edge_followed_by']['count'],
+        'following': res['edge_follow']['count'],
+        'posts': res['edge_owner_to_timeline_media']['count'],
+        'is_private': res['is_private'],
+        'is_verified': res['is_verified'],
+        # 'biography': res['biography'],
+        # 'profile_pic_url_hd': res['profile_pic_url_hd'],
+        # 'saved_media': res['edge_saved_media']['count'],
+        # 'collections': res['edge_media_collections']['count'],
+        # 'is_business_account': res['is_business_account'],
+        # 'is_joined_recently': res['is_joined_recently'],
+        # 'business_category_name': res['business_category_name'],
+        # 'overall_category_name': res['overall_category_name'],
+        # 'connected_fb_page': res['connected_fb_page'],
+    }
+
 def get_userid(username, **kwargs):
     return get_user_info(username, **kwargs)['graphql']['user']['id']
 
