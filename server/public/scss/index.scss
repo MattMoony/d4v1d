@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Barcode+128+Text&family=Roboto&display=swap');
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+    flex-direction: column;
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Libre Barcode 128 Text', sans-serif;
+    }
+
+    header {
+        background-color: #282828;
+        color: #fff;
+        padding: 10px 0; 
+
+        h1 {
+            font-size: 3em;
+            margin: 0;
+            text-align: center;
+        }
+    }
+
+    article {
+        flex-grow: 1;
+        padding: 25px;
+        display: flex;
+        justify-content: stretch;
+        align-items: stretch;
+
+        .sidebar {
+            flex-grow: .1;
+            background-color: #f2f2f2;
+            padding: 5px 0;
+
+            & > div {
+                padding: 4px 10px;
+                transition: .2s ease;
+
+                &:hover {
+                    cursor: pointer;
+                    background-color: rgba(0,0,0,.1);
+                }
+            }
+        }
+
+        .content {
+            flex-grow: .9;
+            background-color: #fff;
+        }
+    }
+}

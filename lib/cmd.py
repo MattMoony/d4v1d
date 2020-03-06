@@ -2,6 +2,7 @@ import os, argparse, traceback, datetime, time, json
 from lib import misc, bot, api, params
 from selenium import webdriver
 import colorama as cm
+import subprocess as sp
 cm.init()
 
 # -- UTILS ----------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -186,6 +187,13 @@ def ls(*args):
                 print(' \t  -> Grab: %s' % datetime.datetime.fromtimestamp(float(ig[1:])).isoformat())
     return SUCCESS
 
+def browse(*args):
+    global __server
+    if not __server:
+        __server = sp.Popen(["node"])
+    
+    return SUCCESS
+
 def he(*args):
     misc.print_dict('Help', { k: v['desc'] for k, v in HELP.items() })
     return SUCCESS
@@ -194,7 +202,11 @@ def handle(com, debug=False):
     try:
         for k in COMS.keys():
             if com[0] in k:
-                return COMS[k](*com)
+                rc = COMS[k](*com)
+                if rc == CLOSING:
+                    if __driver:
+                        __driver.quit()
+                return rc
         if com[0] == '':
             return SUCCESS
         misc.print_err('d4v1d', 'Unknown command: "{}"'.format(com[0]))
@@ -216,6 +228,7 @@ COMS = {
     ('get','dump',): get,
     ('man','manual',): man,
     ('ls','dir','list',): ls,
+    ('br','browse',): browse,
     ('?','help','he',): he, 
 }
 HELP = {
@@ -268,6 +281,9 @@ HELP = {
             '?, help': 'Display this help',
         },
     },
+    'br, browse': {
+        'desc': 'Browse the downloaded information in your browser',
+    },
     '?, help, he': {
         'desc': 'Display help',
     },
@@ -279,3 +295,4 @@ SUCCESS =  1
 
 __bot = None
 __driver = None
+__server = None

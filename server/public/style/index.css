@@ -1,0 +1,51 @@
+@import url("https://fonts.googleapis.com/css2?family=Libre+Barcode+128+Text&family=Roboto&display=swap");
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Roboto", sans-serif;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  flex-direction: column;
+}
+html h1, html h2, html h3, html h4, html h5, html h6, body h1, body h2, body h3, body h4, body h5, body h6 {
+  font-family: "Libre Barcode 128 Text", sans-serif;
+}
+html header, body header {
+  background-color: #282828;
+  color: #fff;
+  padding: 10px 0;
+}
+html header h1, body header h1 {
+  font-size: 3em;
+  margin: 0;
+  text-align: center;
+}
+html article, body article {
+  flex-grow: 1;
+  padding: 25px;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+}
+html article .sidebar, body article .sidebar {
+  flex-grow: 0.1;
+  background-color: #f2f2f2;
+  padding: 5px 0;
+}
+html article .sidebar > div, body article .sidebar > div {
+  padding: 4px 10px;
+  transition: 0.2s ease;
+}
+html article .sidebar > div:hover, body article .sidebar > div:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+html article .content, body article .content {
+  flex-grow: 0.9;
+  background-color: #fff;
+}
+
+/*# sourceMappingURL=index.css.map */

@@ -3,3 +3,5 @@ __pycache__
 geckodriver.log
 *.json
 tmp/
+node_modules
+dist
