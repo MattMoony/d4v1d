@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "pretty": true,
+        "sourceMap": true,
+        "target": "ES6",
+        "outDir": "./dist",
+        "baseUrl": "./src"
+    },
+    "include": [
+        "./src/**/*.ts"
+    ]
+}
