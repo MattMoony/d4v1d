@@ -1,4 +1,7 @@
-# d4v1d.py
+<img src="server/public/media/logo.png" width="100px" align="right" />
+
+d4v1d.py
+========
 _Bibbidi-Bobbidi your data is now my property_
 
 ---
@@ -23,8 +26,6 @@ You should have the following things installed and setup.
 _Todo: Add a proper documentation_
 
 Execute `python d4v1d.py` and make yourself familiar with the CLI. (In case you need help, just type `?` or `help`). _Good luck!_
-
-![geese](server/public/media/goose.gif)
 
 ---
 
