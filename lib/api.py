@@ -2,7 +2,7 @@ import random, time, os, json
 import requests as req
 from lib import params, urls, misc
 
-SAFE_PAUSE = 10
+SAFE_PAUSE = 6
 
     # -- FUNCTIONS -------------------------------------------------------------------------------------------- #
 

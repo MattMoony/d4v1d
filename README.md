@@ -1,10 +1,5 @@
-<div style="display: flex;justify-content: space-between; align-items: center">
-    <div>
-        <h1>d4v1d.py</h1>
-        <i>Bibbidi-Bobbidi your data is now my property</i>
-    </div>
-    <img src="server/public/media/logo.png" width="100px" />
-</div>
+# d4v1d.py
+_Bibbidi-Bobbidi your data is now my property_
 
 ---
 
@@ -28,6 +23,8 @@ You should have the following things installed and setup.
 _Todo: Add a proper documentation_
 
 Execute `python d4v1d.py` and make yourself familiar with the CLI. (In case you need help, just type `?` or `help`). _Good luck!_
+
+![geese](server/public/media/goose.gif)
 
 ---
 

@@ -9,7 +9,6 @@ html, body {
   justify-content: stretch;
   align-items: stretch;
   flex-direction: column;
-  overflow: hidden;
 }
 html h1, body h1 {
   font-family: "Libre Barcode 128 Text", sans-serif;
@@ -87,10 +86,68 @@ html article > div:last-child, body article > div:last-child {
   background-color: #fff;
   margin-left: 15px;
   position: relative;
+  overflow: hidden;
 }
 html article > div:last-child .content, body article > div:last-child .content {
+  display: block;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+}
+html article > div:last-child .content .start, body article > div:last-child .content .start {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: #f8f8f8;
+}
+html article > div:last-child .content .start > span, body article > div:last-child .content .start > span {
+  display: block;
+  font-size: 1.8em;
+  font-family: "Ubuntu Mono", monospace;
+  background-color: #323232;
+  color: #fff;
+  width: 50%;
+  padding: 7.5px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 1px 1.5px 2.5px #282828;
+  overflow: hidden;
+  text-align: center;
+  letter-spacing: 5px;
+}
+@keyframes leet {
+  0% {
+    transform: translateX(-300%);
+    color: #fff;
+  }
+  25% {
+    color: #f88;
+  }
+  50% {
+    transform: translateX(0);
+    color: #8f8;
+  }
+  75% {
+    color: #88f;
+  }
+  100% {
+    transform: translateX(300%);
+    color: #fff;
+  }
+}
+html article > div:last-child .content .start > span > span, body article > div:last-child .content .start > span > span {
+  display: inline-block;
+  animation: leet 3s linear 0s infinite forwards;
+}
+html article > div:last-child .content .start > img, body article > div:last-child .content .start > img {
+  margin-top: 25px;
+  border: 5px solid #e8e8e8;
+  border-radius: 10px;
+  opacity: 0.8;
+  width: 50%;
 }
 html article > div:last-child .content.error, body article > div:last-child .content.error {
   display: flex;

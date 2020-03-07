@@ -41,57 +41,63 @@ window.onload = () => {
     let net = null;
     let ndata = {};
     let done = [];
+    let can = null;
+    const OPTIONS = {
+        autoResize: false,
+        layout: {
+            improvedLayout: false,
+        },
+        physics: {
+            enabled: true,
+            barnesHut: {
+                gravitationalConstant: -10_000,
+                damping: 1,
+                // avoidOverlap: 1,
+            },
+        },
+        nodes: {
+            size: 10,
+            borderWidth: 0.5,
+            color: {
+                background: '#33FFD1',
+                border: '#13604E',
+            },
+        },
+        edges: {
+            arrows: {
+                to: true,
+            },
+            smooth: {
+                enabled: true,
+                type: 'continuous',
+            },
+            color: {
+                color: '#e0e0e0',
+                highlight: '#FF33C7',
+            },
+        },
+        interaction: {
+            dragNodes: true,
+            hideEdgesOnDrag: false,
+        }
+    };
+    let opts = OPTIONS;
+    let SCALEF = 2500;
 
-    function set_cu(user) {
+    function set_cu(user, focus=false) {
         cu._.href = `https://instagram.com/${user.username}`;
         cu.profile.src = user.profile_pic_url || `/media/anon.jpg`;
         cu.private.style.display = user.is_private ? 'inline' : 'none';
         cu.username.innerHTML = user.username;
         cu.verified.style.display = user.is_verified ? 'inline' : 'none';
         cu.fullname.innerHTML = user.full_name || '';
-        net.focus(user.username);
+        if (focus) net.focus(user.username);
     }
 
     function create_net(data) {
-        let opts = {
-            layout: {
-                improvedLayout: false,
-            },
-            physics: {
-                enabled: true,
-                barnesHut: {
-                    gravitationalConstant: -100_000,
-                    damping: 1,
-                    avoidOverlap: 1,
-                },
-            },
-            nodes: {
-                size: 10,
-                borderWidth: 0.5,
-                color: {
-                    background: '#33FFD1',
-                    border: '#13604E',
-                },
-            },
-            edges: {
-                arrows: {
-                    to: true,
-                },
-                smooth: {
-                    enabled: true,
-                    type: 'continuous',
-                },
-                color: {
-                    color: '#e0e0e0',
-                    highlight: '#FF33C7',
-                },
-            },
-            interaction: {
-                dragNodes: true,
-                hideEdgesOnDrag: false,
-            }
-        };
+        opts = OPTIONS;
         let netw = new vis.Network(co, data, opts);
+        can = co.getElementsByTagName('canvas')[0];
         netw.on('click', params => {
             let nid = params.nodes[0];
             if (typeof nid === 'undefined') return;
@@ -117,12 +123,15 @@ window.onload = () => {
         if (net) {
             net.destroy();
             net = null;
+            can = null;
         }
         ndata = {
             nodes: new vis.DataSet([]),
             edges: new vis.DataSet([]),
         };
         net = create_net(ndata);
+        opts.physics.barnesHut.gravitationalConstant = -ndata.nodes.length*SCALEF;
+        window.onresize();
         net.addNodeMode();
         (async () => {
             for (let n of saved.nodes) {
@@ -154,6 +163,11 @@ window.onload = () => {
         if (d > 0) {
             let reso = await get_followers(user.username);
             let resi = await get_following(user.username);
+            let amount = (reso.success ? reso.followers.length : 0)
+                         + (resi.success ? resi.following.length : 0);
+            opts.physics.barnesHut.gravitationalConstant -= amount*SCALEF;
+            net.setOptions(opts);
+            // console.log(`Updating ... ${opts.physics.barnesHut.gravitationalConstant}`);
             done.push(user.username);
             for (let f of [...(reso.success ? reso.followers : []), ...(resi.success ? resi.following : []), ]) {
                 if (!done.includes(f.username)) {
@@ -178,6 +192,7 @@ window.onload = () => {
         };
         done = [];
         net = create_net(ndata);
+        window.onresize();
         build_plot_r({ username: uname, });
     }
 
@@ -186,7 +201,7 @@ window.onload = () => {
             let uname = uin.value;
             if (net && ndata.nodes.get(uname)) {
                 net.selectNodes([ uname, ]);
-                set_cu(ndata.nodes.get(uname).user);
+                set_cu(ndata.nodes.get(uname).user, true);
                 uin.value = '';
                 uin.blur();
             } 
@@ -203,6 +218,28 @@ window.onload = () => {
         } else if (e.keyCode === 83 && e.ctrlKey) { // <Ctrl> + s
             e.preventDefault();
             save_net();
+        } else if (e.keyCode === 71 && e.ctrlKey) { // <Ctrl> + g
+            e.preventDefault();
+            let g = +window.prompt('Enter new gravitational constant: ');
+            if (!isNaN(g) && net) {
+                opts.physics.barnesHut.gravitationalConstant = g;
+                net.setOptions(opts);
+                net.redraw();
+            }
+        }
+    };
+
+    let i = 0;
+    window.onresize = () => {
+        // console.log(`${i++}: ${Boolean(can) && Boolean(net)}`);
+        if (can && net) {
+            let { width, height } = co.getBoundingClientRect();
+            let w = `${width}px`, h = `${height}px`;
+            // console.log(w, h);
+            can.style.width = w;
+            can.style.height = h;
+            net.setSize(w, h);
+            net.redraw();
         }
     };
 };
