@@ -7,18 +7,38 @@
 
     <link rel="stylesheet" type="text/css" href="/style/index.css" />
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://kit.fontawesome.com/eeafe44cad.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
-        <h1>d4v1d</h1>
+        <a href="/"><h1>d4v1d</h1></a>
+        <input id="file-input" type="file" />
+        <i id="open-file" class="far fa-folder-open" title="Open"></i>
     </header>
     <article>
         <div class="sidebar">
+            <h3>Accounts</h3>
             {{#users}}
                 <div>{{name}}</div>
             {{/users}}
         </div>
-        <div class="content">
+        <div>
+            <div class="content">
+            </div>
+            <div class="overlay">
+                <a id="cu-user" href="https://instagram.com/matt_moony" target="_blank" referrerpolicy="no-referrer">
+                    <img id="cu-profile" src="/media/anon.jpg" />
+                    <div>
+                        <h3>
+                            <span id="cu-private">🔒</span>
+                            <span id="cu-username">username</span>
+                            <span id="cu-verified">✔️</span>
+                        </h3>
+                        <p id="cu-fullname">Max Mustermann</p>
+                    </div>
+                </a>
+                <input id="user-in" type="search" placeholder="e.g.: matt_moony" spellcheck="false" autocomplete="off" />
+            </div>
         </div>
     </article>
     <script src="/scripts/index.js"></script>

@@ -1,4 +1,5 @@
 import * as express from 'express';
+import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as handlebars from 'handlebars';
@@ -14,34 +15,57 @@ if (fs.existsSync(path.join(__dirname, '../config/conf.json'))) {
 const PUBLIC: string = path.join(__dirname, '../public');
 const TMP: string = path.join(__dirname, '../../tmp');
 
+function dirs_with(uname: string, c: string, fname: string, dir: string = TMP): Promise<string> {
+    let upath: string = path.join(TMP, uname);
+    return new Promise((resolve, reject) => {
+        fs.exists(upath, _ex => {
+            if (!_ex) return reject({ msg: 'Not scraped', });
+            fs.readdir(upath, (err, files) => {
+                if (err) return reject({ code: 500, msg: 'Internal error', });
+                let qgs: string[] = files.filter(f => f.startsWith(c)).sort();
+                if (qgs.length === 0) return reject({ msg: 'Not scraped', });
+                let qg: string;
+                do {
+                    qg = path.join(upath, qgs.pop(), fname);
+                } while (!fs.existsSync(qg) && qgs.length > 0);
+                if (!fs.existsSync(qg)) return reject({ msg: 'No valid files', });
+                resolve(`{ "success": true, "${fname.split('.')[0]}": ${fs.readFileSync(qg).toString()} }`);
+            });
+        });
+    });
+}
+
 const app: express.Express = express();
 app.get('/', (req, res) => {
     fs.readFile(path.join(PUBLIC, 'index.html'), (err, data) => {
         if (err) return res.status(500).send('Internal Server Error!');
-        let temp: handlebars.Template = handlebars.compile(data.toString());
-        res.send(temp({
-            users: [],
-        }));
+        fs.readdir(TMP, (err, files) => {
+            if (err) return res.status(500).send('Internal Server Error!');
+            let temp: handlebars.Template = handlebars.compile(data.toString());
+            res.send(temp({
+                users: files.filter(f => fs.lstatSync(path.join(TMP, f)).isDirectory()).map(f => { return { name: f, }; }),
+            }));
+        });
     });
 });
 app.get('/api/followers/:uname', (req, res) => {
-    let upath: string = path.join(TMP, req.params.uname);
-    fs.exists(upath, _ex => {
-        if (!_ex) return res.status(400).send('User hasn\'t been scraped yet!');
-        fs.readdir(upath, (err, files) => {
-            if (err) return res.status(500).send('Internal Server Error!');
-            let ogs: string[] = files.filter(f => f.startsWith('o')).sort();
-            if (ogs.length === 0) return res.status(400).send('No records exist!');
-            let og: string;
-            do {
-                og = path.join(upath, ogs.pop(), 'followers.json');
-                console.log(og);
-            } while (!fs.existsSync(og) && ogs.length > 0);
-            if (!fs.existsSync(og)) return res.status(400).send('No records exist!');
-            res.setHeader('Content-Type', 'application/json');
-            res.send(fs.readFileSync(og).toString());
-        });
-    })
+    res.setHeader('Content-Type', 'application/json');
+    dirs_with(req.params.uname, 'o', 'followers.json')
+        .then(msg => res.send(msg))
+        .catch(msg => res.status(msg.code ? msg.code : 200).send(JSON.stringify({ success: false, msg: msg.msg, })));
+});
+app.get('/api/following/:uname', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    dirs_with(req.params.uname, 'i', 'following.json')
+        .then(msg => res.send(msg))
+        .catch(msg => res.status(msg.code ? msg.code : 200).send(JSON.stringify({ success: false, msg: msg.msg, })));
 });
 app.use('/', express.static(PUBLIC));
-app.listen(conf.port, () => console.log(` [d4v1d-s3rv3r]: Listening on :${conf.port} ... `));
+
+const server: http.Server = http.createServer(app);
+server.listen(conf.port, () => console.log(` [d4v1d-s3rv3r]: Listening on :${conf.port} ... `));
+
+process.on('SIGTERM', () => {
+    console.log('Closing ... ');
+    server.close();
+});

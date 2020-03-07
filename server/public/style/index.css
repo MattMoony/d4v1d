@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Libre+Barcode+128+Text&family=Roboto&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Libre+Barcode+128+Text&family=Roboto&family=Ubuntu+Mono&display=swap");
 html, body {
   margin: 0;
   padding: 0;
@@ -9,19 +9,43 @@ html, body {
   justify-content: stretch;
   align-items: stretch;
   flex-direction: column;
+  overflow: hidden;
 }
-html h1, html h2, html h3, html h4, html h5, html h6, body h1, body h2, body h3, body h4, body h5, body h6 {
+html h1, body h1 {
   font-family: "Libre Barcode 128 Text", sans-serif;
+}
+html h2, html h3, html h4, html h5, html h6, body h2, body h3, body h4, body h5, body h6 {
+  font-family: "Ubuntu Mono", sans-serif;
 }
 html header, body header {
   background-color: #282828;
   color: #fff;
-  padding: 10px 0;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0.5px 2.5px #444;
 }
-html header h1, body header h1 {
+html header a, body header a {
+  text-decoration: none;
+  color: inherit;
+}
+html header a h1, body header a h1 {
   font-size: 3em;
   margin: 0;
-  text-align: center;
+  font-weight: normal;
+}
+html header input[type=file], body header input[type=file] {
+  display: none;
+}
+html header i, body header i {
+  font-size: 1.5em;
+  transition: 0.2s ease;
+}
+html header i:hover, body header i:hover {
+  cursor: pointer;
+  opacity: 0.8;
+  transform: scale(1.1);
 }
 html article, body article {
   flex-grow: 1;
@@ -29,23 +53,101 @@ html article, body article {
   display: flex;
   justify-content: stretch;
   align-items: stretch;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 html article .sidebar, body article .sidebar {
-  flex-grow: 0.1;
   background-color: #f2f2f2;
-  padding: 5px 0;
+  min-width: 200px;
+  height: 100%;
+  overflow-y: auto;
+  border-radius: 4px;
+}
+html article .sidebar > h3, body article .sidebar > h3 {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 html article .sidebar > div, body article .sidebar > div {
-  padding: 4px 10px;
+  padding: 4px 15px;
   transition: 0.2s ease;
+}
+html article .sidebar > div.active, body article .sidebar > div.active {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 html article .sidebar > div:hover, body article .sidebar > div:hover {
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.1);
 }
-html article .content, body article .content {
-  flex-grow: 0.9;
+html article > div:last-child, body article > div:last-child {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
   background-color: #fff;
+  margin-left: 15px;
+  position: relative;
 }
-
-/*# sourceMappingURL=index.css.map */
+html article > div:last-child .content, body article > div:last-child .content {
+  width: 100%;
+  height: 100%;
+}
+html article > div:last-child .content.error, body article > div:last-child .content.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f8f8;
+  font-style: italic;
+  color: #333;
+}
+html article > div:last-child .content .vis-network:focus, html article > div:last-child .content canvas:focus, body article > div:last-child .content .vis-network:focus, body article > div:last-child .content canvas:focus {
+  outline: none;
+}
+html article > div:last-child .overlay, body article > div:last-child .overlay {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #fff;
+  padding: 7.5px;
+  border: 1.5px solid #f2f2f2;
+  border-radius: 15px 0 0 0;
+}
+html article > div:last-child .overlay #cu-user, body article > div:last-child .overlay #cu-user {
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+html article > div:last-child .overlay #cu-user #cu-profile, body article > div:last-child .overlay #cu-user #cu-profile {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+html article > div:last-child .overlay #cu-user > div:last-child > h3, body article > div:last-child .overlay #cu-user > div:last-child > h3 {
+  margin: 0;
+}
+html article > div:last-child .overlay #cu-user > div:last-child > h3 *, body article > div:last-child .overlay #cu-user > div:last-child > h3 * {
+  vertical-align: middle;
+}
+html article > div:last-child .overlay #cu-user > div:last-child > h3 #cu-private, html article > div:last-child .overlay #cu-user > div:last-child > h3 #cu-verified, body article > div:last-child .overlay #cu-user > div:last-child > h3 #cu-private, body article > div:last-child .overlay #cu-user > div:last-child > h3 #cu-verified {
+  font-size: 0.7em;
+  display: none;
+}
+html article > div:last-child .overlay #cu-user > div:last-child #cu-fullname, body article > div:last-child .overlay #cu-user > div:last-child #cu-fullname {
+  margin: 0;
+  margin-top: 10px;
+  font-size: 0.8em;
+  color: #444;
+}
+html article > div:last-child .overlay #user-in, body article > div:last-child .overlay #user-in {
+  margin-top: 15px;
+  width: 100%;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  padding: 5px 10px;
+}
+html article > div:last-child .overlay #user-in:focus, body article > div:last-child .overlay #user-in:focus {
+  outline: none;
+}

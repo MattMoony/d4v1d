@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Libre+Barcode+128+Text&family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Barcode+128+Text&family=Roboto&family=Ubuntu+Mono&display=swap');
 
 html, body {
     margin: 0;
@@ -10,20 +10,49 @@ html, body {
     justify-content: stretch;
     align-items: stretch;
     flex-direction: column;
+    overflow: hidden;
 
-    h1, h2, h3, h4, h5, h6 {
+    h1 {
         font-family: 'Libre Barcode 128 Text', sans-serif;
+    }
+
+    h2, h3, h4, h5, h6 {
+        font-family: 'Ubuntu Mono', sans-serif;
     }
 
     header {
         background-color: #282828;
         color: #fff;
-        padding: 10px 0; 
+        padding: 10px 15px; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 .5px 2.5px #444;
 
-        h1 {
-            font-size: 3em;
-            margin: 0;
-            text-align: center;
+        a {
+            text-decoration: none;
+            color: inherit;
+
+            h1 {
+                font-size: 3em;
+                margin: 0;
+                font-weight: normal;
+            }
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        i {
+            font-size: 1.5em;
+            transition: .2s ease;
+
+            &:hover {
+                cursor: pointer;
+                opacity: .8;
+                transform: scale(1.1);
+            }
         }
     }
 
@@ -33,15 +62,30 @@ html, body {
         display: flex;
         justify-content: stretch;
         align-items: stretch;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
 
         .sidebar {
-            flex-grow: .1;
             background-color: #f2f2f2;
-            padding: 5px 0;
+            min-width: 200px;
+            height: 100%;
+            overflow-y: auto;
+            border-radius: 4px;
+
+            & > h3 {
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
 
             & > div {
-                padding: 4px 10px;
+                padding: 4px 15px;
                 transition: .2s ease;
+
+                &.active {
+                    background-color: rgba(0,0,0,.2);
+                }
 
                 &:hover {
                     cursor: pointer;
@@ -50,9 +94,92 @@ html, body {
             }
         }
 
-        .content {
-            flex-grow: .9;
+        & > div:last-child {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
             background-color: #fff;
+            margin-left: 15px;
+            position: relative;
+
+            .content {
+                width: 100%;
+                height: 100%;
+                
+                &.error {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background-color: #f8f8f8;
+                    font-style: italic;
+                    color: #333;
+                }
+
+                .vis-network, canvas {
+                    &:focus {
+                        outline: none;
+                    }
+                }
+            }
+
+            .overlay {
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                background-color: #fff;
+                padding: 7.5px;
+                border: 1.5px solid #f2f2f2;
+                border-radius: 15px 0 0 0;
+
+                #cu-user {
+                    display: flex;
+                    justify-content: stretch;
+                    align-items: center;
+                    text-decoration: none;
+                    color: inherit;
+
+                    #cu-profile {
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        margin-right: 10px;
+                    }
+
+                    & > div:last-child {
+                        & > h3 {
+                            margin: 0;
+    
+                            * {
+                                vertical-align: middle;
+                            }
+    
+                            #cu-private, #cu-verified {
+                                font-size: 0.7em;
+                                display: none;
+                            }
+                        }
+                        
+                        #cu-fullname {
+                            margin: 0;
+                            margin-top: 10px;
+                            font-size: .8em;
+                            color: #444;
+                        }
+                    }
+                }
+
+                #user-in {
+                    margin-top: 15px;
+                    width: 100%;
+                    border: 1px solid #e8e8e8;
+                    border-radius: 4px;
+                    padding: 5px 10px;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+            }
         }
     }
 }

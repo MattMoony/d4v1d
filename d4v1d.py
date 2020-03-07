@@ -22,6 +22,7 @@ def main():
             code = cmd.handle(misc.prompt(cmd.__bot), args.debug)
     except KeyboardInterrupt:
         print()
+        cmd.__cleanup()
     cmd.clear()
 
 if __name__ == '__main__':

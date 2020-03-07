@@ -29,7 +29,11 @@ def prompt(bot=None, lbl='d4v1d'):
 def print_dict(title, d):
     print(' {}{}{}{}{}'.format(cm.Style.BRIGHT, cm.Fore.LIGHTGREEN_EX, title, cm.Fore.RESET, cm.Style.RESET_ALL))
     for k, v in d.items():
-        print(' \t{}{}: {}{}'.format(cm.Style.BRIGHT, k, cm.Style.RESET_ALL, v))
+        print(' \t{}{}: {}'.format(cm.Style.BRIGHT, k, cm.Style.RESET_ALL), end='')
+        if type(v) == int or type(v) == float:
+            print('{:,d}'.format(v))
+        else:
+            print(str(v))
 
 def printl(c='='):
     print(c*shutil.get_terminal_size().columns)

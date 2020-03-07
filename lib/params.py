@@ -2,6 +2,7 @@ import os.path
 
 BASE_PATH = os.path.abspath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
 TMP_PATH = os.path.abspath(os.path.join(BASE_PATH, 'tmp'))
+SRV_PATH = os.path.abspath(os.path.join(BASE_PATH, 'server'))
 
 IG_SIG_KEY = '19ce5f445dbfd9d29c59dc2a78c616a7fc090a8e018b9267bc4240a30244c53b'
 IG_CAPABILITIES = '3brTvw=='

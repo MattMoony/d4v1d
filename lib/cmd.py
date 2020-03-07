@@ -1,4 +1,4 @@
-import os, argparse, traceback, datetime, time, json
+import os, argparse, traceback, datetime, time, json, webbrowser, shutil
 from lib import misc, bot, api, params
 from selenium import webdriver
 import colorama as cm
@@ -11,6 +11,12 @@ class ArgumentParser(argparse.ArgumentParser):
     def error(self, msg):
         print(' %s' % msg)
         raise argparse.ArgumentError()
+
+def __cleanup():
+    if __driver:
+        __driver.quit()
+    if __server:
+        __server.terminate()
 
 # -- FUNCTIONS ------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -85,66 +91,43 @@ def get(*args):
     if len(args) < 2:
         misc.print_err(args[0], 'Missing arguments "{} <opt.>"'.format(args[0]))
         return FAILURE
-    elif args[1] in ('v', 'overview'):
-        parser = ArgumentParser()
-        parser.add_argument('user', help='Specifies the target username ... ')
-        try:
-            args = parser.parse_args(args[2:])
-            misc.print_dict('Overview: {}'.format(args.user), { k.title().replace('_', ' '): v for k, v in api.get_user_overview(args.user, headers=__bot.headers if __bot else {}).items()})
-        except argparse.ArgumentError:
-            return FAILURE
-    elif args[1] in ('o', 'followers'):
-        if not __bot:
-            print(' You need to be logged in!')
-            return FAILURE
-        parser = ArgumentParser()
-        parser.add_argument('user', help='Specifies the target username ... ')
-        parser.add_argument('-d', '--dest', help='Specifies the output directory ...', default=None)
-        try:
-            args = parser.parse_args(args[2:])
-            args.dest = args.dest or os.path.abspath(os.path.join(params.TMP_PATH, '{}/o{}'.format(args.user, str(time.time()))))
-            if not os.path.isdir(args.dest):
-                os.makedirs(args.dest)
-            fs = __bot.get_followers(api.get_userid(args.user))
-            p = os.path.abspath(os.path.join(args.dest, 'followers.json'))
-            print(' Storing in "%s" ... ' % p)
-            with open(p, 'w') as f:
-                json.dump(fs, f, indent=4, sort_keys=True)
-        except argparse.ArgumentError:
-            return FAILURE
-    elif args[1] in ('i', 'following'):
-        if not __bot:
-            print(' You need to be logged in!')
-            return FAILURE
-        parser = ArgumentParser()
-        parser.add_argument('user', help='Specifies the target username ... ')
-        parser.add_argument('-d', '--dest', help='Specifies the output directory ...', default=None)
-        try:
-            args = parser.parse_args(args[2:])
-            args.dest = args.dest or os.path.abspath(os.path.join(params.TMP_PATH, '{}/i{}'.format(args.user, str(time.time()))))
-            if not os.path.isdir(args.dest):
-                os.makedirs(args.dest)
-            fs = __bot.get_following(api.get_userid(args.user))
-            p = os.path.abspath(os.path.join(args.dest, 'following.json'))
-            print(' Storing in "%s" ... ' % p)
-            with open(p, 'w') as f:
-                json.dump(fs, f, indent=4, sort_keys=True)
-        except argparse.ArgumentError:
-            return FAILURE
-    elif args[1] in ('m', 'media'):
-        parser = ArgumentParser()
-        parser.add_argument('user', help='Specifies the target username ... ')
-        parser.add_argument('-d', '--dest', help='Specifies the output directory ...', default=None)
-        try:
-            args = parser.parse_args(args[2:])
-            api.get_media(args.user, args.dest, __bot.session if __bot else None)
-        except argparse.ArgumentError:
-            return FAILURE
-
     elif args[1] in ('?', 'help'):
         misc.print_dict('Help: "{} <opt.>"'.format(args[0]), HELP['get, dump']['opts'])
     else:
-        misc.print_err(args[0], 'Unknown option "{}"'.format(args[1]))
+        if len(args) < 3:
+            misc.print_err(args[0], 'Missing arguments "{} {} <user>"'.format(args[0], args[1]))
+        elif args[1] in ('v', 'overview'):
+            misc.print_dict('Overview: {}'.format(args[2]), { k.title().replace('_', ' '): v for k, v in api.get_user_overview(args[2], headers=__bot.headers if __bot else {}).items()})
+        elif args[1] in ('o', 'followers'):
+            if not __bot:
+                misc.print_err(args[0], 'You need to be logged in!')
+                return FAILURE
+            fs = __bot.get_followers(args[2])
+            if len(fs) == 0:
+                misc.print_wrn(args[0], 'No followers found. Maybe the account is private?')
+                return FAILURE
+            print(' Downloaded {}{}{} followers.'.format(cm.Style.BRIGHT, len(fs), cm.Style.RESET_ALL))
+        elif args[1] in ('i', 'following'):
+            if not __bot:
+                misc.print_err(args[0], 'You need to be logged in!')
+                return FAILURE
+            fs = __bot.get_following(args[2])
+            if len(fs) == 0:
+                misc.print_wrn(args[0], 'No following found. Maybe the account is private?')
+                return FAILURE
+            print(' Downloaded {}{}{} following-connections.'.format(cm.Style.BRIGHT, len(fs), cm.Style.RESET_ALL))
+        elif args[1] in ('m', 'media'):
+            api.get_media(args[2], None, __bot.session if __bot else None)
+        else:
+            if len(args) < 4:
+                misc.print_err('get', 'Missing arguments "{} {} {} <user2>"'.format(*args))
+            elif args[1] in ('p', 'path'):
+                u1, u2 = args[2:]
+                if not __bot:
+                    misc.print_err(args[0], 'You need to be logged in!')
+                    return FAILURE
+                shp = __bot.shortest_path(u2, u1)
+                print(shp[0][1] + ''.join([' {} '.format('->' if i[0] else '<-') + i[1] for i in shp[1:]]))
     return SUCCESS
 
 def man(*args):
@@ -162,26 +145,35 @@ def man(*args):
     return SUCCESS
 
 def ls(*args):
+    uname = None
     if len(args) == 2 and args[1] in ('?', 'help'):
         misc.print_dict('Help: "{} <opt.>"'.format(args[0]), HELP['ls, dir, list']['opts'])
         return SUCCESS
+    elif len(args) == 2 and args[1].startswith('-u'):
+        uname = args[1][2:]
+        d = os.path.join(params.TMP_PATH, uname)
+        if not os.path.isdir(d):
+            misc.print_err('ls', 'User hasn\'t been scraped yet!')
+            return FAILURE
 
     for u in [d for d in os.listdir(params.TMP_PATH) if os.path.isdir(os.path.join(params.TMP_PATH, d))]:
+        if uname and u != uname:
+            continue
         print(' {}{}{}{}{}{}'.format(cm.Style.BRIGHT, cm.Fore.LIGHTGREEN_EX, u, '' if len(args) == 2 and args[1] in ('u', 'users') else ':', 
                                      cm.Fore.RESET, cm.Style.RESET_ALL))
         ds = [d for d in os.listdir(os.path.join(params.TMP_PATH, u)) if os.path.isdir(os.path.join(params.TMP_PATH, u, d))]
         mgs = list(filter(lambda d: d.startswith('m'), ds))
         ogs = list(filter(lambda d: d.startswith('o'), ds))
         igs = list(filter(lambda d: d.startswith('i'), ds))
-        if (len(args) < 2 or args[1] in ('m', 'media')) and len(mgs) > 0:
+        if (len(args) < 2 or uname or args[1] in ('m', 'media')) and len(mgs) > 0:
             print(' \tMedia: ')
             for mg in mgs:
                 print(' \t  -> Grab: %s' % datetime.datetime.fromtimestamp(float(mg[1:])).isoformat())
-        if (len(args) < 2 or args[1] in ('o', 'followers')) and len(ogs) > 0:
+        if (len(args) < 2 or uname or args[1] in ('o', 'followers')) and len(ogs) > 0:
             print(' \tFollowers: ')
             for og in ogs:
                 print(' \t  -> Grab: %s' % datetime.datetime.fromtimestamp(float(og[1:])).isoformat())
-        if (len(args) < 2 or args[1] in ('i', 'following')) and len(igs) > 0:
+        if (len(args) < 2 or uname or args[1] in ('i', 'following')) and len(igs) > 0:
             print(' \tFollowing: ')
             for ig in igs:
                 print(' \t  -> Grab: %s' % datetime.datetime.fromtimestamp(float(ig[1:])).isoformat())
@@ -189,9 +181,74 @@ def ls(*args):
 
 def browse(*args):
     global __server
+    cfile = os.path.join(params.SRV_PATH, 'config/conf.json')
+    if not os.path.isfile(cfile):
+        misc.print_err(args[0], '"{}" doesn\'t exist!'.format(cfile))
+        return FAILURE
     if not __server:
-        __server = sp.Popen(["node"])
-    
+        sfile = os.path.join(params.SRV_PATH, 'dist/server.js')
+        if not os.path.isfile(sfile):
+            misc.print_err(args[0], '"{}" doesn\'t exist. Have you run "npm build" yet?'.format(sfile))
+            return FAILURE
+        FNULL = open(os.devnull, 'w')
+        __server = sp.Popen(["node", sfile], stdout=FNULL, stderr=FNULL)
+    with open(cfile, 'r') as f:
+        conf = json.load(f)
+        try:
+            print(' Listening on http://localhost:%d ... ' % conf['port'])
+            webbrowser.open('http://localhost:{}'.format(conf['port']))
+        except KeyError:
+            misc.print_err(args[0], 'Error: Malformed configuration file!')
+    return SUCCESS
+
+def rm(*args):
+    if len(args) < 2:
+        misc.print_err(args[0], 'Missing arguments "{} <opt.>"'.format(args[0]))
+        return FAILURE
+    elif args[1] in ('?', 'help'):
+        misc.print_dict('Help: "{} <opt.>"'.format(args[0]), HELP['rm, del, remove, delete']['opts'])
+    elif args[1] in ('p', 'purge'):
+        count = 0
+        size = 0
+        for u in args[2].split(',') if len(args) >= 3 else os.listdir(params.TMP_PATH):
+            ud = os.path.join(params.TMP_PATH, u)
+            if not os.path.isdir(ud):
+                continue
+            print(' Purging "{}{}{}": '.format(cm.Fore.LIGHTGREEN_EX, u, cm.Fore.RESET), end='')
+            ds = os.listdir(ud)
+            print(' Media', end='')
+            mfs = list(filter(lambda d: d.startswith('m'), ds))
+            mfs.sort()
+            for m in mfs[:-1]:
+                size += sum([os.path.getsize(os.path.join(ud, m, f)) for f in os.listdir(os.path.join(ud, m)) if os.path.isfile(os.path.join(ud, m, f))])
+                count+=1
+                shutil.rmtree(os.path.join(ud, m))
+            print('✔️, Followers', end='')
+            ofs = list(filter(lambda d: d.startswith('o'), ds))
+            ofs.sort()
+            first = 0
+            for i, o in enumerate(ofs[::-1]):
+                if os.path.isfile(os.path.join(ud, o, 'followers.json')):
+                    first = len(ofs)-i-1
+                    break
+            for o in [*ofs[:first],*ofs[first+1:]]:
+                size += sum([os.path.getsize(os.path.join(ud, o, f)) for f in os.listdir(os.path.join(ud, o)) if os.path.isfile(os.path.join(ud, o, f))])
+                count+=1
+                shutil.rmtree(os.path.join(ud, o))
+            print('✔️, Following', end='')
+            ifs = list(filter(lambda d: d.startswith('i'), ds))
+            ifs.sort()
+            first = 0
+            for j, i in enumerate(ifs[::-1]):
+                if os.path.isfile(os.path.join(ud, i, 'following.json')):
+                    first = len(ifs)-j-1
+                    break
+            for i in [*ifs[:first],*ifs[first+1:]]:
+                size += sum([os.path.getsize(os.path.join(ud, i, f)) for f in os.listdir(os.path.join(ud, i)) if os.path.isfile(os.path.join(ud, i, f))])
+                count+=1
+                shutil.rmtree(os.path.join(ud, i))
+            print('✔️')
+        print(' Deleted {}{}{} directories, freeing up {}{:,.3f}{} MiB of space!'.format(cm.Style.BRIGHT, count, cm.Style.RESET_ALL, cm.Style.BRIGHT, size/2**20, cm.Style.RESET_ALL))
     return SUCCESS
 
 def he(*args):
@@ -204,8 +261,7 @@ def handle(com, debug=False):
             if com[0] in k:
                 rc = COMS[k](*com)
                 if rc == CLOSING:
-                    if __driver:
-                        __driver.quit()
+                    __cleanup()
                 return rc
         if com[0] == '':
             return SUCCESS
@@ -229,6 +285,7 @@ COMS = {
     ('man','manual',): man,
     ('ls','dir','list',): ls,
     ('br','browse',): browse,
+    ('rm','del','remove','delete',): rm,
     ('?','help','he',): he, 
 }
 HELP = {
@@ -265,6 +322,7 @@ HELP = {
             'o, followers': 'Get a list of all people that a certain user follows',
             'i, following': 'Get a list of all people that follow a certain user',
             'm, media': 'Download all the media a certain user has uploaded',
+            'p, path': 'Get the shortest path from one user to another',
             '?, help': 'Display this help',
         },
     },
@@ -283,6 +341,13 @@ HELP = {
     },
     'br, browse': {
         'desc': 'Browse the downloaded information in your browser',
+    },
+    'rm, del, remove, delete': {
+        'desc': 'Delete local items',
+        'opts': {
+            'p, purge': 'Remove all deprecated directories',
+            '?, help': 'Display this help',
+        },
     },
     '?, help, he': {
         'desc': 'Display help',

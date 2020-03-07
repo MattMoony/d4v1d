@@ -2,7 +2,9 @@ import random, time, os, json
 import requests as req
 from lib import params, urls, misc
 
-SAFE_PAUSE = 2
+SAFE_PAUSE = 10
+
+    # -- FUNCTIONS -------------------------------------------------------------------------------------------- #
 
 def get_user_info(username, headers={}):
     return req.get(urls.PUBLIC_INFO.format(username), headers=headers or gen_headers()).json()
