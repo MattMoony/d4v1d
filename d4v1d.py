@@ -8,7 +8,7 @@ def main():
     parser.add_argument('-d', '--debug', action='store_true', help='Debug mode?')
     args = parser.parse_args()
 
-    server.run()
+    server.run(args.debug)
     cmd.clear()
     misc.print_title("""
 ██████╗ ██╗  ██╗██╗   ██╗ ██╗██████╗ 

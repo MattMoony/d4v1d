@@ -23,6 +23,15 @@ __server = None
 def not_scraped():
     return Response(json.dumps(dict(msg='Not scraped!')), mimetype='application/json')
 
+def is_scraped(uname):
+    return os.path.isdir(os.path.join(params.TMP_PATH, uname)) and bool([d for d in os.listdir(os.path.join(params.TMP_PATH, uname)) if os.path.isdir(os.path.join(params.TMP_PATH, uname, d)) and d[0] in ('i','o',)])
+
+def create_user(u):
+    return {
+        **u,
+        'scraped': is_scraped(u['username']),
+    }
+
 @__app.route('/')
 @__app.route('/index.html')
 def index():
@@ -38,7 +47,10 @@ def followers(uname):
         return Response(json.dumps(dict(msg='Not scraped!')), mimetype='application/json')
     ogs.sort()
     with open(os.path.join(upath, ogs[-1], 'followers.json'), 'r') as f:
-        return Response('{{"success":true,"followers":{}}}'.format(f.read()), mimetype='application/json')
+        return Response(json.dumps({
+            'success': True,
+            'followers': list(map(create_user, json.load(f))),
+        }))
 
 @__app.route('/api/following/<uname>')
 def following(uname):
@@ -50,17 +62,23 @@ def following(uname):
         return not_scraped()
     igs.sort()
     with open(os.path.join(upath, igs[-1], 'following.json'), 'r') as f:
-        return Response('{{"success":true,"following":{}}}'.format(f.read()), mimetype='application/json')
+        return Response(json.dumps({
+            'success': True,
+            'following': list(map(create_user, json.load(f))),
+        }))
 
 @__app.route('/shut', methods=['POST',])
 def shut():
     request.environ.get('werkzeug.server.shutdown')()
 
-def run():
+def run(debug=False):
     global __server
     if not __server:
         __server = threading.Thread(target=__app.run, kwargs=dict(host=CONF['host'],port=CONF['port']))
         __server.start()
+    if debug:
+        LOG.disabled = False
+        __app.logger.disabled = False
 
 def stop():
     if __server:

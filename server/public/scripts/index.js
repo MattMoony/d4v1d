@@ -84,18 +84,20 @@ window.onload = () => {
     let opts = OPTIONS;
     
     const SCALEF = 2500;
-    const SLICES = 64;
+    const TIMEOUT = 1500;
 
     class InstaUser {
-        constructor(username, depth, data={}) {
+        constructor(username, depth, data=null) {
             this.username = username;
             this.depth = depth;
+            this.scraped = true;
             if (data) {
                 this.id = data.id;
                 this.full_name = data.full_name;
                 this.is_private = data.is_private;
                 this.is_verified = data.is_verified;
                 this.profile_pic_url = data.profile_pic_url;
+                this.scraped = data.scraped;
             }
         }
     }
@@ -204,6 +206,7 @@ window.onload = () => {
             prog.value = i++;
 
             c = q.shift();
+            if (!c.scraped) continue;
             
             let reso = await get_followers(c.username),
                 resi = await get_following(c.username);
@@ -231,6 +234,8 @@ window.onload = () => {
                     if (following.includes(f.username)) add_edge(c, f);
                 }
             }
+
+            await (async () => new Promise(resolve => window.setTimeout(resolve, TIMEOUT)))();
         }
     }
 
