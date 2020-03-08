@@ -38,9 +38,9 @@ window.onload = () => {
     opf.onclick = () => {
         fin.click();
     };
+    let prog = document.getElementById('progress');
     let net = null;
     let ndata = {};
-    let done = [];
     let can = null;
     const OPTIONS = {
         autoResize: false,
@@ -82,7 +82,23 @@ window.onload = () => {
         }
     };
     let opts = OPTIONS;
-    let SCALEF = 2500;
+    
+    const SCALEF = 2500;
+    const SLICES = 64;
+
+    class InstaUser {
+        constructor(username, depth, data={}) {
+            this.username = username;
+            this.depth = depth;
+            if (data) {
+                this.id = data.id;
+                this.full_name = data.full_name;
+                this.is_private = data.is_private;
+                this.is_verified = data.is_verified;
+                this.profile_pic_url = data.profile_pic_url;
+            }
+        }
+    }
 
     function set_cu(user, focus=false) {
         cu._.href = `https://instagram.com/${user.username}`;
@@ -152,34 +168,67 @@ window.onload = () => {
         return await (await fetch(`/api/following/${uname}`)).json();
     }
 
-    async function build_plot_r(user, d=2) {
-        if (!ndata.nodes.get(user.username)) ndata.nodes.add({ 
-            id: user.username, 
-            label: user.username, 
+    function add_node(user) {
+        ndata.nodes.add({
+            id: user.username,
+            label: user.username,
             shape: user.profile_pic_url ? 'circularImage' : 'dot',
             image: user.profile_pic_url,
             user: user,
         });
-        if (d > 0) {
-            let reso = await get_followers(user.username);
-            let resi = await get_following(user.username);
-            let amount = (reso.success ? reso.followers.length : 0)
-                         + (resi.success ? resi.following.length : 0);
+    }
+
+    function add_edge(fuser, tuser) {
+        ndata.edges.add({
+            from: fuser.username,
+            to: tuser.username,
+        });
+    }
+    
+    function cedge(fuser, tuser) {
+        return {
+            from: fuser.username,
+            to: tuser.username,
+        };
+    }
+
+    async function build_plot_r(user, d=2) {
+        let q = [new InstaUser(user.username, 0),];
+        add_node(q[0]);
+        let a = [user.username];
+        let p = [];
+        let c = null;
+        let i = 0;
+        while (q.length > 0) {
+            prog.max = i+q.length;
+            prog.value = i++;
+
+            c = q.shift();
+            
+            let reso = await get_followers(c.username),
+                resi = await get_following(c.username);
+            let _followers = reso.success ? reso.followers : [],
+                _following = resi.success ? resi.following : [];
+            let followers = _followers.map(f => f.username),
+                following = _following.map(f => f.username);
+            let all = [..._followers, ..._following.filter(f => !followers.includes(f.username)), ];
+
+            if (all.length > 0) p.push(c.username);
+
+            let amount = followers.length+following.length;
             opts.physics.barnesHut.gravitationalConstant -= amount*SCALEF;
             net.setOptions(opts);
-            // console.log(`Updating ... ${opts.physics.barnesHut.gravitationalConstant}`);
-            done.push(user.username);
-            for (let f of [...(reso.success ? reso.followers : []), ...(resi.success ? resi.following : []), ]) {
-                if (!done.includes(f.username)) {
-                    await build_plot_r(f, d-1);
-                    if (reso.success && reso.followers.map(f => f.username).includes(f.username)) ndata.edges.add({ 
-                        from: f.username, 
-                        to: user.username, 
-                    });
-                    if (resi.success && resi.following.map(f => f.username).includes(f.username)) ndata.edges.add({ 
-                        from: user.username, 
-                        to: f.username, 
-                    });
+
+            for (let f of all) {
+                f = new InstaUser(f.username, c.depth+1, f);
+                if (!a.includes(f.username)) {
+                    add_node(f);
+                    a.push(f.username);
+                    if (f.depth < d) q.push(f);
+                }
+                if (!p.includes(f.username)) {
+                    if (followers.includes(f.username)) add_edge(f, c);
+                    if (following.includes(f.username)) add_edge(c, f);
                 }
             }
         }
@@ -190,7 +239,6 @@ window.onload = () => {
             nodes: new vis.DataSet([]),
             edges: new vis.DataSet([]),
         };
-        done = [];
         net = create_net(ndata);
         window.onresize();
         build_plot_r({ username: uname, });

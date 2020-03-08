@@ -1,6 +1,5 @@
-import os, json, math, time, datetime
+import os, json, time
 import requests as req
-import plotly.graph_objects as go
 from queue import Queue
 from lib import api, urls, login, params, misc
 
@@ -99,90 +98,6 @@ class Bot(object):
             with open(os.path.join(outd, 'followers.json'), 'w') as f:
                 json.dump(fols, f, indent=4, sort_keys=True)
         return fols
-
-    def get_follower_nodes(self, username, d=2):
-        if d == 0:
-            return ([], [], [], [], [])
-        if api.get_follower_count(username, headers=self.headers) > 500:
-            return ([], [], [], [], [])
-        print('[*] Indexing {} ... '.format(username))
-
-        followers = self.get_followers(username)
-
-        if len(followers) == 0:
-            return ([], [], [], [], [])
-
-        phi = 2*math.pi/len(followers)
-        r = [20, 30, 40, 50]
-        node_x = [0]
-        node_y = [0]
-        edge_x = []
-        edge_y = []
-        node_text = [username]
-
-        for i, _ in enumerate(followers):
-            node_x.append(math.cos(i*phi)/r[i%len(r)])
-            node_y.append(math.sin(i*phi)/r[i%len(r)])
-            edge_x.append(0)
-            edge_y.append(0)        
-            edge_x.append(node_x[-1])
-            edge_y.append(node_y[-1])
-            edge_x.append(None)
-            edge_y.append(None)
-
-        for f in followers:
-            fnx, fny, fex, fey, ntxt = self.get_follower_nodes(f['username'], d-1)
-            node_x = [*node_x, *fnx]
-            node_y = [*node_y, *fny]
-            edge_x = [*edge_x, *fex]
-            edge_y = [*edge_y, *fey]
-            node_text = [*node_text, *ntxt]
-
-        return (node_x, node_y, edge_x, edge_y, node_text)
-
-    def plot_followers(self, username):
-        node_x, node_y, edge_x, edge_y, node_text = self.get_follower_nodes(username)
-
-        edge_trace = go.Scatter(
-            x=edge_x, y=edge_y,
-            line=dict(width=0.5, color='#D2C2FF'),
-            hoverinfo='none',
-            mode='lines'
-        )
-
-        node_trace = go.Scatter(
-            x=node_x, y=node_y,
-            mode='text',
-            hoverinfo='text',
-            text=[],
-            marker=dict(
-                showscale=True,
-                colorscale='Electric',
-                reversescale=True,
-                color=[],
-                size=10,
-                line_width=2
-            )
-        )
-
-        node_trace.text = node_text
-
-        fig = go.Figure(data=[edge_trace, node_trace],
-                     layout=go.Layout(
-                        title='{}\'{} followers'.format(username, 's' if not username.endswith('s') else ''),
-                        titlefont_size=16,
-                        showlegend=False,
-                        hovermode='closest',
-                        margin=dict(b=20,l=5,r=5,t=40),
-                        annotations=[ dict(
-                            text='<i>{}</i>'.format(datetime.datetime.now().isoformat()),
-                            showarrow=False,
-                            xref="paper", yref="paper",
-                            x=0.005, y=-0.002 ) ],
-                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
-                        )
-        fig.show()
 
     def shortest_path(self, to, fr):
         q = Queue()
