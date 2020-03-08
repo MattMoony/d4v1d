@@ -18,9 +18,9 @@
     <article>
         <div class="sidebar">
             <h3>Accounts</h3>
-            {{#users}}
-                <div>{{name}}</div>
-            {{/users}}
+            {% for u in users %}
+                <div>{{u}}</div>
+            {% endfor %}
         </div>
         <div>
             <div class="content">

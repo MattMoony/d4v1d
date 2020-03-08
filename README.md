@@ -10,22 +10,33 @@ _Bibbidi-Bobbidi your data is now my property_
 
 Fun little side-project of mine that was totally inspired by the everyday activities of one of my friends. Hope you will somehow find a use for this.
 
-## Prerequisites
+## Setup
 
-You should have the following things installed and setup.
+You should have Python 3.* and pip already installed and configured on your system. Afterwards, all you need to do is run this to install all the necessary packages:
 
-* Python 3.*
-* pip
-* `pip install -r requirements.txt`
-* node
-* npm
-* `cd server && npm i && npm run build`
+```bash
+$ python -m pip install -r requirements.txt
+```
 
 ## Usage
 
 _Todo: Add a proper documentation_
 
-Execute `python d4v1d.py` and make yourself familiar with the CLI. (In case you need help, just type `?` or `help`). _Good luck!_
+To use the included console line command interpreter and to start the web-interface, simply run ...
+
+```bash
+$ python d4v1d.py
+```
+
+To access the web-interface either open [http://localhost:12864/](http://localhost:12864) in any browser, or execute ...
+
+```bash
+$ browse
+```
+
+... in the d4v1d-CLI, which will automatically open the web-interface in your default browser.
+
+If you ever feel lost in the CLI, just use the `help` command or `?` at anytime. _Happy h4xx0ring!_
 
 ---
 

@@ -2,5 +2,3 @@
 __pycache__
 geckodriver.log
 tmp/
-node_modules
-dist

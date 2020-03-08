@@ -15,8 +15,6 @@ class ArgumentParser(argparse.ArgumentParser):
 def __cleanup():
     if __driver:
         __driver.quit()
-    if __server:
-        __server.terminate()
 
 # -- FUNCTIONS ------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -180,18 +178,10 @@ def ls(*args):
     return SUCCESS
 
 def browse(*args):
-    global __server
     cfile = os.path.join(params.SRV_PATH, 'config/conf.json')
     if not os.path.isfile(cfile):
         misc.print_err(args[0], '"{}" doesn\'t exist!'.format(cfile))
         return FAILURE
-    if not __server:
-        sfile = os.path.join(params.SRV_PATH, 'dist/server.js')
-        if not os.path.isfile(sfile):
-            misc.print_err(args[0], '"{}" doesn\'t exist. Have you run "npm build" yet?'.format(sfile))
-            return FAILURE
-        FNULL = open(os.devnull, 'w')
-        __server = sp.Popen(["node", sfile], stdout=FNULL, stderr=FNULL)
     with open(cfile, 'r') as f:
         conf = json.load(f)
         try:
@@ -360,4 +350,3 @@ SUCCESS =  1
 
 __bot = None
 __driver = None
-__server = None
