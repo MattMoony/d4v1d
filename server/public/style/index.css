@@ -160,6 +160,21 @@ html article > div:last-child .content.error, body article > div:last-child .con
 html article > div:last-child .content .vis-network:focus, html article > div:last-child .content canvas:focus, body article > div:last-child .content .vis-network:focus, body article > div:last-child .content canvas:focus {
   outline: none;
 }
+html article > div:last-child .cons, body article > div:last-child .cons {
+  display: block;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #fff;
+  border: 1.5px solid #f2f2f2;
+  border-radius: 0 0 0 15px;
+  height: 150px;
+  overflow-y: auto;
+}
+html article > div:last-child .cons > div, html article > div:last-child .cons > h3, body article > div:last-child .cons > div, body article > div:last-child .cons > h3 {
+  padding: 7.5px;
+  margin: 0;
+}
 html article > div:last-child #progress, body article > div:last-child #progress {
   display: block;
   position: absolute;
