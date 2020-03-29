@@ -109,3 +109,10 @@ https://www.instagram.com/graphql/query/?query_hash=ba71ba2fcb5655e7e2f37b05aec0
 	"stories_video_dash_manifest":false
 }
 https://www.instagram.com/graphql/query/?query_hash=ba71ba2fcb5655e7e2f37b05aec0ff98&variables=%7B%22reel_ids%22%3A%5B%5D%2C%22tag_names%22%3A%5B%5D%2C%22location_ids%22%3A%5B%5D%2C%22highlight_reel_ids%22%3A%5B%2217991138781233601%22%2C%2218006667786165744%22%2C%2218005207839050522%22%5D%2C%22precomposed_overlay%22%3Afalse%2C%22show_story_viewer_list%22%3Atrue%2C%22story_viewer_fetch_count%22%3A50%2C%22story_viewer_cursor%22%3A%22%22%2C%22stories_video_dash_manifest%22%3Afalse%7D
+
+// tagged
+https://www.instagram.com/graphql/query/?query_hash=ff260833edf142911047af6024eb634a&variables=%7B%22id%22%3A%2219318909%22%2C%22first%22%3A12%7D
+https://www.instagram.com/graphql/query/?query_hash=ff260833edf142911047af6024eb634a&variables={
+	"id":"19318909",
+	"first":12
+}

@@ -1,7 +1,7 @@
-import os, json, time
+import os, json, time, threading
 import requests as req
 from queue import Queue
-from lib import api, urls, login, params, misc
+from lib import api, urls, login, params, misc, cache
 
 CACHE_PATH = 'cache.json'
 TIMEOUT = 60*60*12
@@ -22,26 +22,17 @@ class UNode(object):
         return hash((self.id, self.fr))
 
 class Bot(object):
-    def __init__(self, cache=True):
-        if not os.path.isdir(os.path.join(params.TMP_PATH, os.path.dirname(CACHE_PATH))):
-            os.mkdir(os.path.join(params.TMP_PATH, os.path.dirname(CACHE_PATH)))
-        if cache and os.path.isfile(os.path.join(params.TMP_PATH, CACHE_PATH)):
-            with open(os.path.join(params.TMP_PATH, CACHE_PATH)) as f:
-                try:
-                    tmp = json.load(f)
-                    if time.time()-tmp['timestamp'] < TIMEOUT:
-                        self.cookies = tmp['cookies']
-                        print(' Loading from cache ({}) ... '.format(os.path.join(params.TMP_PATH, CACHE_PATH)))
-                except Exception:
-                    pass
-        if 'cookies' not in dir(self):
+    def __init__(self, cookies={}):
+        self.cookies = cookies
+        if not self.cookies:
             self.cookies = login.login()
-            if self.cookies:
-                with open(os.path.join(params.TMP_PATH, CACHE_PATH), 'w') as f:
-                    json.dump({ 'timestamp': time.time(), 'cookies': self.cookies, }, f)
+            # if self.cookies:
+            #     with open(os.path.join(params.TMP_PATH, CACHE_PATH), 'w') as f:
+            #         json.dump({ 'timestamp': time.time(), 'cookies': self.cookies, }, f)
         self.session = req.Session()
         for c in self.cookies:
             self.session.cookies.set(**self.cookies[c])
+        self.timestamp = time.time()
         self.headers = api.gen_headers()
         self.user = api.get_user_info_by_id(self.session.cookies.get('ds_user_id'), headers=self.headers)['user']
 
@@ -66,11 +57,12 @@ class Bot(object):
         # if len(fols) == 0:
         #     misc.print_wrn('get_following({})'.format(username), 'No following found ... (maybe private) ')
         if not dcache:
-            outd = os.path.abspath(os.path.join(params.TMP_PATH, '{}/i{}'.format(username, str(time.time()))))
-            if not os.path.isdir(outd):
-                os.makedirs(outd)
-            with open(os.path.join(outd, 'following.json'), 'w') as f:
-                json.dump(fols, f, indent=4, sort_keys=True)
+            # outd = os.path.abspath(os.path.join(params.TMP_PATH, '{}/i{}'.format(username, str(time.time()))))
+            # if not os.path.isdir(outd):
+            #     os.makedirs(outd)
+            # with open(os.path.join(outd, 'following.json'), 'w') as f:
+            #     json.dump(fols, f, indent=4, sort_keys=True)
+            cache.store_following(username, fols)
         return fols
 
     def get_followersr(self, userid, nxmi=None):
@@ -92,11 +84,12 @@ class Bot(object):
         # if len(fols) == 0:
         #     misc.print_wrn('get_followers({})'.format(username), 'No followers found ... (maybe private) ')
         if not dcache:
-            outd = os.path.abspath(os.path.join(params.TMP_PATH, '{}/o{}'.format(username, str(time.time()))))
-            if not os.path.isdir(outd):
-                os.makedirs(outd)
-            with open(os.path.join(outd, 'followers.json'), 'w') as f:
-                json.dump(fols, f, indent=4, sort_keys=True)
+            # outd = os.path.abspath(os.path.join(params.TMP_PATH, '{}/o{}'.format(username, str(time.time()))))
+            # if not os.path.isdir(outd):
+            #     os.makedirs(outd)
+            # with open(os.path.join(outd, 'followers.json'), 'w') as f:
+            #     json.dump(fols, f, indent=4, sort_keys=True)
+            cache.store_followers(username, fols)
         return fols
 
     def shortest_path(self, to, fr):
@@ -131,3 +124,37 @@ class Bot(object):
             c = c.fr
         path.append((c.to, c.uname))
         return list(reversed(path))
+
+class BotGroup(object):
+    def __init__(self, cache=True):
+        if not os.path.isdir(os.path.join(params.TMP_PATH, os.path.dirname(CACHE_PATH))):
+            os.mkdir(os.path.join(params.TMP_PATH, os.path.dirname(CACHE_PATH)))
+        self._bots = []
+        if cache and os.path.isfile(os.path.join(params.TMP_PATH, CACHE_PATH)):
+            with open(os.path.join(params.TMP_PATH, CACHE_PATH)) as f:
+                try:
+                    tmp = json.load(f)
+                    print(' Loading from cache ({}) ... '.format(os.path.join(params.TMP_PATH, CACHE_PATH)))
+                    for b in tmp:
+                        if time.time() - b['timestamp'] < TIMEOUT:
+                            self._bots.append(Bot(cookies=b['cookies']))
+                except Exception:
+                    pass
+
+    def store(self, cpath=CACHE_PATH):
+        with open(os.path.join(params.TMP_PATH, cpath)) as f:
+            json.dump(map(lambda b: dict(timestamp=b.timestamp, cookies=b.cookies)), f)
+
+    def add(self, bot=None):
+        if isinstance(bot, Bot):
+            self._bots.append(bot)
+        else:
+            self._bots.append(Bot())
+        self.store()
+
+    def _init(self):
+        ts = []
+        for b in self._bots:
+            t = threading.Thread(target=b.get_followers, args=(b.user['username'],))
+        for t in ts:
+            t.join()

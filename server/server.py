@@ -2,7 +2,7 @@ import os, threading, json, logging
 from flask import Flask, request, Response, send_from_directory, render_template
 from flup.server.fcgi import WSGIServer
 import requests as req
-from lib import params, misc
+from lib import params, misc, cache
 
 LOG = logging.getLogger('werkzeug')
 LOG.disabled = True
@@ -30,27 +30,35 @@ def index():
 
 @__app.route('/api/followers/<uname>')
 def followers(uname):
-    upath = os.path.join(params.TMP_PATH, uname)
-    if not os.path.isdir(upath):
+    # upath = os.path.join(params.TMP_PATH, uname)
+    # if not os.path.isdir(upath):
+    #     return not_scraped()
+    # ogs = [d for d in os.listdir(upath) if os.path.isdir(os.path.join(upath, d)) and d.startswith('o') and os.path.isfile(os.path.join(upath, d, 'followers.json'))]
+    # if not ogs:
+    #     return Response(json.dumps(dict(msg='Not scraped!')), mimetype='application/json')
+    # ogs.sort()
+    # with open(os.path.join(upath, ogs[-1], 'followers.json'), 'r') as f:
+    #     return Response('{{"success":true,"followers":{}}}'.format(f.read()), mimetype='application/json')
+    fols = cache.load_followers(uname)
+    if not fols:
         return not_scraped()
-    ogs = [d for d in os.listdir(upath) if os.path.isdir(os.path.join(upath, d)) and d.startswith('o') and os.path.isfile(os.path.join(upath, d, 'followers.json'))]
-    if not ogs:
-        return Response(json.dumps(dict(msg='Not scraped!')), mimetype='application/json')
-    ogs.sort()
-    with open(os.path.join(upath, ogs[-1], 'followers.json'), 'r') as f:
-        return Response('{{"success":true,"followers":{}}}'.format(f.read()), mimetype='application/json')
+    return Response('{{"success":true,"followers":{}}}'.format(json.dumps(fols)), mimetype='application/json')
 
 @__app.route('/api/following/<uname>')
 def following(uname):
-    upath = os.path.join(params.TMP_PATH, uname)
-    if not os.path.isdir(upath):
+    # upath = os.path.join(params.TMP_PATH, uname)
+    # if not os.path.isdir(upath):
+    #     return not_scraped()
+    # igs = [d for d in os.listdir(upath) if os.path.isdir(os.path.join(upath, d)) and d.startswith('i') and os.path.isfile(os.path.join(upath, d, 'following.json'))]
+    # if not igs:
+    #     return not_scraped()
+    # igs.sort()
+    # with open(os.path.join(upath, igs[-1], 'following.json'), 'r') as f:
+    #     return Response('{{"success":true,"following":{}}}'.format(f.read()), mimetype='application/json')
+    fols = cache.load_following(uname)
+    if not fols:
         return not_scraped()
-    igs = [d for d in os.listdir(upath) if os.path.isdir(os.path.join(upath, d)) and d.startswith('i') and os.path.isfile(os.path.join(upath, d, 'following.json'))]
-    if not igs:
-        return not_scraped()
-    igs.sort()
-    with open(os.path.join(upath, igs[-1], 'following.json'), 'r') as f:
-        return Response('{{"success":true,"following":{}}}'.format(f.read()), mimetype='application/json')
+    return Response('{{"success":true,"following":{}}}'.format(json.dumps(fols)), mimetype='application/json')
 
 @__app.route('/shut', methods=['POST',])
 def shut():
