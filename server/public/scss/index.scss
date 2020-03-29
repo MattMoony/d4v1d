@@ -184,6 +184,23 @@ html, body {
                 }
             }
 
+            .cons {
+                display: block;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background-color: #fff;
+                border: 1.5px solid #f2f2f2;
+                border-radius: 0 0 0 15px;
+                height: 150px;
+                overflow-y: auto;
+
+                & > div, & > h3 {
+                    padding: 7.5px;
+                    margin: 0;
+                }
+            }
+
             #progress {
                 display: block;
                 position: absolute;

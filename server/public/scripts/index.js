@@ -39,6 +39,7 @@ window.onload = () => {
         fin.click();
     };
     let prog = document.getElementById('progress');
+    let cons = document.getElementsByClassName('cons')[0];
     let net = null;
     let ndata = {};
     let can = null;
@@ -54,6 +55,8 @@ window.onload = () => {
                 damping: 1,
                 // avoidOverlap: 1,
             },
+            maxVelocity: 100,
+            minVelocity: 50,
         },
         nodes: {
             size: 10,
@@ -82,21 +85,26 @@ window.onload = () => {
         }
     };
     let opts = OPTIONS;
+    let users = {};
     
     const SCALEF = 2500;
-    const SLICES = 64;
+    const TIMEOUT = 1500;
 
     class InstaUser {
-        constructor(username, depth, data={}) {
+        constructor(username, depth, data=null) {
             this.username = username;
             this.depth = depth;
+            this.scraped = true;
             if (data) {
                 this.id = data.id;
                 this.full_name = data.full_name;
                 this.is_private = data.is_private;
                 this.is_verified = data.is_verified;
                 this.profile_pic_url = data.profile_pic_url;
+                this.scraped = data.scraped;
             }
+            this.followers = [];
+            this.following = [];
         }
     }
 
@@ -108,6 +116,25 @@ window.onload = () => {
         cu.verified.style.display = user.is_verified ? 'inline' : 'none';
         cu.fullname.innerHTML = user.full_name || '';
         if (focus) net.focus(user.username);
+        if (Object.keys(users).length > 0) {
+            cons.innerHTML = '';
+            let h = document.createElement('h3');
+            h.innerHTML = 'Followers';
+            cons.appendChild(h);
+            for (let o of users[user.username].followers) {
+                let d = document.createElement('div');
+                d.innerHTML = o;
+                cons.appendChild(d);
+            }
+            h = document.createElement('h3');
+            h.innerHTML = 'Following';
+            cons.appendChild(h);
+            for (let i of users[user.username].following) {
+                let d = document.createElement('div');
+                d.innerHTML = i;
+                cons.appendChild(d);
+            }
+        }
     }
 
     function create_net(data) {
@@ -199,11 +226,14 @@ window.onload = () => {
         let p = [];
         let c = null;
         let i = 0;
+        users = {};
         while (q.length > 0) {
             prog.max = i+q.length;
             prog.value = i++;
 
             c = q.shift();
+            users[c.username] = c;
+            if (!c.scraped) continue;
             
             let reso = await get_followers(c.username),
                 resi = await get_following(c.username);
@@ -224,13 +254,24 @@ window.onload = () => {
                 if (!a.includes(f.username)) {
                     add_node(f);
                     a.push(f.username);
+                    users[f.username] = f;
                     if (f.depth < d) q.push(f);
                 }
                 if (!p.includes(f.username)) {
-                    if (followers.includes(f.username)) add_edge(f, c);
-                    if (following.includes(f.username)) add_edge(c, f);
+                    if (followers.includes(f.username)) {
+                        add_edge(f, c);
+                        users[c.username].followers.push(f.username);
+                        users[f.username].following.push(c.username);
+                    }
+                    if (following.includes(f.username)) {
+                        add_edge(c, f);
+                        users[c.username].following.push(f.username);
+                        users[f.username].followers.push(c.username);
+                    }
                 }
             }
+
+            await (async () => new Promise(resolve => window.setTimeout(resolve, TIMEOUT)))();
         }
     }
 
