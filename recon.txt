@@ -116,3 +116,11 @@ https://www.instagram.com/graphql/query/?query_hash=ff260833edf142911047af6024eb
 	"id":"19318909",
 	"first":12
 }
+
+// comments (find first "after" in media timeline response -> post part)
+https://www.instagram.com/graphql/query/?query_hash=bc3296d1ce80a24b1b6e40b1e72903f5&variables=%7B%22shortcode%22%3A%22B7CCo7wASLz%22%2C%22first%22%3A13%2C%22after%22%3A%22QVFBYzh1YUF1a1Z5Nk9ieHVwYnJFdkh6ZjhlemFzNE1KM1k4UFpEMW9zMnF5SnlRRVhlSkI0ZElDOC04NjY5Wm9oeVV1V3RzMm1teGpRNnduMmo2VG9DMQ%3D%3D%22%7D
+https://www.instagram.com/graphql/query/?query_hash=bc3296d1ce80a24b1b6e40b1e72903f5&variables={
+	"shortcode":"B7CCo7wASLz",
+	"first":13,
+	"after":"QVFBYzh1YUF1a1Z5Nk9ieHVwYnJFdkh6ZjhlemFzNE1KM1k4UFpEMW9zMnF5SnlRRVhlSkI0ZElDOC04NjY5Wm9oeVV1V3RzMm1teGpRNnduMmo2VG9DMQ=="
+}

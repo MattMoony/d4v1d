@@ -51,7 +51,7 @@ def followers(uname):
             'success': True,
             'followers': list(map(create_user, json.load(f))),
         }))
-
+        
 @__app.route('/api/following/<uname>')
 def following(uname):
     upath = os.path.join(params.TMP_PATH, uname)
