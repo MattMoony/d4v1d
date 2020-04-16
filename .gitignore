@@ -1,4 +1,7 @@
-.vscode
 __pycache__
+.mypy_cache
 geckodriver.log
-tmp/
+tmp/*
+!tmp/.gitkeep
+venv
+.vscode
