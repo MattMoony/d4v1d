@@ -2,13 +2,14 @@
 All wrappers for the private API are implemented here. (private endpoints --> need to be authenticated, maybe authorized)
 """
 
-from lib import models
+from lib import models, local
 from lib.api import urls, params, base, public
-import time, random, uuid, hmac, json, hashlib, os
+import time, random, uuid, hmac, json, hashlib, os, threading
 import requests as req
 import six.moves.urllib as urllib
-from typing import List, Dict, Optional, Any, Tuple
+from typing import List, Dict, Optional, Any, Tuple, Callable
 from selenium import webdriver
+from queue import Queue
 
 class Bot(object):
     """
@@ -28,6 +29,10 @@ class Bot(object):
         The bot's user account.
     timestamp : float
         A timestamp of when the bot was created.
+    net : Optional[BotNet]
+        The botnet the bot belongs to.
+    _running : bool
+        Whether or not the bot should keep fetching and completing new bot tasks.
 
     Methods
     -------
@@ -35,8 +40,6 @@ class Bot(object):
         Opens a selenium window, allows the user to log in and stores the cookies.
     login_with(uname, passw)
         Signs in with the provided username and password using the Instagram private API.
-    get_user_by_id(uid)
-        Will retrieve an Instagram user via its pk (user-id).
     """
 
     @classmethod
@@ -90,12 +93,14 @@ class Bot(object):
 
     @classmethod
     def seed(cls, *args: str) -> str:
+        """Generate seed for certain Instagram requests"""
         m = hashlib.md5()
         m.update(b''.join([arg.encode() for arg in args]))
         return m.hexdigest()
 
     @classmethod
     def gen_device_id(cls, seed: str) -> str:
+        """Generate device id for certain Instagram requests"""
         vol_seed = "12345"
         m = hashlib.md5()
         m.update(seed.encode() + vol_seed.encode())
@@ -103,14 +108,59 @@ class Bot(object):
 
     @classmethod
     def gen_uuid(cls) -> str:
+        """Generate a uuid"""
         return str(uuid.uuid4())
 
     @classmethod
     def gen_signature(cls, data: str) -> str:
+        """Generates a signature for certain requests"""
         body = hmac.new(params.IG_SIG_KEY.encode(), data.encode(), hashlib.sha256).hexdigest() + '.' + urllib.parse.quote(data)
         return 'ig_sig_key_version={}&signed_body={}'.format(params.SIG_KEY_VERSION, body)
 
-    def __init__(self, cookies: Dict[str, str] = {}, creds: Tuple[str, str] = ()) -> None:
+    @classmethod
+    def get_user_by_id(cls, self: Bot, uid: int) -> models.User:
+        """Gets an Instagram user via its pk (user-id)"""
+        base.pause()
+        res = self.sess.get(urls.IINFO.format(uid), headers=self.headers).json()['user']
+        return models.User(res['pk'], res['username'], res['biography'], res['external_url'], res['full_name'], 
+                           res['is_business'], res['is_private'], res['is_verified'], res['hd_profile_pic_url_info']['url'], 
+                           res['follower_count'], res['following_count'], res)
+
+    @classmethod
+    def get_followers(cls, self: Bot, pk: int, after: str = '') -> List[int]:
+        """Gets all the followers the specified Instagram user has."""
+        base.pause()
+        res = self.sess.get(urls.FOLLOWERS.format(json.dumps({
+            'id': str(pk),
+            'first': 24,
+            'after': after,
+        })), headers=self.headers).json()
+        if not res['status'] == 'ok':
+            return []
+        inf = res['data']['user']['edge_followed_by']
+        return [
+            *map(lambda u: int(u['node']['id']), inf['edges']),
+            *(Bot.get_followers(self, pk, inf['page_info']['end_cursor']) if inf['page_info']['has_next_page'] else []),
+        ]
+
+    @classmethod
+    def get_following(cls, self: Bot, pk: int, after: str = '') -> List[int]:
+        """Gets all the user ids the specified Instagram user follows."""
+        base.pause()
+        res = self.sess.get(urls.FOLLOWING.format(json.dumps({
+            'id': str(pk),
+            'first': 24,
+            'after': after,
+        })), headers=self.headers).json()
+        if not res['status'] == 'ok':
+            return []
+        inf = res['data']['user']['edge_follow']
+        return [
+            *map(lambda u: int(u['node']['id']), inf['edges']),
+            *(Bot.get_following(self, pk, inf['page_info']['end_cursor']) if inf['page_info']['has_next_page'] else []),
+        ]
+
+    def __init__(self, cookies: Dict[str, str] = {}, creds: Tuple[str, str] = (), net: Optional[BotNet] = None) -> None:
         """
         Parameters
         ----------
@@ -132,6 +182,8 @@ class Bot(object):
             self.sess.cookies.set(**self.cookies[c])
         self.user: models.User = self.get_user_by_id(self.sess.cookies.get('ds_user_id'))
         self.timestamp: float = time.time()
+        self.net: Optional[BotNet] = net
+        self._running: bool = False
 
     def login(self) -> None:
         """Opens a selenium window, asks the user to log in and saves the cookies."""
@@ -173,16 +225,78 @@ class Bot(object):
         import os
         os._exit(0)
 
-    def get_user_by_id(self, uid: int) -> models.User:
-        """Gets an Instagram user via its pk (user-id)"""
-        base.pause()
-        res = self.sess.get(urls.IINFO.format(uid), headers=self.headers).json()['user']
-        return models.User(res['pk'], res['username'], res['biography'], res['external_url'], res['full_name'], 
-                           res['is_business'], res['is_private'], res['is_verified'], res['hd_profile_pic_url_info']['url'], 
-                           res['follower_count'], res['following_count'], res)
+    def start(self) -> None:
+        """Start the bot; starts fetching new tasks from botnet (separate thread). Won't do anything without a botnet."""
+        if not self.net:
+            return
+        t = threading.Thread(target=_run)
+        t.start()
+
+    def _run(self) -> None:
+        """Keeps fetching and completing new tasks from botnet."""
+        self._running = True
+        while self._running:
+            pass
+
+    def stop(self) -> None:
+        """Stop the bot; stops fetching new tasks (ends thread)."""
+        self._running = False
 
     def __str__(self) -> str:
         return 'Bot [{}#{}]'.format(self.user.uname, self.user.pk)
+
+class BotTask(object):
+    """
+    Represents a task for a d4v1d-bot.
+
+    ...
+
+    Attributes
+    ----------
+    target : Callable[..., None]
+        The task's target function, the one the bot should execute.
+    prereq : Callable[[Bot, int], bool]
+        The task's prerequisite.
+    args : List[Any]
+        Positional arguments for the target function.
+    kwargs : Dict[str, Any]
+        Keyword arguments for the target function.
+    callback : Callable[Any, None]
+        Will be called upon completion, with the result - if any.
+    cant : List[Bot]
+        List of bots that cannot complete the task.
+
+    Methods
+    -------
+    nope(bot)
+        Add bot the can't complete list.
+    """
+
+    def __init__(self, target: Callable[..., None], prereq: Callable[[Bot, int], bool], args: List[Any], kwargs: Dict[str, Any], 
+                 callback: Callable[Any, None]) -> None:
+        self.target: Callable[..., None] = target
+        self.prereq: Callable[[Bot, int], bool] = prereq
+        self.args: List[Any] = args
+        self.kwargs: Dict[str, Any] = kwargs
+        self.callback: Callable[Any, None] = callback
+        self.cant: List[Bot] = []
+
+    def nope(self, bot: Bot):
+        """Add bot the can't complete list"""
+        self.cant.append(bot)
+
+class BotTaskPrerequisite(object):
+    """
+    Multiple prerequisites for BotTasks.
+    """
+
+    @classmethod
+    def everyone(cls, bot: Bot, pk: int) -> bool:
+        return True
+
+    @classmethod
+    def following(cls, bot: Bot, pk: int) -> bool:
+        return pk in local.get_following(bot.user.pk)
 
 class BotNet(object):
     """
@@ -194,6 +308,10 @@ class BotNet(object):
     ----------
     bots : List[Bot]
         List containing all bots in the botnet.
+    q : Queue[BotTask]
+        Tasks for the bots to complete.
+    qsem : threading.Semaphore
+        Semaphore for synchronized q access.
 
     Methods
     -------
@@ -214,7 +332,9 @@ class BotNet(object):
         nload : bool
             Don't load past bots from the cookie store.
         """
-        self.bots = bots
+        self.bots: List[Bot] = bots
+        self.q: Queue = Queue()
+        self.qsem: threading.Semaphore = threading.Semaphore()
         if not nload:
             self.load()
 

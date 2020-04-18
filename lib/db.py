@@ -58,64 +58,6 @@ def exec(query: str, *args: Any, con: Optional[sqlite3.Connection] = None) -> No
     if arti:
         close(con)
 
-def fetchone(query: str, *args: Any, con: Optional[sqlite3.Connection] = None) -> Union[Tuple[Any], None]:
-    """
-    Opens a connection, executes the query and returns the first result.
-
-    Parameters
-    ----------
-    query : str
-        The query.
-    *args : Any
-        Arguments for the query.
-    con : Optional[sqlite3.Connection]
-        Connection to the db. 
-    
-    Returns
-    -------
-    Union[Tuple[Any], None]
-        Returns the first result (if any).
-    """
-    arti = not con
-    if arti:
-        con, c = connect()
-    else:
-        c = con.cursor()
-    c.execute(query, (*args, ))
-    res = c.fetchone()
-    if arti:
-        close(con)
-    return res
-
-def fetchall(query: str, *args: Any, con: Optional[sqlite3.Connection] = None) -> List[Tuple[Any]]:
-    """
-    Opens a connection, executes the query and returns all results.
-
-    Parameters
-    ----------
-    query : str
-        The query.
-    *args : Any
-        The arguments for the query.
-    con : Optional[sqlite3.Connection]
-        Connection to the db.
-    
-    Returns
-    -------
-    List[Tuple[Any]]
-        Returns resulting rows (or empty list)
-    """
-    arti = not con
-    if arti:
-        con, c = connect()
-    else:
-        c = con.cursor()
-    c.execute(query, (*args, ))
-    res = c.fetchall()
-    if arti:
-        close(con)
-    return res
-
 # =========================================================================================================================== #
 
 def exists(query: str, *args: Any, con: Optional[sqlite3.Connection] = None) -> bool:
@@ -177,5 +119,63 @@ def update_if_necessary(pk: int, col: str, tbls: Dict[str, Tuple[str, Any]], con
             c.execute('INSERT INTO "{}" (pk,"{}") VALUES (?,?)'.format(k, v[0]), (pk, v[1], ))
     if arti:
         close(con)
+
+def fetchone(query: str, *args: Any, con: Optional[sqlite3.Connection] = None) -> Union[Tuple[Any], None]:
+    """
+    Opens a connection, executes the query and returns the first result.
+
+    Parameters
+    ----------
+    query : str
+        The query.
+    *args : Any
+        Arguments for the query.
+    con : Optional[sqlite3.Connection]
+        Connection to the db. 
+    
+    Returns
+    -------
+    Union[Tuple[Any], None]
+        Returns the first result (if any).
+    """
+    arti = not con
+    if arti:
+        con, c = connect()
+    else:
+        c = con.cursor()
+    c.execute(query, (*args, ))
+    res = c.fetchone()
+    if arti:
+        close(con)
+    return res
+
+def fetchall(query: str, *args: Any, con: Optional[sqlite3.Connection] = None) -> List[Tuple[Any]]:
+    """
+    Opens a connection, executes the query and returns all results.
+
+    Parameters
+    ----------
+    query : str
+        The query.
+    *args : Any
+        The arguments for the query.
+    con : Optional[sqlite3.Connection]
+        Connection to the db.
+    
+    Returns
+    -------
+    List[Tuple[Any]]
+        Returns resulting rows (or empty list)
+    """
+    arti = not con
+    if arti:
+        con, c = connect()
+    else:
+        c = con.cursor()
+    c.execute(query, (*args, ))
+    res = c.fetchall()
+    if arti:
+        close(con)
+    return res
 
 # =========================================================================================================================== #
