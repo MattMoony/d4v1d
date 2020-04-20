@@ -2,14 +2,13 @@
 All wrappers for the private API are implemented here. (private endpoints --> need to be authenticated, maybe authorized)
 """
 
-from lib import models, local
+from lib import models, local, db
 from lib.api import urls, params, base, public
-import time, random, uuid, hmac, json, hashlib, os, threading
+import time, random, uuid, hmac, json, hashlib, os, threading, datetime
 import requests as req
 import six.moves.urllib as urllib
 from typing import List, Dict, Optional, Any, Tuple, Callable
 from selenium import webdriver
-from queue import Queue
 
 class Bot(object):
     """
@@ -31,8 +30,12 @@ class Bot(object):
         A timestamp of when the bot was created.
     net : Optional[BotNet]
         The botnet the bot belongs to.
+    requests : int
+        Total number of requests the bot has made.
     _running : bool
         Whether or not the bot should keep fetching and completing new bot tasks.
+    status : str
+        What is the bot doing at the moment?
 
     Methods
     -------
@@ -40,7 +43,17 @@ class Bot(object):
         Opens a selenium window, allows the user to log in and stores the cookies.
     login_with(uname, passw)
         Signs in with the provided username and password using the Instagram private API.
+    req(method, url)
+        Uses the bot's session to request the given URL.
+    start()
+        Start the bot; starts fetching new tasks from botnet (separate thread). Won't do anything without a botnet.
+    _run()
+        Keeps fetching and completing new tasks from botnet.
+    stop()
+        Stop the bot; stops fetching new tasks (ends thread).
     """
+
+    NO_TASK_TIMEOUT: int = 2
 
     @classmethod
     def ccookie(cls, c: Dict[Any, Any]) -> Dict[str, str]:
@@ -118,49 +131,81 @@ class Bot(object):
         return 'ig_sig_key_version={}&signed_body={}'.format(params.SIG_KEY_VERSION, body)
 
     @classmethod
-    def get_user_by_id(cls, self: Bot, uid: int) -> models.User:
+    def get_user_by_id(cls, self: 'Bot', uid: int) -> models.User:
         """Gets an Instagram user via its pk (user-id)"""
         base.pause()
-        res = self.sess.get(urls.IINFO.format(uid), headers=self.headers).json()['user']
+        res = self.req('get', urls.IINFO.format(uid)).json()['user']
         return models.User(res['pk'], res['username'], res['biography'], res['external_url'], res['full_name'], 
                            res['is_business'], res['is_private'], res['is_verified'], res['hd_profile_pic_url_info']['url'], 
                            res['follower_count'], res['following_count'], res)
 
     @classmethod
-    def get_followers(cls, self: Bot, pk: int, after: str = '') -> List[int]:
+    def get_followers(cls, self: 'Bot', pk: int) -> List[int]:
+        """Gets and stores all the followers the specified Instagram user has."""
+        self.status = 'get_followers({})'.format(local.get_user_by_pk(pk).uname)
+        fls = Bot._get_followers(self, pk)
+        con, c = db.connect()
+        lfls = list(map(lambda e: e[0], db.fetchall('SELECT fpk FROM fols WHERE tpk = ? AND last_seen IS NULL', pk, con=con)))
+        for f in filter(lambda pf: pf not in fls, lfls):
+            db.exec('UPDATE fols SET last_seen = ? WHERE fpk = ? AND tpk = ? AND last_seen IS NULL', datetime.datetime.now(), f, pk, con=con)
+        for f in filter(lambda pf: pf not in lfls, fls):
+            db.exec('INSERT INTO fols (fpk, tpk) VALUES (?, ?)', f, pk)
+        db.close(con)
+        return fls
+
+    @classmethod
+    def _get_followers(cls, self: 'Bot', pk: int, after: str = '') -> List[int]:
         """Gets all the followers the specified Instagram user has."""
         base.pause()
-        res = self.sess.get(urls.FOLLOWERS.format(json.dumps({
+        res = self.req('get', urls.FOLLOWERS.format(json.dumps({
             'id': str(pk),
             'first': 24,
             'after': after,
-        })), headers=self.headers).json()
+        }))).json()
         if not res['status'] == 'ok':
             return []
         inf = res['data']['user']['edge_followed_by']
         return [
             *map(lambda u: int(u['node']['id']), inf['edges']),
-            *(Bot.get_followers(self, pk, inf['page_info']['end_cursor']) if inf['page_info']['has_next_page'] else []),
+            *(Bot._get_followers(self, pk, inf['page_info']['end_cursor']) if inf['page_info']['has_next_page'] else []),
         ]
 
     @classmethod
-    def get_following(cls, self: Bot, pk: int, after: str = '') -> List[int]:
+    def get_following(cls, self: 'Bot', pk: int) -> List[int]:
+        """Gets and stores all the user ids the specified Instagram user follows"""
+        self.status = 'get_following({})'.format(local.get_user_by_pk(pk).uname)
+        fls = Bot._get_following(self, pk)
+        con, c = db.connect()
+        lfls = list(map(lambda e: e[0], db.fetchall('SELECT tpk FROM fols WHERE fpk = ? AND last_seen IS NULL', pk, con=con)))
+        for f in filter(lambda pf: pf not in fls, lfls):
+            db.exec('UPDATE fols SET last_seen = ? WHERE fpk = ? AND tpk = ? AND last_seen IS NULL', datetime.datetime.now(), pk, f, con=con)
+        for f in filter(lambda pf: pf not in lfls, fls):
+            db.exec('INSERT INTO fols (fpk, tpk) VALUES (?, ?)', pk, f)
+        db.close(con)
+        return fls
+
+    @classmethod
+    def _get_following(cls, self: 'Bot', pk: int, after: str = '') -> List[int]:
         """Gets all the user ids the specified Instagram user follows."""
         base.pause()
-        res = self.sess.get(urls.FOLLOWING.format(json.dumps({
+        res = self.req('get', urls.FOLLOWING.format(json.dumps({
             'id': str(pk),
             'first': 24,
             'after': after,
-        })), headers=self.headers).json()
+        }))).json()
         if not res['status'] == 'ok':
             return []
         inf = res['data']['user']['edge_follow']
         return [
             *map(lambda u: int(u['node']['id']), inf['edges']),
-            *(Bot.get_following(self, pk, inf['page_info']['end_cursor']) if inf['page_info']['has_next_page'] else []),
+            *(Bot._get_following(self, pk, inf['page_info']['end_cursor']) if inf['page_info']['has_next_page'] else []),
         ]
 
-    def __init__(self, cookies: Dict[str, str] = {}, creds: Tuple[str, str] = (), net: Optional[BotNet] = None) -> None:
+    @classmethod
+    def _get_media(cls, self: 'Bot', pk: int, after: str = '') -> None:
+        pass
+
+    def __init__(self, cookies: Dict[str, str] = {}, creds: Tuple[str, str] = (), net: Optional['BotNet'] = None) -> None:
         """
         Parameters
         ----------
@@ -180,10 +225,12 @@ class Bot(object):
                 self.login()
         for c in self.cookies:
             self.sess.cookies.set(**self.cookies[c])
-        self.user: models.User = self.get_user_by_id(self.sess.cookies.get('ds_user_id'))
-        self.timestamp: float = time.time()
         self.net: Optional[BotNet] = net
+        self.requests: int = 0
+        self.user: models.User = Bot.get_user_by_id(self, self.sess.cookies.get('ds_user_id'))
+        self.timestamp: float = time.time()
         self._running: bool = False
+        self.status: str = 'stopped'
 
     def login(self) -> None:
         """Opens a selenium window, asks the user to log in and saves the cookies."""
@@ -219,31 +266,47 @@ class Bot(object):
         print(data)
         data = Bot.gen_signature(data)
         print(data)
-        res = self.sess.post(urls.LOGIN, headers=self.headers, data=data)
+        res = self.req('post', urls.LOGIN, data=data)
         print(res)
         print(res.text)
         import os
         os._exit(0)
 
+    def req(self, method: str, url: str) -> req.Response:
+        self.requests += 1
+        return self.sess.request(method, url, headers=self.headers)
+
     def start(self) -> None:
         """Start the bot; starts fetching new tasks from botnet (separate thread). Won't do anything without a botnet."""
         if not self.net:
             return
-        t = threading.Thread(target=_run)
+        self.status = 'starting'
+        t = threading.Thread(target=self._run)
         t.start()
 
     def _run(self) -> None:
         """Keeps fetching and completing new tasks from botnet."""
         self._running = True
         while self._running:
-            pass
+            self.status = 'idling'
+            t = self.net.next_task(self)
+            if not t:
+                time.sleep(Bot.NO_TASK_TIMEOUT)
+                continue
+            t.callback(t.target(self, *t.args, **t.kwargs))
 
     def stop(self) -> None:
         """Stop the bot; stops fetching new tasks (ends thread)."""
         self._running = False
+        self.status = 'stopped'
 
     def __str__(self) -> str:
-        return 'Bot [{}#{}]'.format(self.user.uname, self.user.pk)
+        return 'Bot [{}#{}] ... {}'.format(self.user.uname, self.user.pk, self.status)
+
+    def __eq__(self, other):
+        if not isinstance(other, Bot):
+            return False
+        return self.user.pk == other.user.pk
 
 class BotTask(object):
     """
@@ -255,7 +318,7 @@ class BotTask(object):
     ----------
     target : Callable[..., None]
         The task's target function, the one the bot should execute.
-    prereq : Callable[[Bot, int], bool]
+    prereq : Callable[[Bool], bool]
         The task's prerequisite.
     args : List[Any]
         Positional arguments for the target function.
@@ -263,8 +326,8 @@ class BotTask(object):
         Keyword arguments for the target function.
     callback : Callable[Any, None]
         Will be called upon completion, with the result - if any.
-    cant : List[Bot]
-        List of bots that cannot complete the task.
+    cant : Set[Bot]
+        Set of bots that cannot complete the task.
 
     Methods
     -------
@@ -272,18 +335,21 @@ class BotTask(object):
         Add bot the can't complete list.
     """
 
-    def __init__(self, target: Callable[..., None], prereq: Callable[[Bot, int], bool], args: List[Any], kwargs: Dict[str, Any], 
-                 callback: Callable[Any, None]) -> None:
+    def __init__(self, target: Callable[..., None], prereq: Callable[[Bot, int], bool], 
+                 args: List[Any], kwargs: Dict[str, Any], callback: Callable[..., None]) -> None:
         self.target: Callable[..., None] = target
         self.prereq: Callable[[Bot, int], bool] = prereq
         self.args: List[Any] = args
         self.kwargs: Dict[str, Any] = kwargs
-        self.callback: Callable[Any, None] = callback
+        self.callback: Callable[..., None] = callback
         self.cant: List[Bot] = []
 
     def nope(self, bot: Bot):
         """Add bot the can't complete list"""
         self.cant.append(bot)
+
+    def __str__(self) -> str:
+        return 'BotTask [{}]'.format(self.target.__name__)
 
 class BotTaskPrerequisite(object):
     """
@@ -291,12 +357,12 @@ class BotTaskPrerequisite(object):
     """
 
     @classmethod
-    def everyone(cls, bot: Bot, pk: int) -> bool:
-        return True
+    def everyone(cls, pk: int) -> Callable[[Bot], bool]:
+        return lambda bot: True
 
     @classmethod
-    def following(cls, bot: Bot, pk: int) -> bool:
-        return pk in local.get_following(bot.user.pk)
+    def following(cls, pk: int) -> Callable[[Bot], bool]:
+        return lambda bot: pk in local.get_following(bot.user.pk)
 
 class BotNet(object):
     """
@@ -306,9 +372,9 @@ class BotNet(object):
 
     Attributes
     ----------
-    bots : List[Bot]
-        List containing all bots in the botnet.
-    q : Queue[BotTask]
+    bots : Set[Bot]
+        Set containing all bots in the botnet.
+    q : List[BotTask]
         Tasks for the bots to complete.
     qsem : threading.Semaphore
         Semaphore for synchronized q access.
@@ -333,7 +399,7 @@ class BotNet(object):
             Don't load past bots from the cookie store.
         """
         self.bots: List[Bot] = bots
-        self.q: Queue = Queue()
+        self.q: List[BotTask] = []
         self.qsem: threading.Semaphore = threading.Semaphore()
         if not nload:
             self.load()
@@ -345,8 +411,10 @@ class BotNet(object):
         with open(fname, 'r') as f:
             bs = json.load(f)
             pks = list(map(lambda b: b.user.pk, self.bots))
-            ext = [ Bot(cookies=b['cookies']) for b in bs if time.time() - b['timestamp'] < params.BOT_TIMEOUT and b['pk'] not in pks ]
+            ext = [ Bot(cookies=b['cookies'], net=self) for b in bs if time.time() - b['timestamp'] < params.BOT_TIMEOUT and b['pk'] not in pks ]
             self.bots.extend(ext)
+            for b in ext:
+                b.start()
             if len(ext) == 0:
                 print(' No new bots were added to the botnet ... ')
                 return
@@ -361,8 +429,43 @@ class BotNet(object):
 
     def add(self, bot: Optional[Bot] = None) -> None:
         """Adds a new bot to the botnet"""
-        b = bot or Bot()
-        if b.user.pk in list(map(lambda b: b.user.pk, self.bots)):
-            return
+        b = bot or Bot(net=self)
         self.bots.append(b)
         self.store()
+        b.start()
+
+    def stop(self) -> None:
+        for b in self.bots:
+            b.stop()
+
+    def next_task(self, bot: Bot) -> Optional[BotTask]:
+        ft = None
+        ri = []
+        self.qsem.acquire()
+        for i, t in enumerate(self.q):
+            if t.prereq(bot):
+                ft = t
+                ri.append(i)
+                break
+            else:
+                t.nope(bot)
+            if self.bots.issubset(t.cant):
+                ri.append(i)
+        for i in reversed(ri):
+            del self.q[i]
+        self.qsem.release()
+        return ft
+
+    def get_followers(self, uname: str, *unames: str) -> None:
+        """Adds a task for one of the bots to get all followers of the given user."""
+        for u in [uname, *unames]:
+            user = public.get_user(u)
+            prereq = BotTaskPrerequisite.following(user.pk) if user.private else BotTaskPrerequisite.everyone(user.pk)
+            self.q.append(BotTask(Bot.get_followers, prereq, [user.pk,], {}, lambda fls: None))
+
+    def get_following(self, uname: str, *unames: str) -> None:
+        """Adds a task for one of the bots to get all following of the given user."""
+        for u in [uname, *unames]:
+            user = public.get_user(u)
+            prereq = BotTaskPrerequisite.following(user.pk) if user.private else BotTaskPrerequisite.everyone(user.pk)
+            self.q.append(BotTask(Bot.get_following, prereq, [user.pk,], {}, lambda fls: None))

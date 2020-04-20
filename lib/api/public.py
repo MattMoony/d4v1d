@@ -12,7 +12,7 @@ from selenium.webdriver.firefox.options import Options
 
 def get_user(uname: str, headers: Dict[str, str] = {}) -> models.User:
     """
-    Get an Instagram user by its username.
+    Get an Instagram user by their username.
 
     Parameters
     ----------
@@ -30,7 +30,7 @@ def get_user(uname: str, headers: Dict[str, str] = {}) -> models.User:
 
 def get_username_by_id(uid: int, headers: Dict[str, str] = {}) -> str:
     """
-    Gets the username of an Instagram user by its user-id.
+    Gets the username of an Instagram user by their user-id.
 
     Parameters
     ----------
@@ -44,7 +44,7 @@ def get_username_by_id(uid: int, headers: Dict[str, str] = {}) -> str:
     return req.get(urls.IINFO.format(uid), headers=headers).json()['user']['username']
 
 def get_csrftoken() -> str:
-    """Will make a request to instagram and return the generated csrf-token."""
+    """Will make a request to Instagram and return the generated csrf-token."""
     opts = Options()
     opts.headless = True
     driver = webdriver.Firefox(options=opts)

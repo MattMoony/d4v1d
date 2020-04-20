@@ -43,7 +43,7 @@ def get_user_by_pk(pk: int) -> models.User:
     if not u:
         return None
     inf = get_current_info(pk)
-    if not all(inf):
+    if any(map(lambda i: i is None, inf)):
         return None
     return models.User(pk, *inf, *u)
 

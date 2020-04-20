@@ -80,9 +80,9 @@ class User(object):
         """
         self.pk: int = pk
         self.uname: str = uname
-        self.bio: str = bio
-        self.url: str = url
-        self.name: str = name
+        self.bio: str = bio or ''
+        self.url: str = url or ''
+        self.name: str = name or ''
         self.business: str = business
         self.private: bool = private
         self.verified: bool = verified
