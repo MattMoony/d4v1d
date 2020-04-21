@@ -28,9 +28,9 @@ def main() -> None:
     if args.fnames:
         for name in args.fnames:
             with open(name, 'r') as f:
-                cmd.parse_command(*f.readlines())
+                cmd.parse_script(f.read())
     elif args.cmd:
-        cmd.parse_command(args.cmd)
+        cmd.parse_script(args.cmd)
     else:
         cmd.keep_polling()
     etime = time.time()

@@ -438,6 +438,13 @@ class BotNet(object):
         for b in self.bots:
             b.stop()
 
+    def wait_till_done(self) -> None:
+        while self.q:
+            if not any(map(lambda b: b._running, self.bots)):
+                break
+            time.sleep(2)
+        self.stop()
+
     def next_task(self, bot: Bot) -> Optional[BotTask]:
         ft = None
         ri = []

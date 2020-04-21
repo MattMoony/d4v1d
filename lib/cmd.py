@@ -114,3 +114,8 @@ def parse_command(cmd: str, *args: str) -> None:
     """Will parse the given command(s)."""
     for cm in [cmd, *args]:
         sh.parse(cm)
+
+def parse_script(script: str) -> None:
+    """Will parse multiple commands (separated by newline)"""
+    parse_command(*script.replace('\r', '').split('\n'))
+    bn.wait_till_done()
