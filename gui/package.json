@@ -1,0 +1,89 @@
+{
+  "name": "d4v1d-gui",
+  "version": "0.1.0",
+  "description": "",
+  "main": "electron/main.ts",
+  "scripts": {
+    "start:web": "gatsby start",
+    "dev": "nodemon",
+    "dev:nodemon": "cross-env NODE_ENV=dev electron -r ts-node/register .",
+    "dev:web": "gatsby develop",
+    "build": "tsc",
+    "build:web": "gatsby build",
+    "clean:web": "gatsby clean",
+    "serve:web": "gatsby serve",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "m4ttm00ny",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@babel/plugin-proposal-decorators": "^7.14.5",
+    "@theme-ui/presets": "^0.10.0",
+    "babel-preset-gatsby": "^1.10.0",
+    "electron-serve": "^1.1.0",
+    "gatsby": "^3.10.2",
+    "gatsby-plugin-gatsby-cloud": "^2.10.0",
+    "gatsby-plugin-image": "^1.10.1",
+    "gatsby-plugin-manifest": "^3.10.0",
+    "gatsby-plugin-offline": "^4.10.0",
+    "gatsby-plugin-react-helmet": "^4.10.0",
+    "gatsby-plugin-sass": "^4.10.0",
+    "gatsby-plugin-sharp": "^3.10.2",
+    "gatsby-plugin-theme-ui": "^0.10.1",
+    "gatsby-source-filesystem": "^3.10.0",
+    "gatsby-transformer-sharp": "^3.10.0",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-helmet": "^6.1.0",
+    "react-treebeard": "^3.2.4",
+    "theme-ui": "^0.10.0"
+  },
+  "devDependencies": {
+    "@iconify-icons/ant-design": "^1.1.0",
+    "@iconify-icons/codicon": "^1.1.18",
+    "@iconify-icons/ri": "^1.1.0",
+    "@iconify/react": "^1.1.4",
+    "@types/react": "^17.0.15",
+    "@types/react-dom": "^17.0.9",
+    "cross-env": "^7.0.3",
+    "electron": "^13.1.7",
+    "electron-forge": "^5.2.4",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "name": "Electron starter",
+        "executableName": "electron-starter",
+        "icon": "assets/icon",
+        "extraResource": [
+          "assets"
+        ]
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "Electron Starter"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  }
+}
