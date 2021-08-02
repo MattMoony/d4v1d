@@ -12,8 +12,10 @@ contextBridge.exposeInMainWorld(
       const validChannels = ['fromMain',];
       if (validChannels.includes(channel)) {
         if (listeners[action]) ipcRenderer.removeListener(channel, listeners[action]);
-        listeners[action] = (e, ...args) => func(...args);
-        ipcRenderer.on(channel, listeners[action]);
+        listeners[action] = (...args) => func(...args);
+        ipcRenderer.on(channel, (e, _action, ..._args) => {
+          if (_action === action) listeners[action](..._args);
+        });
       }
     },
   }

@@ -125,7 +125,7 @@ class Terminal extends React.Component<TerminalProps, TerminalState> {
   }
 
   public componentDidMount() {
-    window.api.receive('fromMain', 'cli', (action: string, ...args: any[]) => {
+    window.api.receive('fromMain', 'cli', (...args: any[]) => {
       if (typeof args[0] === 'string') {
         this.setState({ log: this.state.log + atob(args[0]), })
         if (this.state.sticky && this.output) this.output.scrollTo(0, this.output.scrollHeight);
