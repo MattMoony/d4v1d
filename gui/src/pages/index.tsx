@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { navigate } from '@reach/router';
 import terminalIcon from '@iconify-icons/bi/terminal';
 import Icon from '@iconify/react';
+import Terminal from '../components/Terminal';
 
 const Index = () => {
   useEffect(() => {
@@ -15,8 +16,15 @@ const Index = () => {
         case ',':
           if (e.ctrlKey) navigate('/settings/');
           break;
+        case '.':
+          if (e.ctrlKey) setTermVisible(!termVisible);
+          break;
       }
     });
+    window.addEventListener('resize', () => {
+      setHeight(window.document.body.getBoundingClientRect().height);
+    });
+    setHeight(window.document.body.getBoundingClientRect().height);
   });
 
   const [tree, setTree] = useState({
@@ -48,6 +56,7 @@ const Index = () => {
   const context = useThemeUI();
   const { theme, } = context;
   const [termVisible, setTermVisible] = useState(false);
+  const [height, setHeight] = useState(0);
 
   return (
     <WindowLayout>
@@ -161,9 +170,9 @@ const Index = () => {
         <Flex sx={{
           backgroundColor: 'transparent',
           position: 'relative',
-          transition: '.2s cubic-bezier(0, 1, 0, 1)',
+          transition: '.2s ease',
           // transform: `translateY(${termVisible ? '0' : '100%'})`,
-          maxHeight: termVisible ? 2000 : 3,
+          maxHeight: termVisible ? Math.floor(height/2) : 3,
           height: '50%',
           flexDirection: 'column',
           justifyContent: 'stretch',
@@ -194,10 +203,8 @@ const Index = () => {
             borderTop: '3px solid',
             borderColor: 'primary',
             flexGrow: 1,
-            boxSizing: 'border-box',
-            p: 2,
           }}>
-            
+            <Terminal height={Math.floor((height/2)*.9)} />
           </Box>
         </Flex>
       </Flex>
