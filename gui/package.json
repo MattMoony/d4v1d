@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@iconify-icons/ant-design": "^1.1.0",
+    "@iconify-icons/bi": "^1.1.5",
     "@iconify-icons/codicon": "^1.1.18",
     "@iconify-icons/ri": "^1.1.0",
     "@iconify/react": "^1.1.4",

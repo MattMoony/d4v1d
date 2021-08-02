@@ -30,6 +30,7 @@ function createWindow(): void {
     resizable: true,
     backgroundColor: '#060606',
     title: 'd4v1d',
+    icon: path.resolve(__dirname, '..', 'src', 'images', 'logo.png'),
   });
 
   process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';

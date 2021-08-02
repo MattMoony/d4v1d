@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Box, Flex, Grid, Heading, useThemeUI } from 'theme-ui';
+import { Box, Flex, Grid, Heading, IconButton, Label, useThemeUI } from 'theme-ui';
 import { Treebeard } from 'react-treebeard';
 import WindowLayout from '../components/WindowLayout';
 import { useEffect } from 'react';
 import { navigate } from '@reach/router';
+import terminalIcon from '@iconify-icons/bi/terminal';
+import Icon from '@iconify/react';
 
 const Index = () => {
   useEffect(() => {
@@ -45,109 +47,159 @@ const Index = () => {
 
   const context = useThemeUI();
   const { theme, } = context;
+  const [termVisible, setTermVisible] = useState(false);
 
   return (
     <WindowLayout>
       <Flex sx={{
         width: '100%',
         height: '100%',
+        flexDirection: 'column',
+        overflowY: 'hidden',
       }}>
-        <Box sx={{
-          maxWidth: '10em',
-          width: '50%',
-          borderRight: '3px solid',
-          borderColor: 'muted',
+        <Flex sx={{
+          width: '100%',
+          height: '100%',
         }}>
-          <Treebeard
-            data={tree}
-            onToggle={onToggle}
-            style={{
-              tree: {
-                base: {
-                  listStyle: 'none',
-                  backgroundColor: theme.rawColors.background,
-                  margin: 0,
-                  padding: 0,
-                  color: theme.rawColors.text,
-                  fontFamily: 'lucida grande ,tahoma,verdana,arial,sans-serif',
-                  fontSize: '14px'
-                },
-                node: {
+          <Box sx={{
+            maxWidth: '10em',
+            width: '50%',
+            borderRight: '3px solid',
+            borderColor: 'muted',
+          }}>
+            <Treebeard
+              data={tree}
+              onToggle={onToggle}
+              style={{
+                tree: {
                   base: {
-                    position: 'relative'
-                  },
-                  link: {
-                    cursor: 'pointer',
-                    position: 'relative',
-                    padding: '0px 5px',
-                    display: 'block'
-                  },
-                  activeLink: {
-                    background: theme.rawColors.muted,
-                  },
-                  toggle: {
-                    base: {
-                      position: 'relative',
-                      display: 'inline-block',
-                      verticalAlign: 'top',
-                      marginLeft: '-5px',
-                      height: '24px',
-                      width: '24px'
-                    },
-                    wrapper: {
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      margin: '-7px 0 0 -7px',
-                      height: '14px'
-                    },
-                    height: 14,
-                    width: 14,
-                    arrow: {
-                      fill: theme.rawColors.text,
-                      strokeWidth: 0
-                    }
-                  },
-                  header: {
-                    base: {
-                      display: 'inline-block',
-                      verticalAlign: 'top',
-                      color: theme.rawColors.text,
-                    },
-                    connector: {
-                      width: '2px',
-                      height: '12px',
-                      borderLeft: 'solid 2px black',
-                      borderBottom: 'solid 2px black',
-                      position: 'absolute',
-                      top: '0px',
-                      left: '-21px'
-                    },
-                    title: {
-                      lineHeight: '24px',
-                      verticalAlign: 'middle'
-                    }
-                  },
-                  subtree: {
                     listStyle: 'none',
-                    paddingLeft: '19px'
+                    backgroundColor: theme.rawColors.background,
+                    margin: 0,
+                    padding: 0,
+                    color: theme.rawColors.text,
+                    fontFamily: 'lucida grande ,tahoma,verdana,arial,sans-serif',
+                    fontSize: '14px'
                   },
-                  loading: {
-                    color: theme.rawColors.secondary,
+                  node: {
+                    base: {
+                      position: 'relative'
+                    },
+                    link: {
+                      cursor: 'pointer',
+                      position: 'relative',
+                      padding: '0px 5px',
+                      display: 'block'
+                    },
+                    activeLink: {
+                      background: theme.rawColors.muted,
+                    },
+                    toggle: {
+                      base: {
+                        position: 'relative',
+                        display: 'inline-block',
+                        verticalAlign: 'top',
+                        marginLeft: '-5px',
+                        height: '24px',
+                        width: '24px'
+                      },
+                      wrapper: {
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        margin: '-7px 0 0 -7px',
+                        height: '14px'
+                      },
+                      height: 14,
+                      width: 14,
+                      arrow: {
+                        fill: theme.rawColors.text,
+                        strokeWidth: 0
+                      }
+                    },
+                    header: {
+                      base: {
+                        display: 'inline-block',
+                        verticalAlign: 'top',
+                        color: theme.rawColors.text,
+                      },
+                      connector: {
+                        width: '2px',
+                        height: '12px',
+                        borderLeft: 'solid 2px black',
+                        borderBottom: 'solid 2px black',
+                        position: 'absolute',
+                        top: '0px',
+                        left: '-21px'
+                      },
+                      title: {
+                        lineHeight: '24px',
+                        verticalAlign: 'middle'
+                      }
+                    },
+                    subtree: {
+                      listStyle: 'none',
+                      paddingLeft: '19px'
+                    },
+                    loading: {
+                      color: theme.rawColors.secondary,
+                    }
                   }
                 }
-              }
-            }}
-          />
-        </Box>
-        <Box p={4} sx={{
-          flex: 1,
-          backgroundColor: 'muted',
+              }}
+            />
+          </Box>
+          <Box p={4} sx={{
+            flex: 1,
+            backgroundColor: 'muted',
+          }}>
+            <Heading>
+              Hello World!
+            </Heading>
+          </Box>
+        </Flex>
+        <Flex sx={{
+          backgroundColor: 'transparent',
+          position: 'relative',
+          transition: '.2s cubic-bezier(0, 1, 0, 1)',
+          // transform: `translateY(${termVisible ? '0' : '100%'})`,
+          maxHeight: termVisible ? 2000 : 3,
+          height: '50%',
+          flexDirection: 'column',
+          justifyContent: 'stretch',
+          boxSizing: 'border-box',
         }}>
-          <Heading>
-            Hello World!
-          </Heading>
-        </Box>
+          <IconButton sx={{
+            fontSize: 2,
+            backgroundColor: 'gray',
+            position: 'absolute',
+            borderTop: '3px solid',
+            borderLeft: '3px solid',
+            borderRight: '3px solid',
+            borderColor: 'primary',
+            borderRadius: '15% 15% 0 0',
+            top: -29,
+            right: 10,
+            zIndex: 10,
+            transition: '.2s ease',
+            ':hover': {
+              color: 'primary',
+              cursor: 'pointer',
+            }
+          }} onClick={() => setTermVisible(!termVisible)}>
+            <Icon icon={terminalIcon} />
+          </IconButton>
+          <Box sx={{
+            backgroundColor: 'gray',
+            borderTop: '3px solid',
+            borderColor: 'primary',
+            flexGrow: 1,
+            boxSizing: 'border-box',
+            p: 2,
+          }}>
+            
+          </Box>
+        </Flex>
       </Flex>
     </WindowLayout>
   );

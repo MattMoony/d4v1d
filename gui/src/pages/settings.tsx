@@ -1,11 +1,18 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import { Box, Close, Divider, Flex, Heading, IconButton, useColorMode } from "theme-ui";
 import WindowLayout from '../components/WindowLayout';
-import { Link } from 'gatsby';
+import { Link, navigate } from 'gatsby';
 import Setting from '../components/Setting';
 
 const Settings = () => {
   const [colorMode, setMode] = useColorMode();
+
+  useEffect(() => {
+    window.addEventListener('keyup', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') navigate('/');
+    });
+  });
 
   return (
     <WindowLayout>

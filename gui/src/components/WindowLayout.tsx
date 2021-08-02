@@ -21,11 +21,6 @@ const WindowLayout = ({ children, }: WindowLayoutProps) => {
       }}>
         {children}
       </Box>
-      <Divider sx={{
-        height: '5px',
-        m: 0,
-        backgroundColor: 'muted',
-      }} />
     </Flex>
   );
 };
