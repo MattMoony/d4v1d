@@ -4,6 +4,9 @@ geckodriver.log
 tmp/
 venv
 node_modules
+data/
+!data/.gitkeep
+test.py
 
 # https://github.com/wearehive/project-guidelines/blob/master/.gitignore
 

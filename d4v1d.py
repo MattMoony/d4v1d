@@ -1,6 +1,8 @@
-import os, threading
-from lib import misc, bot, cmd
+import os, sys, threading
+import lib.cmd
+from lib import misc, bot
 from server import server
+from nubia import Nubia, Options
 from argparse import ArgumentParser
 
 def main():
@@ -9,7 +11,7 @@ def main():
     args = parser.parse_args()
 
     # server.run(args.debug)
-    cmd.clear()
+    # cmd.clear()
     try:
         misc.print_title("""
 ██████╗ ██╗  ██╗██╗   ██╗ ██╗██████╗ 
@@ -21,17 +23,23 @@ def main():
         """)
     except:
         pass
-    try:
-        code = cmd.SUCCESS
-        while code != cmd.CLOSING:
-            code = cmd.handle(misc.prompt(cmd.__bot), args.debug)
-        # else:
-        #     server.stop()
-    except KeyboardInterrupt:
-        print()
-        # server.stop()
-        cmd.__cleanup()
-    cmd.clear()
+    # try:
+    #     code = cmd.SUCCESS
+    #     while code != cmd.CLOSING:
+    #         code = cmd.handle(misc.prompt(cmd.__bot), args.debug)
+    #     # else:
+    #     #     server.stop()
+    # except KeyboardInterrupt:
+    #     print()
+    #     # server.stop()
+    #     cmd.__cleanup()
+    # cmd.clear()
+
+    shell = Nubia(
+        name='d4v1d',
+        command_pkgs=lib.cmd,
+    )
+    sys.exit(shell.run())
 
 if __name__ == '__main__':
     main()
