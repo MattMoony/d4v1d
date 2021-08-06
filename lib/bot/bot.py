@@ -28,8 +28,13 @@ class Bot(object):
         for c in self.cookies:
             self.session.cookies.set(**self.cookies[c])
 
+    def login(self, username: str, password: str) -> bool:
+        """Connects the bot with an account"""
+        self.username: str = username
+        return self.platform.login(self.session, username, password, headers=self.headers)
+
     def get_user(self, username: str) -> User:
         """Gets a basic overview of a social-media user"""
-        u: User = self.platform.get_user(self.session, username, self.headers)
+        u: User = self.platform.get_user(self.session, username, headers=self.headers)
         self.db_controller.store_user(u)
         return u

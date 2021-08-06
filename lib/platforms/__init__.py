@@ -23,6 +23,11 @@ class Platform(object):
         raise NotImplementedError()
 
     @classmethod
+    def login(cls, session: req.Session, username: str, password: str, headers: Optional[Dict[str, str]] = None) -> bool:
+        """Logs into the social-media platform using the given credentials"""
+        raise NotImplementedError()
+
+    @classmethod
     def get_user(cls, session: req.Session, username: str, headers: Optional[Dict[str, str]] = None) -> User:
         """Gets a basic overview of a social-media user"""
         raise NotImplementedError()

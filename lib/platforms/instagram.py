@@ -1,6 +1,6 @@
 """Contains methods for crawling Instagram (https://www.instagram.com/)."""
 
-import random
+import random, datetime, re
 import requests as req
 from lib.models.user import User
 from lib.platforms import Platform
@@ -33,7 +33,8 @@ class Instagram(Platform):
 
     """Contains endpoints required for all interactions with the platform"""
     endpoints: Dict[str, str] = {
-        'login': 'https://i.instagram.com/api/v1/accounts/login/',
+        'login': 'https://www.instagram.com/accounts/login/',
+        'post_login': 'https://www.instagram.com/accounts/login/ajax/',
         'followers': 'https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables={}',
         'following': 'https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables={}',
         'media': 'https://www.instagram.com/graphql/query/?query_hash=e769aa130647d2354c40ea6a439bfc08&variables={}',
@@ -49,6 +50,7 @@ class Instagram(Platform):
                         cls.params['PHONE_MANUFACTURER'], cls.params['PHONE_DEVICE'], cls.params['PHONE_MODEL'],
                         cls.params['PHONE_DPI'], cls.params['PHONE_RESOLUTION'], cls.params['PHONE_CHIPSET'], 
                         cls.params['VERSION_CODE'])
+        # return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.3'
 
     @classmethod
     def get_headers(cls) -> Dict[str, str]:
@@ -66,8 +68,22 @@ class Instagram(Platform):
             'X-IG-Bandwidth-Speed-KBPS': '-1.000',
             'X-IG-Bandwidth-TotalBytes-B': '0',
             'X-IG-Bandwidth-TotalTime-MS': '0',
+            'X-IG-Origin-Region': 'ldc',
+            'X-IG-Push-State': 'c2',
             'X-FB-HTTP-Engine': cls.params['FB_HTTP_ENGINE'],
         }
+
+    @classmethod
+    def login(cls, session: req.Session, username: str, password: str, headers: Optional[Dict[str, str]] = None) -> bool:
+        """Logs into the Instagram platform using the given credentials"""
+        csrf: str = re.findall(r'csrf_token\":\"(.*?)\"', session.get(cls.endpoints['login'], headers=headers).text)[0]
+        res: object = session.post(cls.endpoints['post_login'], data={
+            'username': username,
+            'enc_password': f'#PWD_INSTAGRAM_BROWSER:0:{int(datetime.datetime.now().timestamp())}:{password}',
+            'queryParams': {},
+            'optIntoOneTap': 'false',
+        }, headers={ **headers, 'X-CSRFToken': csrf, }).json()
+        return res['authenticated']
 
     @classmethod
     def get_user(cls, session: req.Session, username: str, headers: Optional[Dict[str, str]] = None) -> User:
