@@ -11,6 +11,9 @@ from typing import *
 class Instagram(Platform):
     """Represents the Instagram platform"""
 
+    name: str = 'Instagram'
+    link: str = 'https://instagram.com/'
+
     """Defines some social-media platform specific parameters"""
     params: Dict[str, str] = {
         'IG_SIG_KEY': '19ce5f445dbfd9d29c59dc2a78c616a7fc090a8e018b9267bc4240a30244c53b',
@@ -77,7 +80,7 @@ class Instagram(Platform):
     def login(cls, session: req.Session, username: str, password: str, headers: Optional[Dict[str, str]] = None) -> bool:
         """Logs into the Instagram platform using the given credentials"""
         csrf: str = re.findall(r'csrf_token\":\"(.*?)\"', session.get(cls.endpoints['login'], headers=headers).text)[0]
-        res: object = session.post(cls.endpoints['post_login'], data={
+        res: Dict[str, Any] = session.post(cls.endpoints['post_login'], data={
             'username': username,
             'enc_password': f'#PWD_INSTAGRAM_BROWSER:0:{int(datetime.datetime.now().timestamp())}:{password}',
             'queryParams': {},
@@ -88,7 +91,7 @@ class Instagram(Platform):
     @classmethod
     def get_user(cls, session: req.Session, username: str, headers: Optional[Dict[str, str]] = None) -> User:
         """Gets a basic overview of an Instagram account"""
-        res: object = session.get(cls.endpoints['public_info'].format(username), headers=headers).json()
+        res: Dict[str, Any] = session.get(cls.endpoints['public_info'].format(username), headers=headers).json()
         if not len(res.keys()):
             raise UnknownUserException(f'User "{username}" cannot be found on platform Instagram ... ')
         res = res['graphql']['user']

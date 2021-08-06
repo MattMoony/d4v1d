@@ -15,11 +15,17 @@ def print_title(txt):
         print(''.join([rand_color()+c for c in l]))
     print(cm.Fore.RESET, end='')
 
-def print_err(lbl, msg):
-    print(cm.Fore.RED + cm.Style.BRIGHT + ' [-] ' + lbl + ': ' + cm.Style.RESET_ALL + cm.Fore.LIGHTRED_EX + msg + cm.Fore.RESET)
+def print_err(lbl: str, msg: str) -> None:
+    """Print a labeled error message to the console"""
+    print(cm.Fore.RED + cm.Style.BRIGHT + '[-] ' + lbl + ': ' + cm.Style.RESET_ALL + cm.Fore.LIGHTRED_EX + msg + cm.Fore.RESET)
 
-def print_wrn(lbl, msg):
-    print(cm.Fore.YELLOW + cm.Style.BRIGHT + ' [!] ' + lbl + ': ' + cm.Style.RESET_ALL + cm.Fore.LIGHTYELLOW_EX + msg + cm.Fore.RESET)
+def print_wrn(lbl: str, msg: str) -> None:
+    """Print a labeled warning message to the console"""
+    print(cm.Fore.YELLOW + cm.Style.BRIGHT + '[!] ' + lbl + ': ' + cm.Style.RESET_ALL + cm.Fore.LIGHTYELLOW_EX + msg + cm.Fore.RESET)
+
+def print_inf(msg: str) -> None:
+    """Print some info string to the console"""
+    print(f'{cm.Style.DIM}{msg}{cm.Style.RESET_ALL}')
 
 def prompt(bot=None, lbl='d4v1d'):
     if bot:

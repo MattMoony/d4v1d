@@ -7,6 +7,8 @@ node_modules
 data/
 !data/.gitkeep
 test.py
+lib/**/*.json
+*.code-workspace
 
 # https://github.com/wearehive/project-guidelines/blob/master/.gitignore
 

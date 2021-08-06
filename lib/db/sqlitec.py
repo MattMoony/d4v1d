@@ -1,10 +1,15 @@
-import os, csv, pathlib
+import os, pathlib
 import sqlite3
 import lib.params
+from lib import db
+from lib import platforms
 from lib.models.user import User
+from prompt_toolkit import prompt
+from lib.db.dbc import DBController
+from prompt_toolkit.completion import PathCompleter
 from typing import *
 
-class SQLiteController(object):
+class SQLiteController(DBController):
     """DB Controller for SQLite databases"""
 
     """The DDL required for database setup"""
@@ -45,19 +50,40 @@ class SQLiteController(object):
     def __init__(self, dbname: str = os.path.join(lib.params.DATA_PATH, 'data.db')):
         self.dbname: str = dbname
         self.con: sqlite3.Connection = sqlite3.connect(self.dbname)
+        db.register_controller(self)
+        self.setup()
+
+    def __str__(self) -> str:
+        return f'SQLiteController("{self.dbname}")'
+
+    @classmethod
+    def create(cls) -> "SQLiteController":
+        """Creates a new SQLite DB Controller interactively"""
+        print('SQLite3 Connector - Setup')
+        path: str = prompt('  Path for SQLite3 DB [default=data/data.db]: ', completer=PathCompleter(), complete_while_typing=True)
+        return SQLiteController(path if path.strip() != '' else os.path.join(lib.params.DATA_PATH, 'data.db'))
+
+    @classmethod
+    def unjson(cls, json: Dict[str, Any]) -> "SQLiteController":
+        """Creates a new SQLite Controller with the given configuration"""
+        return SQLiteController(json['dbname'])
 
     def setup(self) -> None:
         """Creates all necessary tables, etc."""
         c: sqlite3.Cursor = self.con.cursor()
         for l in SQLiteController.__setup:
             c.execute(l)
-        with open(os.path.join(lib.params.BASE_PATH, 'lib', 'db', 'platforms.csv'), 'r') as f:
-            for p in csv.DictReader(f):
-                try:
-                    c.execute('INSERT INTO platforms (name, link) VALUES (?, ?)', (p['name'], p['link'],))
-                except sqlite3.IntegrityError:
-                    pass
+        ps: List[Tuple[str, str]] = list(map(lambda p: (p.name, p.link), platforms.PLATFORMS))
+        for p in ps:
+            try:
+                c.execute('INSERT INTO platforms (name, link) VALUES (?, ?)', p)
+            except sqlite3.IntegrityError:
+                pass
         self.con.commit()
+
+    def json(self) -> Dict[str, Any]:
+        """Converts the SQLite Controller's config to a dictionary"""
+        return dict(type=self.__class__.__name__, dbname=self.dbname)
 
     def get_platform(self, pid: Optional[int] = None, name: Optional[str] = None) -> Tuple[int, str, str]:
         """Gets the id, name and link of a platform"""
