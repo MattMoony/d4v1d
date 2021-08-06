@@ -51,7 +51,6 @@ class SQLiteController(DBController):
         self.dbname: str = dbname
         self.con: sqlite3.Connection = sqlite3.connect(self.dbname)
         db.register_controller(self)
-        self.setup()
 
     def __str__(self) -> str:
         return f'SQLiteController("{self.dbname}")'
@@ -61,7 +60,9 @@ class SQLiteController(DBController):
         """Creates a new SQLite DB Controller interactively"""
         print('SQLite3 Connector - Setup')
         path: str = prompt('  Path for SQLite3 DB [default=data/data.db]: ', completer=PathCompleter(), complete_while_typing=True)
-        return SQLiteController(path if path.strip() != '' else os.path.join(lib.params.DATA_PATH, 'data.db'))
+        c: DBController = SQLiteController(path if path.strip() != '' else os.path.join(lib.params.DATA_PATH, 'data.db'))
+        c.setup()
+        return c
 
     @classmethod
     def unjson(cls, json: Dict[str, Any]) -> "SQLiteController":
@@ -84,6 +85,10 @@ class SQLiteController(DBController):
     def json(self) -> Dict[str, Any]:
         """Converts the SQLite Controller's config to a dictionary"""
         return dict(type=self.__class__.__name__, dbname=self.dbname)
+
+    def healthy(self) -> bool:
+        """Check that the SQLite db is still healthy and operational"""
+        return os.path.isfile(self.dbname)
 
     def get_platform(self, pid: Optional[int] = None, name: Optional[str] = None) -> Tuple[int, str, str]:
         """Gets the id, name and link of a platform"""

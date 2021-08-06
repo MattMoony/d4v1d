@@ -47,7 +47,10 @@ def init():
         # TODO: PROBABLY NEED TO RE-WRITE THE FOLLOWING AS IT'S PROBABLY NOT THE BEST IDEA TO HAVE SUCH
         # TODO: LOOSE RESTRICTIONS ON "CODE EXECUTION" FROM CONFIG FILES ... 
         for c in contr:
-            controller_type(c['type']).unjson(c)
+            cc: DBController = controller_type(c['type']).unjson(c)
+            if not cc.healthy():
+                print(cc)
+                del CONTROLLERS[CONTROLLERS.index(cc)]
 
 def register_controller(c: DBController) -> None:
     """Registers a new DB Controller, both in memory and on disk"""

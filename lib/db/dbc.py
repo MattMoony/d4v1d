@@ -27,6 +27,10 @@ class DBController(object):
         """Converts the DBController's configuration to a dictionary"""
         raise NotImplementedError()
 
+    def healthy(self) -> bool:
+        """Confirm that the db controller's db is still healthy and operational"""
+        raise NotImplementedError()
+
     def get_platform(self, pid: Optional[int] = None, name: Optional[str] = None) -> Tuple[int, str, str]:
         """Gets the id, name and link of a platform"""
         raise NotImplementedError()
