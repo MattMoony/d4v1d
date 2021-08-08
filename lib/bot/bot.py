@@ -2,19 +2,28 @@ from lib.errors import LoginFailedError
 import requests as req
 from lib.db import DBController
 from lib.models.user import User
+from threading import Lock, Thread
 from lib.platforms import Platform
 from typing import *
 
 class Bot(object):
     """A bot - an automated user of a social-media platform."""
 
+    """Is the bot currently doing work?"""
+    occupied: bool = False
+    """Lock for synchronizing occupied access across thread"""
+    occupied_lock: Lock = Lock()
+    """The task that the bot is currently working on"""
+    task: Optional[Tuple[Tuple[Callable, List[Any], Dict[str, Any], Optional[Callable]]]] = None
+
     def __init__(self, platform: Platform, db_controller: DBController, cookies: Optional[Dict[str, str]]=None, proxy: Optional[str] = None, 
-                 headers: Optional[Dict[str, str]] = None, username: Optional[str] = None, password: Optional[str] = None):
+                 headers: Optional[Dict[str, str]] = None, username: Optional[str] = None, password: Optional[str] = None, group: Optional["BotGroup"] = None):
         self.platform: Platform = platform
         self.db_controller: DBController = db_controller
         self.cookies: Optional[Dict[str, str]] = cookies
         self.proxy: Optional[str] = proxy
         self.headers: Dict[str, str] = { **self.platform.get_headers(), **headers, } if headers else self.platform.get_headers()
+        self.group: Optional["BotGroup"] = group
         self.session: req.Session = req.Session()
         if username:
             if not self.login(username, password):
@@ -41,6 +50,34 @@ class Bot(object):
         """Apply the current cookies to the current session"""
         for c in self.cookies:
             self.session.cookies.set(**self.cookies[c])
+
+    def __poll_group(self) -> None:
+        """Polls the group for something to do"""
+        if not self.group:
+            return
+        with self.group.tasks_lock:
+            if not self.group.tasks.empty():
+                with self.occupied_lock:
+                    if not self.occupied:
+                        self.occupied = True
+                        task: Tuple[Tuple[Callable, List[Any], Dict[str, Any], Optional[Callable]]] = self.group.tasks.get()
+        if task:
+            Thread(target=self.do, args=task)
+
+    def feierabend(self) -> None:
+        """Finish work on the current task"""
+        with self.occupied_lock:
+            self.task = None
+            self.occupied = False
+
+    def do(self, task: Callable, args: List[Any], kwargs: Dict[str, Any], callback: Optional[Callable]) -> None:
+        """Do an asynchronous task"""
+        self.task = (task, args, kwargs, callback,)
+        res: Any = getattr(self, task.__name__)(*args, **kwargs)
+        self.feierabend()
+        self.__poll_group()
+        if callback:
+            callback(res)
 
     def login(self, username: str, password: str) -> bool:
         """Connects the bot with an account"""
