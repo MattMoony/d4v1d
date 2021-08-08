@@ -11,7 +11,7 @@ class BotGroup(object):
     """A group of bots - useful for distributing tasks among many automated accounts"""
 
     """The tasks that should be distributed"""
-    tasks: Queue = Queue()
+    tasks: List[Tuple[Tuple[Callable, List[Any], Dict[str, Any], Optional[Callable]]]] = []
     """Lock for synchronizing task access across threads"""
     tasks_lock: Lock = Lock()
 
@@ -45,14 +45,14 @@ class BotGroup(object):
             if 0 <= idx < len(self.bots):
                 del self.bots[idx]
 
-    def run(self, task: Callable, args: List[Any], kwargs: Dict[str, Any], callback: Optional[Callable]) -> None:
+    def run(self, task: Callable, *args: List[Any], callback: Optional[Callable] = None, **kwargs: Dict[str, Any]) -> None:
         """Adds & runs a task"""
         with self.bots_lock:
             for b in self.bots:
                 with b.occupied_lock:
                     if not b.occupied:
                         b.occupied = True
-                        Thread(target=b.do, args=(args, kwargs, callback,))
+                        Thread(target=b.do, args=(task, args, kwargs, callback,)).start()
                         return
         with self.tasks_lock:
-            self.tasks.put((task, args, kwargs, callback,))
+            self.tasks.append((task, args, kwargs, callback,))

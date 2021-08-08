@@ -60,9 +60,9 @@ class Bot(object):
                 with self.occupied_lock:
                     if not self.occupied:
                         self.occupied = True
-                        task: Tuple[Tuple[Callable, List[Any], Dict[str, Any], Optional[Callable]]] = self.group.tasks.get()
+                        task: Tuple[Tuple[Callable, List[Any], Dict[str, Any], Optional[Callable]]] = self.group.tasks.pop(0)
         if task:
-            Thread(target=self.do, args=task)
+            Thread(target=self.do, args=task).start()
 
     def feierabend(self) -> None:
         """Finish work on the current task"""
@@ -70,7 +70,7 @@ class Bot(object):
             self.task = None
             self.occupied = False
 
-    def do(self, task: Callable, args: List[Any], kwargs: Dict[str, Any], callback: Optional[Callable]) -> None:
+    def do(self, task: Callable, args: List[Any], kwargs: Dict[str, Any], callback: Optional[Callable] = None) -> None:
         """Do an asynchronous task"""
         self.task = (task, args, kwargs, callback,)
         res: Any = getattr(self, task.__name__)(*args, **kwargs)
