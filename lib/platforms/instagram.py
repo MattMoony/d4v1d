@@ -5,7 +5,7 @@ import requests as req
 from lib.models.user import User
 from lib.platforms import Platform
 from lib.models.picture import Picture
-from lib.errors import UnknownUserException
+from lib.errors import UnknownUserError
 from typing import *
 
 class Instagram(Platform):
@@ -93,7 +93,7 @@ class Instagram(Platform):
         """Gets a basic overview of an Instagram account"""
         res: Dict[str, Any] = session.get(cls.endpoints['public_info'].format(username), headers=headers).json()
         if not len(res.keys()):
-            raise UnknownUserException(f'User "{username}" cannot be found on platform Instagram ... ')
+            raise UnknownUserError(f'User "{username}" cannot be found on platform Instagram ... ')
         res = res['graphql']['user']
         return User(username, 'Instagram', res['is_private'], res['is_verified'], 
                     profile_pic=Picture(url=res['profile_pic_url_hd']), fullname=res['full_name'], 

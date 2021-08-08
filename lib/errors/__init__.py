@@ -2,7 +2,10 @@
 
 from typing import *
 
-class UnknownUserException(Exception):
+class UnknownUserError(Exception):
     """Thrown, when a user doesn't exist on a platform"""
     pass
 
+class LoginFailedError(Exception):
+    """Thrown, when a login fails"""
+    pass

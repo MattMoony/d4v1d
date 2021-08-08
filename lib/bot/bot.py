@@ -1,3 +1,4 @@
+from lib.errors import LoginFailedError
 import requests as req
 from lib.db import DBController
 from lib.models.user import User
@@ -16,7 +17,8 @@ class Bot(object):
         self.headers: Dict[str, str] = { **self.platform.get_headers(), **headers, } if headers else self.platform.get_headers()
         self.session: req.Session = req.Session()
         if username:
-            self.login(username, password)
+            if not self.login(username, password):
+                raise LoginFailedError()
         else:
             self.username: Optional[str] = None
         if self.cookies:
@@ -27,8 +29,8 @@ class Bot(object):
             self.session.proxies = { value.split(':')[0]: value, }
         elif name == 'headers':
             self.__dict__['headers'] = { **self.platform.get_headers(), **value, }
-        elif name == 'cookies':
-            self.__dict__['cookies'] = { **self.cookies, **value, }
+        elif name == 'cookies' and value:
+            self.__dict__['cookies'] = { **(self.cookies if self.cookies else {}), **value, }
             self.__update_session_cookies()
         super().__setattr__(name, value)
 
