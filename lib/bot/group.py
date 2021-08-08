@@ -25,3 +25,8 @@ class BotGroup(object):
     def add(self, username: Optional[str] = None, password: Optional[str] = None) -> None:
         """Adds a new bot to the group"""
         self.bots.append(Bot(self.platform, self.db_controller, username=username, password=password))
+
+    def remove(self, idx: int) -> None:
+        """Removes a bot from the group"""
+        if 0 <= idx < len(self.bots):
+            del self.bots[idx]
