@@ -1,9 +1,10 @@
 import os, sys, threading
-import lib.cmd
+import lib.cmd.basic
 from lib import misc, bot
 from server import server
 from nubia import Nubia, Options
 from argparse import ArgumentParser
+from lib.cmd.plugin import D4v1dNubiaPlugin
 
 def main():
     parser = ArgumentParser()
@@ -37,7 +38,8 @@ def main():
 
     shell = Nubia(
         name='d4v1d',
-        command_pkgs=lib.cmd,
+        command_pkgs=lib.cmd.basic,
+        plugin=D4v1dNubiaPlugin(),
     )
     sys.exit(shell.run())
 

@@ -1,6 +1,7 @@
 """Exposes an array of all active botgroups"""
 
-from lib.bot.group import BotGroup
+from .bot import *
+from .group import *
 from typing import *
 
 """A list of all currently active bot groups"""
