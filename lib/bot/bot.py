@@ -1,7 +1,7 @@
 from lib.errors import LoginFailedError
 import requests as req
 from lib.db import DBController
-from lib.models.user import User
+from lib.models import User, Media
 from threading import Lock, Thread
 from lib.platforms import Platform
 from typing import *
@@ -90,8 +90,18 @@ class Bot(object):
         self.db_controller.store_user(u)
         return u
 
-    def get_media(self, username: str) -> None:
+    def get_media(self, username: str, after: Optional[str] = None) -> Tuple[List[Media], str]:
         """Gets all media in a social-media account"""
-        u: User = self.db_controller.get_user(username, self.db_controller.get_platform(name=self.platform.name))\
+        u: User = self.db_controller.get_user(username, self.db_controller.get_platform(name=self.platform.name)[0])\
                   or self.get_user(username)
-        
+        media, after = self.platform.get_media(self.session, u.id, after=after, headers=self.headers)
+        if self.group:
+            if after:
+                self.group.run(Bot.get_media, username, after=after)
+            for m in media:
+                self.group.run(Bot.download_media, m)
+        return (media, after)
+
+    def download_media(self, media: Media) -> None:
+        """Downloads the given media to disk"""
+        media.download(session=self.session, header=self.headers)

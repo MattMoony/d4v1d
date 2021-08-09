@@ -4,7 +4,7 @@ import lib.params
 from lib import db
 from lib import platforms
 from contextlib import closing
-from lib.models.user import User
+from lib.models import User, Media
 from prompt_toolkit import prompt
 from lib.db.dbc import DBController
 from prompt_toolkit.completion import PathCompleter
@@ -27,7 +27,7 @@ class SQLiteController(DBController):
                 username    TEXT,
                 pid         INTEGER,
                 userid      INTEGER,
-                FOREIGN KEY (pid) REFERENCES platform(pid),
+                FOREIGN KEY (pid) REFERENCES platforms(pid),
                 PRIMARY KEY (username, pid)
             )
         ''',
@@ -45,6 +45,46 @@ class SQLiteController(DBController):
                 FOREIGN KEY (username) REFERENCES users(username),
                 FOREIGN KEY (pid) REFERENCES users(pid),
                 PRIMARY KEY (username, pid, timestamp)
+            )
+        ''',
+        '''
+            CREATE TABLE IF NOT EXISTS media_snapshots (
+                username    TEXT,
+                pid         INTEGER,
+                timestamp   INTEGER DEFAULT CURRENT_TIMESTAMP
+                FOREIGN KEY (username) REFERENCES users(username),
+                FOREIGN KEY (pid) REFERENCES users(pid),
+                PRIMARY KEY (username, pid, timestamp)
+            )
+        ''',
+        '''
+            CREATE TABLE IF NOT EXISTS media (
+                username    TEXT,
+                pid         INTEGER,
+                timestamp   INTEGER,
+                name        TEXT,
+                caption     TEXT,
+                likes       INTEGER,
+                FOREIGN KEY (username) REFERENCES media_snapshots(username),
+                FOREIGN KEY (pid) REFERENCES media_snapshots(pid),
+                FOREIGN KEY (timestamp) REFERENCES media_snapshots(timestamp),
+                PRIMARY KEY (username, pid, timestamp, name)
+            )
+        ''',
+        '''
+            CREATE TABLE IF NOT EXISTS tagged (
+                username        TEXT,
+                pid             INTEGER,
+                timestamp       INTEGER,
+                name            TEXT,
+                tag_username    TEXT,
+                FOREIGN KEY (username) REFERENCES media(username),
+                FOREIGN KEY (pid) REFERENCES media(pid),
+                FOREIGN KEY (timestamp) REFERENCES media(timestamp),
+                FOREIGN KEY (name) REFERENCES media(name),
+                FOREIGN KEY (tag_username) REFERENCES users(username),
+                FOREIGN KEY (pid) REFERENCES users(pid),
+                PRIMARY KEY (username, pid, timestamp, name, tag_username)
             )
         ''',
     ]
@@ -131,21 +171,25 @@ class SQLiteController(DBController):
 
     def get_user(self, username: str, pid: int) -> Optional[User]:
         """Loads and returns a user from the SQLite db"""
-        with closing(sqlite3.connect(self.dbnam)) as con:
+        with closing(sqlite3.connect(self.dbname)) as con:
             c: sqlite3.Cursor = con.cursor()
-            c.execute('''SELECT u.userid, o.* 
+            c.execute('''SELECT u.username, u.userid, u.pid, o.private,
+                                o.verified, o.profile_pic, o.fullname,
+                                o.website, o.bio
                          FROM   users u LEFT OUTER JOIN (SELECT     *
-                                                         FROM       overviews
-                                                         WHERE      timestamp = (SELECT MAX(timestamp)
-                                                                                 FROM   overviews
-                                                                                 WHERE  username = u.username
-                                                                                        AND pid = u.pid)
-                                                                    AND username = u.username
-                                                                    AND pid = u.pid) o 
+                                                         FROM       overviews o1
+                                                         WHERE      o1.username = username
+                                                                    AND o1.pid = pid
+                                                                    AND timestamp = (SELECT     MAX(timestamp)
+                                                                                     FROM       overviews o2
+                                                                                     WHERE      o2.username = username
+                                                                                                AND o2.pid = pid)) o
                                         ON u.username = o.username AND u.pid = o.pid
                          WHERE  u.username = ? AND u.pid = ?''', (username, pid,))
             res: Optional[List[Any]] = c.fetchone()
         if not res:
             return None
-        return User(res[1], self.get_platform(pid=pid), res[3], res[4], 
-                    user_id=res[0], profile_pic=res[5], fullname=res[6], website=res[7], bio=res[8])                
+        return User(res[0], self.get_platform(pid=pid)[1], res[3], res[4], 
+                    user_id=res[1], profile_pic=Media(path=res[5]) if res[5] else None, fullname=res[6], website=res[7], bio=res[8])                
+
+    def store_media()

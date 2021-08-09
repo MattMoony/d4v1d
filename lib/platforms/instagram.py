@@ -117,13 +117,20 @@ class Instagram(Platform):
             return ([], None)
         ret: List[Media] = []
         for e in res['edges']:
-            basename: str = f'{datetime.datetime.fromtimestamp(e["node"]["taken_at_timestamp"]).isoformat()}-{e["node"]["shortcode"]}'
-            if 'edge_sidecar_to_children' in e['node'].keys():
-                zeros: int = math.floor(math.log10(len(e['node']['edge_sidecar_to_children']['edges'])))+1
-                for i, c in enumerate(e['node']['edge_sidecar_to_children']['edges']):
-                    ret.append(Media(name=basename+'-'+str(i).rjust(zeros, '0'),
-                                     url=c['node']['video_url'] if c['node']['is_video'] else c['node']['display_url']))
+            e = e['node']
+            basename: str = f'{datetime.datetime.fromtimestamp(e["taken_at_timestamp"]).isoformat()}-{e["shortcode"]}'
+            caption: Optional[str] = e['edge_media_caption']['edges'][0]['node']['text'] if e['edge_media_caption']['edges'] else None
+            tagged: List[User] = [User(u['node']['user']['username'], 'Instagram', None, u['node']['user']['is_verified'], user_id=u['node']['user']['id']) for u in e['edge_media_to_tagged_user']['edges']]
+            likes: int = e['edge_media_preview_like']['count']
+            if 'edge_sidecar_to_children' in e.keys():
+                zeros: int = math.floor(math.log10(len(e['edge_sidecar_to_children']['edges'])))+1
+                for i, c in enumerate(e['edge_sidecar_to_children']['edges']):
+                    c = c['node']
+                    ret.append(Media(name=basename+'-'+str(i).rjust(zeros, '0'), 
+                                     caption=caption, tagged=tagged, likes=likes,
+                                     url=c['video_url'] if c['is_video'] else c['display_url']))
             else:
-                ret.append(Media(name=basename, 
+                ret.append(Media(name=basename,
+                                 caption=caption, tagged=tagged, likes=likes,
                                  url=e['node']['video_url'] if e['node']['is_video'] else e['node']['display_url']))
         return (ret, res['page_info']['end_cursor'])

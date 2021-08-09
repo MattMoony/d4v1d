@@ -5,7 +5,9 @@ from typing import *
 class Media(object):
     """An arbitrary picture/video/... - either from the web, disk, memory, ..."""
 
-    def __init__(self, name: Optional[str] = None, url: Optional[str] = None, data: Optional[bytes] = None, path: Optional[str] = None, headers: Optional[str] = None):
+    def __init__(self, name: Optional[str] = None, caption: Optional[str] = None, tagged: List["User"] = [],
+                 likes: Optional[int] = None, dislikes: Optional[int] = None,
+                 url: Optional[str] = None, data: Optional[bytes] = None, path: Optional[str] = None, headers: Optional[str] = None):
         self.name: Optional[str] = name
         self.__url: Optional[str] = url
         self.__data: Optional[bytes] = data
