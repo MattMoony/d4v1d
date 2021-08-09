@@ -1,2 +1,2 @@
-from .media import *
 from .user import *
+from .media import *

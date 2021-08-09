@@ -2,6 +2,7 @@
 
 import random, datetime, re, json, math
 import requests as req
+from urllib.parse import quote
 from lib.misc import print_wrn
 from lib.models import User
 from lib.models.media import Media
@@ -108,7 +109,11 @@ class Instagram(Platform):
             'first': 50,
             'after': after,
         }
-        res: Dict[str, Any] = session.get(cls.endpoints['media'].format(json.dumps(variables))).json()
+        print(cls.endpoints['media'].format(quote(json.dumps(variables))))
+        res: Dict[str, Any] = session.get(cls.endpoints['media'].format(quote(json.dumps(variables))), headers=headers)
+        with open('tmp/out.html', 'wb') as f:
+            f.write(res.content)
+        res = res.json()
         if res['status'] != 'ok':
             return ([], None)
         res = res['data']['user']['edge_owner_to_timeline_media']

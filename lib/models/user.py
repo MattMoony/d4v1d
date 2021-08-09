@@ -1,6 +1,6 @@
 """Contains the User class. A representation of an arbitrary social-media user."""
 
-from lib.models import Media
+from lib.models.media import Media
 from typing import *
 
 class User(object):

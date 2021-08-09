@@ -1,7 +1,8 @@
 
-import lib.bot
+from lib.errors import BotGroupNameTaken
 from queue import Queue
 from lib.bot.bot import Bot
+from lib import platforms, db, bot
 from lib.platforms import Platform
 from threading import Thread, Lock
 from lib.db.dbc import DBController
@@ -24,20 +25,46 @@ class BotGroup(object):
         self.name: str = name
         self.platform: Platform = platform
         self.db_controller: DBController = db_controller
-        lib.bot.GROUPS.append(self)
-    
+        if self in bot.GROUPS:
+            raise BotGroupNameTaken()
+        bot.register_group(self)
+
     def __str__(self) -> str:
         return f'{self.name}({self.platform.name}, {len(self.bots)} bots, {round((len(self.get_authenticated())/max(len(self.bots), 1))*100)}% authenticated)'
+
+    def __eq__(self, other: Any) -> bool:
+        if type(other) != type(self):
+            return False
+        return self.name == other.name
+
+    @classmethod
+    def unjson(cls, json: Dict[str, Any]) -> "BotGroup":
+        group: BotGroup = BotGroup(json['name'], platforms.platform(json['platform']), db.CONTROLLERS[json['db_controller']])
+        for b in json['bots']:
+            group.add(username=b['username'], cookies=b['cookies'], proxy=b['proxy'], headers=b['headers'])
+        return group
+
+    def json(self) -> Dict[str, Any]:
+        """Converts the group's (and all its bots') configuration to a dictionary"""
+        with self.bots_lock:
+            res: Dict[str, Any] = {
+                'name': self.name,
+                'platform': self.platform.name,
+                'db_controller': db.CONTROLLERS.index(self.db_controller),
+                'bots': [ b.json() for b in self.bots ]
+            }
+        return res
 
     def get_authenticated(self) -> None:
         """Returns a list of all authenticated bots"""
         with self.bots_lock:
             return list(filter(lambda b: b.username, self.bots))
 
-    def add(self, username: Optional[str] = None, password: Optional[str] = None) -> None:
+    def add(self, username: Optional[str] = None, password: Optional[str] = None, cookies: Optional[Dict[str, str]] = None, **kwargs) -> None:
         """Adds a new bot to the group"""
         with self.bots_lock:
-            self.bots.append(Bot(self.platform, self.db_controller, username=username, password=password))
+            self.bots.append(Bot(self.platform, self.db_controller, username=username, password=password, cookies=cookies, **kwargs))
+        bot.write_config()
 
     def remove(self, idx: int) -> None:
         """Removes a bot from the group"""

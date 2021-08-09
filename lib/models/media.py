@@ -9,6 +9,10 @@ class Media(object):
                  likes: Optional[int] = None, dislikes: Optional[int] = None,
                  url: Optional[str] = None, data: Optional[bytes] = None, path: Optional[str] = None, headers: Optional[str] = None):
         self.name: Optional[str] = name
+        self.caption: Optional[str] = caption
+        self.tagged: List["User"] = tagged
+        self.likes: Optional[int] = likes
+        self.dislikes: Optional[int] = dislikes
         self.__url: Optional[str] = url
         self.__data: Optional[bytes] = data
         self.__path: Optional[str] = path

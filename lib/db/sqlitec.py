@@ -1,10 +1,11 @@
-import os, pathlib
+import os, pathlib, datetime
 import sqlite3
 import lib.params
 from lib import db
 from lib import platforms
 from contextlib import closing
-from lib.models import User, Media
+from lib.models import User
+from lib.models.media import Media
 from prompt_toolkit import prompt
 from lib.db.dbc import DBController
 from prompt_toolkit.completion import PathCompleter
@@ -51,7 +52,7 @@ class SQLiteController(DBController):
             CREATE TABLE IF NOT EXISTS media_snapshots (
                 username    TEXT,
                 pid         INTEGER,
-                timestamp   INTEGER DEFAULT CURRENT_TIMESTAMP
+                timestamp   INTEGER DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (username) REFERENCES users(username),
                 FOREIGN KEY (pid) REFERENCES users(pid),
                 PRIMARY KEY (username, pid, timestamp)
@@ -65,6 +66,7 @@ class SQLiteController(DBController):
                 name        TEXT,
                 caption     TEXT,
                 likes       INTEGER,
+                dislikes    INTEGER,
                 FOREIGN KEY (username) REFERENCES media_snapshots(username),
                 FOREIGN KEY (pid) REFERENCES media_snapshots(pid),
                 FOREIGN KEY (timestamp) REFERENCES media_snapshots(timestamp),
@@ -151,6 +153,11 @@ class SQLiteController(DBController):
             res: Optional[Tuple[str, int]] = c.fetchone()
         return res != None
 
+    def __store_user(self, username: str, pid: int, user_id: int, c: sqlite3.Cursor) -> None:
+        """Only store the most essential information"""
+        c.execute('''INSERT INTO users (username, pid, userid) 
+                     VALUES (?, ?, ?)''', (username, pid, user_id))
+
     def store_user(self, user: User) -> None:
         """Stores a social-media user in the SQLite db"""
         with closing(sqlite3.connect(self.dbname)) as con:
@@ -161,8 +168,7 @@ class SQLiteController(DBController):
             c: sqlite3.Cursor = con.cursor()
             platform: Tuple[int, str, str] = self.get_platform(name=user.platform)
             if not self.user_exists(platform[0], user.username):
-                c.execute('''INSERT INTO users (username, pid, userid) 
-                             VALUES (?, ?, ?)''', (user.username, platform[0], user.id))
+                self.__store_user(user.username, platform[0], user.id, c)
             c.execute('''INSERT INTO overviews (username, pid, private, verified, profile_pic, fullname, website, bio)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', 
                     (user.username, platform[0], user.private, user.verified, 
@@ -192,4 +198,40 @@ class SQLiteController(DBController):
         return User(res[0], self.get_platform(pid=pid)[1], res[3], res[4], 
                     user_id=res[1], profile_pic=Media(path=res[5]) if res[5] else None, fullname=res[6], website=res[7], bio=res[8])                
 
-    def store_media()
+    def store_media_snapshot(self, username: str, pid: int) -> int:
+        """Creates a new media snapshot entry and returns the timestamp"""
+        timestamp: int = int(datetime.datetime.now().timestamp())
+        with closing(sqlite3.connect(self.dbname)) as con:
+            c: sqlite3.Cursor = con.cursor()
+            c.execute('''INSERT INTO media_snapshots
+                         VALUES (?, ?, ?)''', (username, pid, timestamp,))
+            con.commit()
+        return timestamp
+
+    def store_media(self, user: User, pid: int, timestamp: int, media: Media) -> None:
+        """Stores a media entry in the SQLite db"""
+        with closing(sqlite3.connect(self.dbname)) as con:
+            pic_path: str = os.path.join(lib.params.DATA_PATH, user.username, user.platform, datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d_%H-%M-%S'), f'{media.name}.{media.ext()}')
+            pathlib.Path(os.path.dirname(pic_path)).mkdir(parents=True, exist_ok=True)
+            media.write(pic_path)
+            c: sqlite3.Cursor = con.cursor()
+            c.execute('''INSERT INTO media
+                                (username, pid, timestamp, name, caption, likes)
+                         VALUES (?, ?, ?, ?, ?, ?)''', (user.username, pid, timestamp, media.name, media.caption, media.likes))
+            for t in media.tagged:
+                self.__store_tagged(user.username, pid, timestamp, media.name, t, c)
+            con.commit()
+
+    def __store_tagged(self, username: str, pid: int, timestamp: int, name: str, tagged: User, c: sqlite3.Cursor) -> None:
+        """Method called by store_tagged"""
+        if not self.user_exists(pid, tagged.username):
+            self.__store_user(tagged.username, pid, tagged.id)
+        c.execute('''INSERT INTO tagged
+                     VALUES (?, ?, ?, ?, ?)''', (username, pid, timestamp, name, tagged.username))
+
+    def store_tagged(self, username: str, pid: int, timestamp: int, name: str, tagged: User) -> None:
+        """Stores a user that has been tagged in media in the db"""
+        with closing(sqlite3.connect(self.dbname)) as con:
+            c: sqlite3.Cursor = con.cursor()
+            self.__store_tagged(username, pid, timestamp, name, tagged, c)
+            con.commit()

@@ -9,3 +9,7 @@ class UnknownUserError(Exception):
 class LoginFailedError(Exception):
     """Thrown, when a login fails"""
     pass
+
+class BotGroupNameTaken(Exception):
+    """Thrown, when a group with the given name already exists"""
+    pass

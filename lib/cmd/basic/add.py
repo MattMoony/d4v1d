@@ -1,4 +1,4 @@
-from lib.errors import LoginFailedError
+from lib.errors import BotGroupNameTaken, LoginFailedError
 import colorama as cm
 cm.init()
 from prompt_toolkit import prompt
@@ -23,7 +23,10 @@ class Add(object):
         if not 0 <= db_controller < len(db.CONTROLLERS):
             print_err('DB Controllers', 'Unknown db controller (index out of range)')
             return
-        BotGroup(name, platforms.platform(platform), db.CONTROLLERS[db_controller])
+        try:
+            BotGroup(name, platforms.platform(platform), db.CONTROLLERS[db_controller])
+        except BotGroupNameTaken:
+            print_err('bot-groups', f'Group with the name "{name}" already exists ... ')
 
     @command
     @argument('sort', description='The type of db controller', positional=True, choices=list(map(lambda c: c.__name__, db.CONTROLLER_TYPES)))

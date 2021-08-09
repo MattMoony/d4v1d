@@ -1,4 +1,4 @@
-from lib.models.user import User
+from lib.models import User, Media
 from typing import *
 
 class DBController(object):
@@ -38,6 +38,10 @@ class DBController(object):
     def user_exists(self, pid: int, username: str) -> bool:
         """Checks, whether or not the user on the given platform is already part of the db"""
         raise NotImplementedError()
+
+    def __store_user(self, username: str, pid: int, user_id: int, *args: List[Any]) -> None:
+        """Only store the most essential information"""
+        raise NotImplementedError()
     
     def store_user(self, user: User) -> None:
         """Stores a basic overview of a social-media user in the DB"""
@@ -45,4 +49,20 @@ class DBController(object):
 
     def get_user(self, username: str, pid: int) -> User:
         """Loads and returns a user from the database"""
+        raise NotImplementedError()
+
+    def store_media_snapshot(self, username: str, pid: int) -> int:
+        """Creates a new media snapshot entry and returns the timestamp"""
+        raise NotImplementedError()
+
+    def store_media(self, user: User, pid: int, timestamp: int, media: Media) -> None:
+        """Stores a media entry in the db"""
+        raise NotImplementedError()
+
+    def __store_tagged(self, username: str, pid: int, timestamp: int, name: str, tagged: User, *args: List[Any]) -> None:
+        """Method called by store_tagged"""
+        raise NotImplementedError()
+
+    def store_tagged(self, username: str, pid: int, timestamp: int, name: str, tagged: User) -> None:
+        """Stores a user that has been tagged in media in the db"""
         raise NotImplementedError()
