@@ -89,3 +89,9 @@ class Bot(object):
         u: User = self.platform.get_user(self.session, username, headers=self.headers)
         self.db_controller.store_user(u)
         return u
+
+    def get_media(self, username: str) -> None:
+        """Gets all media in a social-media account"""
+        u: User = self.db_controller.get_user(username, self.db_controller.get_platform(name=self.platform.name))\
+                  or self.get_user(username)
+        

@@ -1,10 +1,11 @@
 """Contains methods for crawling Instagram (https://www.instagram.com/)."""
 
-import random, datetime, re
+import random, datetime, re, json, math
 import requests as req
-from lib.models.user import User
+from lib.misc import print_wrn
+from lib.models import User
+from lib.models.media import Media
 from lib.platforms import Platform
-from lib.models.picture import Picture
 from lib.errors import UnknownUserError
 from typing import *
 
@@ -96,5 +97,33 @@ class Instagram(Platform):
             raise UnknownUserError(f'User "{username}" cannot be found on platform Instagram ... ')
         res = res['graphql']['user']
         return User(username, 'Instagram', res['is_private'], res['is_verified'], 
-                    profile_pic=Picture(url=res['profile_pic_url_hd']), fullname=res['full_name'], 
-                    website=res['external_url'], bio=res['biography'])
+                    user_id=int(res['id']), profile_pic=Media(url=res['profile_pic_url_hd']), 
+                    fullname=res['full_name'], website=res['external_url'], bio=res['biography'])
+
+    @classmethod
+    def get_media(cls, session: req.Session, user_id: int, after: Optional[str] = None, headers: Optional[Dict[str, str]] = None) -> Tuple[List[Media], str]:
+        """Downloads all media of an Instagram account"""
+        variables: Dict[str, Any] = {
+            'id': user_id,
+            'first': 50,
+            'after': after,
+        }
+        res: Dict[str, Any] = session.get(cls.endpoints['media'].format(json.dumps(variables))).json()
+        if res['status'] != 'ok':
+            return ([], None)
+        res = res['data']['user']['edge_owner_to_timeline_media']
+        if len(res['edges']) == 0:
+            print_wrn(f'Instagram account #{user_id}', 'Couldn\'t find any media... perhaps private?')
+            return ([], None)
+        ret: List[Media] = []
+        for e in res['edges']:
+            basename: str = f'{datetime.datetime.fromtimestamp(e["node"]["taken_at_timestamp"]).isoformat()}-{e["node"]["shortcode"]}'
+            if 'edge_sidecar_to_children' in e['node'].keys():
+                zeros: int = math.floor(math.log10(len(e['node']['edge_sidecar_to_children']['edges'])))+1
+                for i, c in enumerate(e['node']['edge_sidecar_to_children']['edges']):
+                    ret.append(Media(name=basename+'-'+str(i).rjust(zeros, '0'),
+                                     url=c['node']['video_url'] if c['node']['is_video'] else c['node']['display_url']))
+            else:
+                ret.append(Media(name=basename, 
+                                 url=e['node']['video_url'] if e['node']['is_video'] else e['node']['display_url']))
+        return (ret, res['page_info']['end_cursor'])

@@ -26,6 +26,7 @@ class SQLiteController(DBController):
             CREATE TABLE IF NOT EXISTS users (
                 username    TEXT,
                 pid         INTEGER,
+                userid      INTEGER,
                 FOREIGN KEY (pid) REFERENCES platform(pid),
                 PRIMARY KEY (username, pid)
             )
@@ -120,9 +121,31 @@ class SQLiteController(DBController):
             c: sqlite3.Cursor = con.cursor()
             platform: Tuple[int, str, str] = self.get_platform(name=user.platform)
             if not self.user_exists(platform[0], user.username):
-                c.execute('INSERT INTO users (username, pid) VALUES (?, ?)', (user.username, platform[0]))
+                c.execute('''INSERT INTO users (username, pid, userid) 
+                             VALUES (?, ?, ?)''', (user.username, platform[0], user.id))
             c.execute('''INSERT INTO overviews (username, pid, private, verified, profile_pic, fullname, website, bio)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', 
                     (user.username, platform[0], user.private, user.verified, 
                     pic_path if user.profile_pic else '', user.fullname or '', user.website or '', user.bio or ''))
             con.commit()
+
+    def get_user(self, username: str, pid: int) -> Optional[User]:
+        """Loads and returns a user from the SQLite db"""
+        with closing(sqlite3.connect(self.dbnam)) as con:
+            c: sqlite3.Cursor = con.cursor()
+            c.execute('''SELECT u.userid, o.* 
+                         FROM   users u LEFT OUTER JOIN (SELECT     *
+                                                         FROM       overviews
+                                                         WHERE      timestamp = (SELECT MAX(timestamp)
+                                                                                 FROM   overviews
+                                                                                 WHERE  username = u.username
+                                                                                        AND pid = u.pid)
+                                                                    AND username = u.username
+                                                                    AND pid = u.pid) o 
+                                        ON u.username = o.username AND u.pid = o.pid
+                         WHERE  u.username = ? AND u.pid = ?''', (username, pid,))
+            res: Optional[List[Any]] = c.fetchone()
+        if not res:
+            return None
+        return User(res[1], self.get_platform(pid=pid), res[3], res[4], 
+                    user_id=res[0], profile_pic=res[5], fullname=res[6], website=res[7], bio=res[8])                

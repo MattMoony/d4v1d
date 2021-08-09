@@ -42,3 +42,7 @@ class DBController(object):
     def store_user(self, user: User) -> None:
         """Stores a basic overview of a social-media user in the DB"""
         raise NotImplementedError()
+
+    def get_user(self, username: str, pid: int) -> User:
+        """Loads and returns a user from the database"""
+        raise NotImplementedError()

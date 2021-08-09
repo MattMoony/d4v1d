@@ -49,7 +49,6 @@ def init():
         for c in contr:
             cc: DBController = controller_type(c['type']).unjson(c)
             if not cc.healthy():
-                print(cc)
                 del CONTROLLERS[CONTROLLERS.index(cc)]
 
 def register_controller(c: DBController) -> None:

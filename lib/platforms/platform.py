@@ -1,5 +1,5 @@
 import requests as req
-from lib.models.user import User
+from lib.models import User, Media
 from typing import *
 
 class Platform(object):
@@ -33,4 +33,9 @@ class Platform(object):
     @classmethod
     def get_user(cls, session: req.Session, username: str, headers: Optional[Dict[str, str]] = None) -> User:
         """Gets a basic overview of a social-media user"""
+        raise NotImplementedError()
+
+    @classmethod
+    def get_media(cls, session: req.Session, user: Union[str, int], after: Optional[str] = None, headers: Optional[Dict[str, str]] = None) -> Tuple[List[Media], str]:
+        """Gets all media in a social-media account"""
         raise NotImplementedError()
