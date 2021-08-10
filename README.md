@@ -1,43 +1,44 @@
-<img src="server/public/media/logo.png" width="100px" align="right" />
-
-d4v1d.py
-========
-_Bibbidi-Bobbidi your data is now my property_
+<p align="center">
+  <img alt="d4v1d" src="gui/src/images/logo.png" width="125" height="125" />
+</p>
+<h1 align="center">🅳4🆅1🅳</h1>
+<p align="center">
+  <img alt="GitHub" src="https://img.shields.io/github/license/MattMoony/d4v1d?style=for-the-badge">
+  <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/MattMoony/d4v1d?style=for-the-badge">
+  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/MattMoony/d4v1d?style=for-the-badge&color=cecece">
+</p>
 
 ---
 
 ## About
 
-Fun little side-project of mine that was totally inspired by the everyday activities of one of my friends. Hope you will somehow find a use for this.
+A social-media *social-engineering* tool. While originally inspired by one of my friends' Instagram  activities, starting from the latest version that's currently in development, `v4`, it should have the ability to be expanded to encompass **any** social-media platform.
 
 ## Setup
 
-You should have Python 3.* and pip already installed and configured on your system. Afterwards, all you need to do is run this to install all the necessary packages:
+*To run the older, but finished version, `v2`, checkout the [`legacy`](https://github.com/MattMoony/d4v1d/tree/legacy) branch of this repository. It has its own `README.md` with all necessary setup steps.*
+
+At the moment - as the current "version" of this tool isn't finished yet and therefore has no proper release, just *clone* the repo, install all pip dependencies and run `d4v1d.py` to be greated with an interactive shell.
+
+### Linux / macOS
 
 ```bash
-$ python -m pip install -r requirements.txt
+python3 -m pip install ./requirements-unix.txt
+chmod 755 ./d4v1d.py
+./d4v1d.py
 ```
 
-## Usage
-
-_Todo: Add a proper documentation_
-
-To use the included console line command interpreter and to start the web-interface, simply run ...
+### Windows
 
 ```bash
-$ python d4v1d.py
+python -m pip install .\requirements-win.txt
+python .\d4v1d.py
 ```
 
-To access the web-interface either open [http://localhost:12864/](http://localhost:12864) in any browser, or execute ...
+## Roadmap
 
-```bash
-$ browse
-```
-
-... in the d4v1d-CLI, which will automatically open the web-interface in your default browser.
-
-If you ever feel lost in the CLI, just use the `help` command or `?` at anytime. _Happy h4xx0ring!_
+*to be continued*
 
 ---
 
-... Matthias M. (March 2020)
+... Matthias M. (August 2021)
