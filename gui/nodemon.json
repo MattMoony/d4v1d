@@ -1,0 +1,6 @@
+{
+  "watch": ["electron"],
+  "ext": "ts",
+  "ignore": ["electron/**/*.spec.ts"],
+  "exec": "npm run dev:nodemon"
+}
