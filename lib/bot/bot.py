@@ -27,11 +27,10 @@ class Bot(object):
         self.session: req.Session = req.Session()
         self.cookies: Dict[str, str] = cookies or {}
         self.proxy: Optional[str] = proxy
+        self.username: Optional[str] = username
         if username and password:
             if not self.login(username, password):
                 raise LoginFailedError()
-        else:
-            self.username: Optional[str] = None
         if self.cookies:
             self.__update_session_cookies()
 
@@ -74,12 +73,13 @@ class Bot(object):
         """Polls the group for something to do"""
         if not self.group:
             return
+        task: Optional[Tuple[Tuple[Callable, List[Any], Dict[str, Any], Optional[Callable]]]] = None
         with self.group.tasks_lock:
-            if not self.group.tasks.empty():
+            if self.group.tasks:
                 with self.occupied_lock:
                     if not self.occupied:
                         self.occupied = True
-                        task: Tuple[Tuple[Callable, List[Any], Dict[str, Any], Optional[Callable]]] = self.group.tasks.pop(0)
+                        task = self.group.tasks.pop(0)
         if task:
             Thread(target=self.do, args=task).start()
 
@@ -119,7 +119,6 @@ class Bot(object):
         if not timestamp:
             timestamp: int = self.db_controller.store_media_snapshot(username, p[0])
         media, after = self.platform.get_media(self.session, u.id, after=after, headers=self.headers)
-        print(f'[*] Got {len(media)} media ... ')
         if self.group:
             if after:
                 self.group.run(Bot.get_media, username, after=after, timestamp=timestamp)
@@ -129,7 +128,6 @@ class Bot(object):
 
     def download_media(self, user: User, media: Media, timestamp: int = int(datetime.datetime.now().timestamp())) -> None:
         """Downloads the given media to disk"""
-        print(f'[*] Downloading media "{media.name}" ... ')
-        media.download(session=self.session, header=self.headers)
+        media.download(session=self.session, headers=self.headers)
         p: Tuple[int, str, str] = self.db_controller.get_platform(name=self.platform.name)
         self.db_controller.store_media(user, p[0], timestamp, media)

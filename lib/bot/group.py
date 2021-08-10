@@ -39,6 +39,7 @@ class BotGroup(object):
 
     @classmethod
     def unjson(cls, json: Dict[str, Any]) -> "BotGroup":
+        """Creates a new bot-group based on the configuration given as a dictionary"""
         group: BotGroup = BotGroup(json['name'], platforms.platform(json['platform']), db.CONTROLLERS[json['db_controller']])
         for b in json['bots']:
             group.add(username=b['username'], cookies=b['cookies'], proxy=b['proxy'], headers=b['headers'])
@@ -63,7 +64,7 @@ class BotGroup(object):
     def add(self, username: Optional[str] = None, password: Optional[str] = None, cookies: Optional[Dict[str, str]] = None, **kwargs) -> None:
         """Adds a new bot to the group"""
         with self.bots_lock:
-            self.bots.append(Bot(self.platform, self.db_controller, username=username, password=password, cookies=cookies, **kwargs))
+            self.bots.append(Bot(self.platform, self.db_controller, group=self, username=username, password=password, cookies=cookies, **kwargs))
         bot.write_config()
 
     def remove(self, idx: int) -> None:

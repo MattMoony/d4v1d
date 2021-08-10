@@ -161,7 +161,7 @@ class SQLiteController(DBController):
     def store_user(self, user: User) -> None:
         """Stores a social-media user in the SQLite db"""
         with closing(sqlite3.connect(self.dbname)) as con:
-            pic_path: str = os.path.join(lib.params.DATA_PATH, user.username, user.platform, f'profile.{user.profile_pic.ext()}')
+            pic_path: str = os.path.join(lib.params.DATA_PATH, user.username, user.platform, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'), f'profile.{user.profile_pic.ext()}')
             pathlib.Path(os.path.dirname(pic_path)).mkdir(parents=True, exist_ok=True)
             if user.profile_pic:
                 user.profile_pic.write(pic_path)
@@ -225,7 +225,7 @@ class SQLiteController(DBController):
     def __store_tagged(self, username: str, pid: int, timestamp: int, name: str, tagged: User, c: sqlite3.Cursor) -> None:
         """Method called by store_tagged"""
         if not self.user_exists(pid, tagged.username):
-            self.__store_user(tagged.username, pid, tagged.id)
+            self.__store_user(tagged.username, pid, tagged.id, c)
         c.execute('''INSERT INTO tagged
                      VALUES (?, ?, ?, ?, ?)''', (username, pid, timestamp, name, tagged.username))
 

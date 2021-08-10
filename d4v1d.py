@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os, sys, threading
 import lib.cmd.basic
 from lib import misc, bot

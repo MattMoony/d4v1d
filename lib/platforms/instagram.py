@@ -109,7 +109,6 @@ class Instagram(Platform):
             'first': 50,
             'after': after,
         }
-        print(cls.endpoints['media'].format(quote(json.dumps(variables))))
         res: Dict[str, Any] = session.get(cls.endpoints['media'].format(quote(json.dumps(variables))), headers=headers)
         with open('tmp/out.html', 'wb') as f:
             f.write(res.content)
@@ -124,7 +123,7 @@ class Instagram(Platform):
         for e in res['edges']:
             e = e['node']
             basename: str = f'{datetime.datetime.fromtimestamp(e["taken_at_timestamp"]).isoformat()}-{e["shortcode"]}'
-            caption: Optional[str] = e['edge_media_caption']['edges'][0]['node']['text'] if e['edge_media_caption']['edges'] else None
+            caption: Optional[str] = e['edge_media_to_caption']['edges'][0]['node']['text'] if e['edge_media_to_caption']['edges'] else None
             tagged: List[User] = [User(u['node']['user']['username'], 'Instagram', None, u['node']['user']['is_verified'], user_id=u['node']['user']['id']) for u in e['edge_media_to_tagged_user']['edges']]
             likes: int = e['edge_media_preview_like']['count']
             if 'edge_sidecar_to_children' in e.keys():
@@ -137,5 +136,5 @@ class Instagram(Platform):
             else:
                 ret.append(Media(name=basename,
                                  caption=caption, tagged=tagged, likes=likes,
-                                 url=e['node']['video_url'] if e['node']['is_video'] else e['node']['display_url']))
+                                 url=e['video_url'] if e['is_video'] else e['display_url']))
         return (ret, res['page_info']['end_cursor'])

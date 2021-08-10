@@ -1,4 +1,4 @@
-import os, magic
+import os, magic, mimetypes
 import requests as req
 from typing import *
 
@@ -20,6 +20,9 @@ class Media(object):
         if not (url or data or path):
             raise Exception('Cannot initialize media without any information!')
 
+    def __str__(self) -> str:
+        return 'Media(' + (f'"{self.name}"' if self.name else 'untitled') + f' from {self.__url or self.__path or "memory"})'
+
     def __iadd__(self, other: Union["Media", bytes]):
         """Add content to the media (e.g. when downloading multiple chunks)"""
         if type(other) == bytes:
@@ -31,7 +34,7 @@ class Media(object):
         """Downloads the image if necessary"""
         if not self.__url:
             return
-        self.__data = (session or req).get(self.__url, headers=(headers or self.headers))
+        self.__data = (session or req).get(self.__url, headers=(headers or self.headers)).content
 
     def raw(self) -> bytes:
         """Get the media's raw bytes"""
@@ -47,11 +50,12 @@ class Media(object):
     def ext(self) -> str:
         """Get the media's appropriate extension"""
         if self.__data:
-            return magic.from_buffer(self.__data).split()[0].lower()
+            mime: magic.Magic = magic.Magic(mime=True)
+            return mimetypes.guess_extension(mime.from_buffer(self.__data).split()[0].lower())[1:]
         elif self.__url:
-            return os.path.splitext(self.__url.split('?')[0])[1]
+            return os.path.splitext(self.__url.split('?')[0])[1][1:]
         elif self.__path:
-            return os.path.splitext(self.__path)[1]
+            return os.path.splitext(self.__path)[1][1:]
 
     def write(self, path: str) -> None:
         """Store the media on the hard disk"""

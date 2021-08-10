@@ -21,7 +21,7 @@ class Show(object):
                 print_inf('No tasks in queue ... ')
                 return
             print('QUEUED TASKS')
-            print('    - '+'\n    - '.join(f'{t[0].__name__}({", ".join(t[1])})' for t in cmd.BOT_GROUP.tasks))
+            print('    - '+'\n    - '.join(f'{t[0].__name__}({", ".join(str(x) for x in t[1])})' for t in cmd.BOT_GROUP.tasks))
     
     @command
     def tasks(self) -> None:
@@ -36,5 +36,5 @@ class Show(object):
             print_inf('No tasks are currently being worked on ... ')
             return
         print('RUNNING TASKS')
-        print('    . '+'\n    . '.join(f'{b} - {t[0].__name__}({", ".join(t[1])})' for b, t in tasks))
+        print('    . '+'\n    . '.join(f'{b} - {t[0].__name__}({", ".join(str(x) for x in t[1])})' for b, t in tasks))
     

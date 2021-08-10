@@ -4,7 +4,7 @@ geckodriver.log
 tmp/
 venv
 node_modules
-data/
+data/*
 !data/.gitkeep
 test.py
 lib/**/*.json

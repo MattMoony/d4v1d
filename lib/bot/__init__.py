@@ -45,7 +45,11 @@ def init():
             reset_config()
             return
         for g in groups:
-            BotGroup.unjson(g)
+            try:
+                BotGroup.unjson(g)
+            except:
+                print_wrn('Corrupted bot-group', 'Removing it ... ')
+        write_config()
 
 def register_group(g: BotGroup) -> None:
     """Registers a new bot-group, both in memory and on disk"""
