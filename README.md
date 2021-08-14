@@ -35,6 +35,12 @@ python -m pip install .\requirements-win.txt
 python .\d4v1d.py
 ```
 
+## Structure
+
+The idea is to structure `d4v1d` as flexibly as possible, making it easy to exchange and add new components such as database connections, social-media platforms, etc. To achieve this, at the moment, I'm aiming to build it according to the following pattern:
+
+![d4v1d-structure](gui/src/images/structure.png)
+
 ## Roadmap
 
 Below is a list of things that I'm planning on incorporating / hoping to incorporate into this project. It'll probably change & grow over time. *Feel free to add more ideas if you feel like it.*

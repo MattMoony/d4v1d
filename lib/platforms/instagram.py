@@ -43,6 +43,9 @@ class Instagram(Platform):
         'followers': 'https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables={}',
         'following': 'https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables={}',
         'media': 'https://www.instagram.com/graphql/query/?query_hash=e769aa130647d2354c40ea6a439bfc08&variables={}',
+        'post': 'https://www.instagram.com/graphql/query/?query_hash=2efa04f61586458cef44441f474eee7c&variables={"shortcode":"{shortcode}","child_comment_count":3,"fetch_comment_count":40,"parent_comment_count":24,"has_threaded_comments":true}',
+        'comments': 'https://www.instagram.com/graphql/query/?query_hash=bc3296d1ce80a24b1b6e40b1e72903f5&variables={"shortcode":"{shortcode}","first":{first},"after":"{after}"}',
+        'comment_replies': 'https://www.instagram.com/graphql/query/?query_hash=1ee91c32fc020d44158a3192eda98247&variables={"comment_id":"{id}","first":{first},"after":"{after}"}',
         'info': 'https://i.instagram.com/api/v1/users/{}/info/',
         'public_info': 'https://www.instagram.com/{}/?__a=1',
     }
@@ -122,7 +125,8 @@ class Instagram(Platform):
         ret: List[Media] = []
         for e in res['edges']:
             e = e['node']
-            basename: str = f'{datetime.datetime.fromtimestamp(e["taken_at_timestamp"]).isoformat()}-{e["shortcode"]}'
+            # basename: str = f'{datetime.datetime.fromtimestamp(e["taken_at_timestamp"]).isoformat()}-{e["shortcode"]}'
+            basename: str = e['shortcode']
             caption: Optional[str] = e['edge_media_to_caption']['edges'][0]['node']['text'] if e['edge_media_to_caption']['edges'] else None
             tagged: List[User] = [User(u['node']['user']['username'], 'Instagram', None, u['node']['user']['is_verified'], user_id=u['node']['user']['id']) for u in e['edge_media_to_tagged_user']['edges']]
             likes: int = e['edge_media_preview_like']['count']

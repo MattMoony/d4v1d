@@ -43,8 +43,7 @@ class SQLiteController(DBController):
                 fullname    TEXT,
                 website     TEXT,
                 bio         TEXT,
-                FOREIGN KEY (username) REFERENCES users(username),
-                FOREIGN KEY (pid) REFERENCES users(pid),
+                FOREIGN KEY (username, pid) REFERENCES users(username, pid),
                 PRIMARY KEY (username, pid, timestamp)
             )
         ''',
@@ -53,8 +52,7 @@ class SQLiteController(DBController):
                 username    TEXT,
                 pid         INTEGER,
                 timestamp   INTEGER DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (username) REFERENCES users(username),
-                FOREIGN KEY (pid) REFERENCES users(pid),
+                FOREIGN KEY (username, pid) REFERENCES users(username, pid),
                 PRIMARY KEY (username, pid, timestamp)
             )
         ''',
@@ -67,9 +65,7 @@ class SQLiteController(DBController):
                 caption     TEXT,
                 likes       INTEGER,
                 dislikes    INTEGER,
-                FOREIGN KEY (username) REFERENCES media_snapshots(username),
-                FOREIGN KEY (pid) REFERENCES media_snapshots(pid),
-                FOREIGN KEY (timestamp) REFERENCES media_snapshots(timestamp),
+                FOREIGN KEY (username, pid, timestamp) REFERENCES media_snapshots(username, pid, timestamp),
                 PRIMARY KEY (username, pid, timestamp, name)
             )
         ''',
@@ -80,13 +76,34 @@ class SQLiteController(DBController):
                 timestamp       INTEGER,
                 name            TEXT,
                 tag_username    TEXT,
-                FOREIGN KEY (username) REFERENCES media(username),
-                FOREIGN KEY (pid) REFERENCES media(pid),
-                FOREIGN KEY (timestamp) REFERENCES media(timestamp),
-                FOREIGN KEY (name) REFERENCES media(name),
-                FOREIGN KEY (tag_username) REFERENCES users(username),
-                FOREIGN KEY (pid) REFERENCES users(pid),
+                FOREIGN KEY (username, pid, timestamp, name) REFERENCES media(username, pid, timestamp, name),
+                FOREIGN KEY (tag_username, pid) REFERENCES users(username, pid),
                 PRIMARY KEY (username, pid, timestamp, name, tag_username)
+            )
+        ''',
+        '''
+            CREATE TABLE IF NOT EXISTS comments_snapshot (
+                username        TEXT,
+                pid             INTEGER,
+                timestamp       INTEGER,
+                media_name      TEXT,
+                FOREIGN KEY (username, pid) REFERENCES users(username, pid),
+                PRIMARY KEY (username, pid, timestamp, media_name)
+            )
+        ''',
+        '''
+            CREATE TABLE IF NOT EXISTS comments (
+                username        TEXT,
+                pid             INTEGER,
+                timestamp       INTEGER,
+                media_name      TEXT,
+                com_id          INTEGER,
+                com_username    TEXT,
+                com_reply_to    INTEGER,
+                comment         TEXT,
+                FOREIGN KEY (username, pid, timestamp, media_name) REFERENCES comments_snapshot(username, pid, timestamp, media_name),
+                FOREIGN KEY (com_username, pid) REFERENCES users(username, pid)
+                PRIMARY KEY (username, pid, timestamp, media_name, com_id)
             )
         ''',
     ]
