@@ -37,7 +37,25 @@ python .\d4v1d.py
 
 ## Roadmap
 
-*to be continued*
+Below is a list of things that I'm planning on incorporating / hoping to incorporate into this project. It'll probably change & grow over time. *Feel free to add more ideas if you feel like it.*
+
+- [ ] Instagram
+  - [x] Profile Overview
+  - [ ] Posts
+    - [x] Media
+    - [ ] Comments
+  - [ ] Followers / Following
+  - [ ] Stories
+- [ ] TikTok
+  - [ ] Profile Overview
+  - [ ] Posts
+    - [ ] Media
+    - [ ] Comments
+  - [ ] Followers / Following
+- [ ] Twitter
+- [ ] Reddit
+- [ ] Snapchat
+- [ ] Facebook
 
 ---
 
