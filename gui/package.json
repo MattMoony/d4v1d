@@ -48,7 +48,7 @@
     "@types/react": "^17.0.15",
     "@types/react-dom": "^17.0.9",
     "cross-env": "^7.0.3",
-    "electron": "^13.1.7",
+    "electron": "^18.3.7",
     "electron-forge": "^5.2.4",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
