@@ -37,9 +37,19 @@ python -m pip install .\requirements-win.txt
 python .\d4v1d.py
 ```
 
+## Usage
+
+Simply run the main script (`d4v1d.py`) to enter `d4v1d`'s terminal-like environment:
+
+```bash
+python3 ./d4v1d.py
+```
+
+To learn more about the commands and features you can use from here, take a look at the [docs](docs/USAGE.md).
+
 ## Structure
 
-The idea is to structure `d4v1d` as flexibly as possible, making it easy to exchange and add new components such as database connections, social-media platforms, etc. 
+The idea is to structure `d4v1d` as flexibly as possible, making it easy to exchange and add new components such as database connections, social-media platforms, etc.
 
 ## Roadmap
 
