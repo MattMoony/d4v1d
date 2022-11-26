@@ -1,0 +1,12 @@
+# ignore some files/folders that don't need to
+# be made public / included in the GitHub repo
+
+# for python ...
+venv
+__pycache__
+
+# for vscode
+.vscode
+
+# misc
+tmp
