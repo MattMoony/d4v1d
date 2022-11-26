@@ -49,7 +49,7 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 <details>
 
-<summary>Completion <progress max="100" value="0"></progress></summary>
+<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
 
 - [ ] Data Collection
   - [ ] Profile Overview
@@ -69,7 +69,7 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 <details>
 
-<summary>Completion <progress max="100" value="0"></progress></summary>
+<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
 
 - [ ] Data Collection
   - [ ] Profile Overview
@@ -88,7 +88,7 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 <details>
 
-<summary>Completion <progress max="100" value="0"></progress></summary>
+<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
 
 - [ ] Data Collection
 - [ ] DB Controllers
@@ -102,7 +102,7 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 <details>
 
-<summary>Completion <progress max="100" value="0"></progress></summary>
+<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
 
 - [ ] Data Collection
 - [ ] DB Controllers
@@ -116,7 +116,7 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 <details>
 
-<summary>Completion <progress max="100" value="0"></progress></summary>
+<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
 
 - [ ] Data Collection
 - [ ] DB Controllers
@@ -130,7 +130,7 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 <details>
 
-<summary>Completion <progress max="100" value="0"></progress></summary>
+<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
 
 - [ ] Data Collection
 - [ ] DB Controllers
@@ -144,7 +144,7 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 <details>
 
-<summary>Completion <progress max="100" value="0"></progress></summary>
+<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
 
 - [ ] Data Collection
 - [ ] DB Controllers
