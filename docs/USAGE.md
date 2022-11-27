@@ -3,4 +3,29 @@
 </p>
 <h1 align="center">🅳4🆅1🅳 - Usage</h1>
 
-> Coming soon ...
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [General commands](#general-commands)
+  - [`help`](#help)
+  - [`exit`](#exit)
+
+## General commands
+
+These commands have nothing to do with the specific functionality of the program.
+
+### `help`
+
+**Aliases:** `?`
+
+Displays a list of all available commands with a short description of what they do.
+
+### `exit`
+
+**Aliases:** `quit`
+
+Quits the application.
+
+---
+
+... m4ttm00ny (November 2022)
