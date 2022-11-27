@@ -10,13 +10,33 @@ from cmd.cmd import Command
 from cmd.help import HelpCommand
 from cmd.exit import ExitCommand
 from prompt_toolkit import PromptSession
+from prompt_toolkit.document import Document
 from prompt_toolkit.completion import NestedCompleter
+from prompt_toolkit.validation import Validator, ValidationError
 from typing import *
 
 CMDS: Dict[str, Any] = {
     'exit': ExitCommand(),
 }
 CMDS['help'] = HelpCommand(CMDS)
+
+class CmdValidator(Validator):
+    """
+    Validator for the command prompt
+    """
+    def validate(self, document: Document) -> None:
+        """
+        Validate some input
+
+        Args:
+            document (Document): The input to validate
+        """
+        if not document.text.strip():
+            return
+        try:
+            get_cmd(document.text)
+        except ValueError as e:
+            raise ValidationError(message=str(e))
 
 def __build_aliases() -> None:
     """
@@ -40,6 +60,22 @@ def __build_completer(cmds: Dict[str, Any]) -> None:
         else:
             __build_completer(v)
 
+def get_cmd(cmd: str) -> Tuple[Command, List[str]]:
+    """
+    Returns the command specified by the given arguments
+    plus the remaining arguments.
+    """
+    args: List[str] = cmd.split()
+    d: Union[Dict[str, Any], Command] = CMDS
+    while isinstance(d, dict) and len(args) > 0:
+        cu: str = args.pop(0)
+        if cu not in d:
+            raise ValueError(f'Unknown command: "{cmd}"')
+        d = d[cu]
+    if not isinstance(d, Command):
+        raise ValueError(f'Incomplete command: "{cmd}"')
+    return d, args
+
 def completer() -> NestedCompleter:
     """
     Returns a NestedCompleter object with all
@@ -53,25 +89,26 @@ def handle(inp: str) -> None:
     """
     Handles the specified user input.
     """
-    args: List[str] = inp.split()
-    d: Union[Dict[str, Any], Command] = CMDS
-    while isinstance(d, dict) and len(args) > 0:
-        cu: str = args.pop(0)
-        if cu not in d:
-            print(f'[-] Unknown command: [italic]{cu}[/italic]. Enter [bold]help[/bold] to see all available commands ...')
-            return
-        d = d[cu]
-    if not isinstance(d, Command):
-        print(f'[-] Incomplete command: [italic]{cu}[/italic]. Enter [bold]help {cu}[/bold] to see how to use it ...')
+    if not inp.strip():
         return
-    d(args)
+    try:
+        cmd, args = get_cmd(inp)
+        cmd(args)
+    except ValueError as e:
+        # should never happen, since commands should
+        # be validated before being executed
+        print(f'[-] {e}')
 
 def start() -> None:
     """
     Starts handling user input.
     """
     __build_aliases()
-    session = PromptSession(completer=completer(), complete_while_typing=config.COMPLETE_WHILE_TYPING)
+    session = PromptSession(
+        completer=completer(), 
+        complete_while_typing=config.COMPLETE_WHILE_TYPING,
+        validator=CmdValidator(),
+    )
     while True:
         try:
             handle(session.prompt(config.PROMPT))
