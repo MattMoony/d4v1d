@@ -62,7 +62,7 @@ def color_text(s: str) -> str:
     Returns:
         str: The colored text.
     """
-    return ''.join(rand_color()+c for c in list(s))
+    return ''.join(rand_color()+c for c in list(s)) + cr.Style.RESET_ALL
 
 def title(s: str, color: bool = True, center: bool = True) -> str:
     """
