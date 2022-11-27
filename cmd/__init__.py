@@ -12,6 +12,7 @@ from cmd.exit import ExitCommand
 from prompt_toolkit import PromptSession
 from prompt_toolkit.document import Document
 from prompt_toolkit.completion import NestedCompleter
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.validation import Validator, ValidationError
 from typing import *
 
@@ -108,6 +109,7 @@ def start() -> None:
         completer=completer(), 
         complete_while_typing=config.COMPLETE_WHILE_TYPING,
         validator=CmdValidator(),
+        auto_suggest=AutoSuggestFromHistory(),
     )
     while True:
         try:
