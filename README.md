@@ -164,6 +164,38 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 </details>
 
+### <img src="https://bere.al/favicon.ico" height="16em" width="auto" /> BeReal
+
+<details>
+
+<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
+
+- [ ] Data Collection
+- [ ] DB Controllers
+  - [ ] SQLite
+  - [ ] MySQL
+  - [ ] Postgres
+
+</details>
+
+### <img src="https://tinder.com/favicon.ico" height="16em" width="auto" /> Tinder
+
+<details>
+
+<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
+
+- [ ] Data Collection
+- [ ] DB Controllers
+  - [ ] SQLite
+  - [ ] MySQL
+  - [ ] Postgres
+
+</details>
+
+## Ideas
+
+As already mentioned above, `d4v1d` is supposed to be a sort of data aggregator for multiple social-media platforms. Obviously, once you have some data, you can start doing some cool things with it, like perhaps start tracing people across multiple networks using simple characteristics like their usernames, profile pictures, etc. or even using more advanced concepts like *facial recognition* ...
+
 ---
 
 ... m4ttm00ny (November 2022)
