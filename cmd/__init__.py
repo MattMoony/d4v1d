@@ -5,21 +5,18 @@ commands from the user.
 
 import copy
 import config
+import platforms
 from rich import print
 from cmd.cmd import Command
-from cmd.help import HelpCommand
-from cmd.exit import ExitCommand
+from cmd._helper.commands import CMDS
+from cmd._helper.clisessionstate import CLISessionState
 from prompt_toolkit import PromptSession
 from prompt_toolkit.document import Document
+from prompt_toolkit.formatted_text.html import HTML
 from prompt_toolkit.completion import NestedCompleter
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.validation import Validator, ValidationError
 from typing import *
-
-CMDS: Dict[str, Any] = {
-    'exit': ExitCommand(),
-}
-CMDS['help'] = HelpCommand(CMDS)
 
 class CmdValidator(Validator):
     """
@@ -54,6 +51,9 @@ def __build_completer(cmds: Dict[str, Any]) -> None:
     """
     Builds a completer dictionary from the specified
     dictionary of commands.
+
+    Args:
+        cmds (Dict[str, Any]): The dictionary of commands
     """
     for k, v in cmds.items():
         if isinstance(v, Command):
@@ -65,6 +65,9 @@ def get_cmd(cmd: str) -> Tuple[Command, List[str]]:
     """
     Returns the command specified by the given arguments
     plus the remaining arguments.
+
+    Args:
+        cmd (str): The command to get
     """
     args: List[str] = cmd.split()
     d: Union[Dict[str, Any], Command] = CMDS
@@ -86,34 +89,40 @@ def completer() -> NestedCompleter:
     __build_completer(d)
     return NestedCompleter.from_nested_dict(d)
 
-def handle(inp: str) -> None:
+def handle(inp: str, state: CLISessionState) -> None:
     """
     Handles the specified user input.
+
+    Args:
+        inp (str): The user input
+        state (CLISessionState): The current state of the CLI session
     """
     if not inp.strip():
         return
     try:
         cmd, args = get_cmd(inp)
-        cmd(args)
+        cmd(args, state=state)
     except ValueError as e:
         # should never happen, since commands should
         # be validated before being executed
-        print(f'[-] {e}')
+        print(f'[bold red][-][/bold red] {e}')
 
 def start() -> None:
     """
     Starts handling user input.
     """
     __build_aliases()
-    session = PromptSession(
+    session: PromptSession = PromptSession(
         completer=completer(), 
         complete_while_typing=config.COMPLETE_WHILE_TYPING,
         validator=CmdValidator(),
         auto_suggest=AutoSuggestFromHistory(),
     )
+    state: CLISessionState = CLISessionState()
     while True:
         try:
-            handle(session.prompt(config.PROMPT))
+            prompt: HTML = HTML(config.PROMPT.replace('%%', f' <aaa fg="DarkGrey">{state.platform}</aaa>' if state.platform else ''))
+            handle(session.prompt(prompt), state)
         except KeyboardInterrupt:
             continue
         except EOFError:

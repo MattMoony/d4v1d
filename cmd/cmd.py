@@ -2,6 +2,7 @@
 Module providing the template for a command
 """
 
+from cmd._helper.clisessionstate import CLISessionState
 from typing import *
 
 class Command(object):
@@ -17,14 +18,14 @@ class Command(object):
         self.aliases: List[str] = aliases
         self.description: str = description
 
-    def execute(self, args: List[str]) -> None:
+    def execute(self, args: List[str], state: CLISessionState) -> None:
         """
         Executes the command with the specified arguments.
         """
         pass
 
-    def __call__(self, args: List[str]) -> None:
+    def __call__(self, args: List[str], state: CLISessionState) -> None:
         """
         Calls the execute method.
         """
-        self.execute(args)
+        self.execute(args, state=state)

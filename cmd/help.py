@@ -5,9 +5,10 @@ Module for the help command
 from rich import print
 from rich.tree import Tree
 from cmd.cmd import Command
+from cmd._helper.clisessionstate import CLISessionState
 from typing import *
 
-class HelpCommand(Command):
+class Help(Command):
     """
     The help command
     """
@@ -39,12 +40,12 @@ class HelpCommand(Command):
                 t: Tree = tree.add(k)
                 self.__build_tree(v, t)
 
-    def execute(self, args: List[str]) -> None:
+    def execute(self, args: List[str], state: CLISessionState) -> None:
         """
         Executes the help command
         """
         if len(args) == 0:
-            cmd_tree: Tree = Tree('[*] Available commands:')
+            cmd_tree: Tree = Tree('[bold grey53][*][/bold grey53] Available commands:')
             self.__build_tree(self.cmds, cmd_tree)
             print(cmd_tree)
         else:
@@ -52,11 +53,11 @@ class HelpCommand(Command):
             if cmd in self.cmds:
                 c: Command = self.cmds[cmd]
                 if isinstance(c, Command):
-                    print(f'[*] [bold]{c.name}[/bold]: {c.description}')
+                    print(f'[bold grey53][*][/bold grey53] [bold]{c.name}[/bold]: {c.description}')
                     if len(c.aliases) > 0:
                         print(f'    └── Aliases: [bold]{", ".join(c.aliases)}[/bold]')
                 else:
                     # TODO: Add support for subcommands
-                    print(f'[*] [italic]TODO[/italic]')
+                    print(f'[bold grey53][*][/bold grey53] [italic]TODO[/italic]')
             else:
-                print(f'[-] Unknown command: [italic]{cmd}[/italic]. Enter [bold]help[/bold] to see all available commands ...')
+                print(f'[bold red][-][/bold red] Unknown command: [italic]{cmd}[/italic]. Enter [bold]help[/bold] to see all available commands ...')
