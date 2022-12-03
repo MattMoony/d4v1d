@@ -3,17 +3,19 @@
 </p>
 <h1 align="center">🅳4🆅1🅳 - Usage</h1>
 
-## Table of Contents
+> This is an overview of all commands included in d4v1d, and how to use them.
 
-- [Table of Contents](#table-of-contents)
-- [General commands](#general-commands)
+## 📖 Table of Contents
+
+- [📖 Table of Contents](#-table-of-contents)
+- [🎲 General commands](#-general-commands)
   - [`help`](#help)
   - [`exit`](#exit)
   - [`show`](#show)
     - [`show platforms`](#show-platforms)
   - [`use [<PLATFORM>]`](#use-platform)
 
-## General commands
+## 🎲 General commands
 
 These commands have nothing to do with the specific functionality of the program.
 

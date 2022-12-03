@@ -10,19 +10,19 @@
 
 ---
 
-## About
+## ❓ About
 
 A social-media *social-engineering* tool. While originally inspired by one of my friends' Instagram  activities, starting from version `v4`, which was actually never fully releaed, the idea was for it to be a sort of *swiss army knife* for **multiple** social-media platforms.
 
 > After over a year of not working on this project, I've decided to come back to it and start developing `v5` - maybe even with some extra help.
 
-## Setup
+## 👷 Setup
 
 *To run the older, but last complete version, `v2`, checkout the [`legacy`](https://github.com/MattMoony/d4v1d/tree/legacy) branch of this repository. It has its own `README.md` with all necessary setup steps.*
 
 At the moment - as the current "version" of this tool isn't finished yet and therefore has no proper release, just *clone* the repo, install all pip dependencies and run `d4v1d.py` to be greated with an interactive shell.
 
-### Linux / macOS
+### 🐧 Linux / macOS
 
 ```bash
 python3 -m pip install ./requirements-unix.txt
@@ -30,14 +30,14 @@ chmod 755 ./d4v1d.py
 ./d4v1d.py
 ```
 
-### Windows
+### 🪟 Windows
 
 ```bash
 python -m pip install .\requirements-win.txt
 python .\d4v1d.py
 ```
 
-## Usage
+## 🎮 Usage
 
 Simply run the main script (`d4v1d.py`) to enter `d4v1d`'s terminal-like environment:
 
@@ -47,11 +47,11 @@ python3 ./d4v1d.py
 
 To learn more about the commands and features you can use from here, take a look at the [docs](docs/USAGE.md).
 
-## Structure
+## 🏗️ Structure
 
 The idea is to structure `d4v1d` as flexibly as possible, making it easy to exchange and add new components such as database connections, social-media platforms, etc.
 
-## Roadmap
+## 🛣️ Roadmap
 
 Below is a list of things that I'm planning on incorporating / hoping to incorporate into this project. It'll probably change & grow over time. *Feel free to add more ideas if you feel like it.*
 
@@ -192,7 +192,7 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 </details>
 
-## Ideas
+## 💡 Ideas
 
 As already mentioned above, `d4v1d` is supposed to be a sort of data aggregator for multiple social-media platforms. Obviously, once you have some data, you can start doing some cool things with it, like perhaps start tracing people across multiple networks using simple characteristics like their usernames, profile pictures, etc. or even using more advanced concepts like *facial recognition* ...
 
