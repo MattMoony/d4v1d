@@ -16,6 +16,10 @@ A social-media *social-engineering* tool. While originally inspired by one of my
 
 > After over a year of not working on this project, I've decided to come back to it and start developing `v5` - maybe even with some extra help.
 
+For more info on how `d4v1d` works, how to extend it and how to use it, take a look at the [docs](docs/README.md).
+
+> ❗ **Note:** This project is still in development, which is why it is not impossible for there to be bugs or other unwanted behaviour. If you find any, please report them in the [issues](https://github.com/MattMoony/d4v1d/issues) section. Of course you can also decide to contribute and start working on your own fix.
+
 ## 👷 Setup
 
 *To run the older, but last complete version, `v2`, checkout the [`legacy`](https://github.com/MattMoony/d4v1d/tree/legacy) branch of this repository. It has its own `README.md` with all necessary setup steps.*
@@ -198,4 +202,4 @@ As already mentioned above, `d4v1d` is supposed to be a sort of data aggregator 
 
 ---
 
-... m4ttm00ny (November 2022)
+... m4ttm00ny (December 2022)
