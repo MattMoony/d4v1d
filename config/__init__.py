@@ -24,12 +24,12 @@ with open(os.path.join(BASE_PATH, 'config', 'platforms.json'), 'r') as f:
     PLATFORMS = json.load(f)
     dir: str = os.getenv('D4V1D_DIR')
 
-    if not dir and not PLATFORMS['dir']:
+    if not dir and ('dir' not in PLATFORMS.keys() or not PLATFORMS['dir']):
         PLATFORMS['dir'] = os.path.join(BASE_PATH, '_')
     if not os.path.isdir(PLATFORMS['dir']):
         os.mkdir(PLATFORMS['dir'])
     
     for k, v in PLATFORMS.items():
         v = v.replace('$D4V1D_DIR', PLATFORMS['dir'])
-        if k.endswith('_dir') and not os.isdir(v):
+        if k.endswith('_dir') and not os.path.isdir(v):
             os.mkdir(v)
