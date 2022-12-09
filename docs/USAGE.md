@@ -47,6 +47,6 @@ Switches to the given platform; allows you to interact with this social-media pl
 
 ---
 
-[⬆️ Back to top](#table-of-contents)
+[⬆️ Back to top](#📖-table-of-contents)
 
-... m4ttm00ny (November 2022)
+... m4ttm00ny (December 2022)

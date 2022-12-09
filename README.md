@@ -202,4 +202,6 @@ As already mentioned above, `d4v1d` is supposed to be a sort of data aggregator 
 
 ---
 
+[⬆️ Back to top](#❓-about)
+
 ... m4ttm00ny (December 2022)
