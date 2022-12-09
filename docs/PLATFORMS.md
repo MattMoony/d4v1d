@@ -11,12 +11,14 @@
 - [1️⃣ What are platforms?](#1️⃣-what-are-platforms)
 - [2️⃣ How are platforms integrated?](#2️⃣-how-are-platforms-integrated)
 - [3️⃣ How are platforms implemented?](#3️⃣-how-are-platforms-implemented)
-  - [📊 Info Class](#-info-class)
+  - [📦 Platform Module](#-platform-module)
+    - [`init`](#init)
   - [🚉 Platform class](#-platform-class)
     - [`get_user_description`](#get_user_description)
     - [`get_user_followers`](#get_user_followers)
     - [`get_user_following`](#get_user_following)
     - [`get_user_number_posts`](#get_user_number_posts)
+  - [📊 Info Class](#-info-class)
   - [🤖 Bot Class](#-bot-class)
   - [👥 Group Class](#-group-class)
   - [🗃️ Database Class](#️-database-class)
@@ -39,19 +41,17 @@ Only a **few standard platforms** that ship with `d4v1d` are implemented in the 
 
 Each platform module has to be structured in the way that the model `platform` platform is structured.
 
-### 📊 Info Class
+### 📦 Platform Module
 
-> `d4v1d.platforms.platform.info.Info`
+In order to allow for the easy extensibility of `d4v1d`, some standard functions have to be implemented:
 
-This class is used to wrap the information that is retrieved from the platform. It contains the following attributes:
+#### `init`
 
-```md
-- value (Any): The information
-- date (datetime): The date of the information
-- platform (Platform): The platform
-```
+> `init () -> Platform`
 
-This class has been introduced, because it seems rather reasonable to assume that the information retrieved from a platform is **not static**, but rather **changes over time**.
+This method is called by the `d4v1d` platform loader upon discovering the platform module. It is used to **register the platform** with the `d4v1d` core, and allows for **custom initialization** of the platform.
+
+It should return an instance of the [`Platform` class](#🚉-platform-class).
 
 ### 🚉 Platform class
 
@@ -83,17 +83,47 @@ Get a list of the usernames of all users that the specified user follows. Just l
 
 Get the number of posts that the user has made.
 
+### 📊 Info Class
+
+> `d4v1d.platforms.platform.info.Info`
+
+This class is used to wrap the information that is retrieved from the platform. It contains the following attributes:
+
+```md
+- value (Any): The information
+- date (datetime): The date of the information
+- platform (Platform): The platform
+```
+
+This class has been introduced, because it seems rather reasonable to assume that the information retrieved from a platform is **not static**, but rather **changes over time**.
+
 ### 🤖 Bot Class
 
 > `d4v1d.platforms.platform.bot.Bot`
+
+This class is the "adapter" between `d4v1d` and the social-media platform. As you might have guessed, a *bot* represents an **automated user** - be it someone that's signed-in, or more preferably, if possible, someone that's just browsing anonymously.
+
+Since the **core will never call** any methods of **this class directly**, it is not necessary to adhere to any specific naming convention for the methods of this class - just keep it clean and understandable I guess.
+
+You can find examples for what the implementation of a bot could look like in the standard platforms that ship with `d4v1d` (i.e. [instagram](../platforms/instagram/), etc.).
 
 ### 👥 Group Class
 
 > `d4v1d.platforms.platform.bot.Group`
 
+Generally, in order to **avoid getting banned** and just to load balance in general, it seems reasonable to create groups of bots that can be used to **interact with the platform**. The idea being that not only one user does all the scraping, but the load is divided in order to make it less noticable.
+
+Of course, groups can also just contain a single bot - however, it's always an option to add more.
+
+Generally, I'd recommend, you never access instances of the `Bot` class directly, but only command and control as part of a group.
+
 ### 🗃️ Database Class
 
 > `d4v1d.platforms.platform.db.Database`
+
+It's up to you to decide what database format to use for your platform implementations. As long as you can provide the info that is required by the `d4v1d` core (as specified in the description of the [`Platform` class](#🚉-platform-class)), you can use whatever you want.
+
+If you want, you can even let the user decide between multiple database formats and this is the reason as to why you should implement a general `Database` class - it'd probably be a good idea to go with the naming convention `<PLATFORM-NAME>Database`, e.g. `InstagramDatabase` - and extend it with the actual database implementations. For inspiration, you can take a look at how the standard platforms that ship with `d4v1d` are implemented (e.g. [instagram](../platforms/instagram/)).
 
 ### 🕹️ Commands Module
 
