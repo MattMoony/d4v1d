@@ -20,8 +20,17 @@ COMPLETE_WHILE_TYPING: bool = True
 PLATFORMS: Dict[str, str] = dict()
 """Contains various config options for platforms"""
 
+LOG_NAME: str = 'd4v1d'
+"""The name of the logger"""
+
 LOG_FORMAT: str = '%(message)s'
 """The format for error/warning log messages"""
+
+LOG_LEVEL: str = 'WARNING'
+"""The default log level for the logger"""
+
+LOG_DATEFMT: str = '[%X]'
+"""The date format for log messages"""
 
 with open(os.path.join(BASE_PATH, 'config', 'platforms.json'), 'r') as f:
     PLATFORMS = json.load(f)
