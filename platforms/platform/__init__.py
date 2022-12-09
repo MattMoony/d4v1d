@@ -20,3 +20,12 @@ class Platform(object):
         """
         self.name: str = name
         self.desc: str = desc
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the platform
+
+        Returns:
+            str: The string representation of the platform
+        """
+        return self.name
