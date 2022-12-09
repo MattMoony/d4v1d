@@ -15,6 +15,7 @@
     - [`init`](#init)
   - [🚉 Platform class](#-platform-class)
     - [`get_user_description`](#get_user_description)
+    - [`get_user_profile_pic`](#get_user_profile_pic)
     - [`get_user_followers`](#get_user_followers)
     - [`get_user_following`](#get_user_following)
     - [`get_user_number_posts`](#get_user_number_posts)
@@ -64,6 +65,12 @@ Every platform **needs to extend this class**, and implement at least the follow
 > `get_user_description (cls, username: str) -> d4v1d.platforms.platform.info.Info<str>`
 
 Get a brief summary of the user - usually something like a bio exists, in which case, this can simply be returned.
+
+#### `get_user_profile_pic`
+
+> `get_user_profile_pic (cls,  username: str) -> d4v1d.platforms.platform.info.Info<str>`
+
+Get the users' profile picture. The return value being the path to the image file.
 
 #### `get_user_followers`
 
