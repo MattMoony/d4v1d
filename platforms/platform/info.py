@@ -4,14 +4,13 @@ information relating to a social network.
 """
 
 from datetime import datetime
-from . import Platform
 from typing import *
 
 class Info(object):
     """
     Represents a piece of information
     """
-    def __init__(self, value: Any, date: datetime, platform: Platform):
+    def __init__(self, value: Any, date: datetime, platform: "Platform"):
         """
         Creates a new piece of information
 
@@ -22,7 +21,7 @@ class Info(object):
         """
         self.value: Any = value
         self.date: datetime = date
-        self.platform: Platform = platform
+        self.platform: "Platform" = platform
 
     def __str__(self) -> str:
         """
