@@ -20,6 +20,9 @@ COMPLETE_WHILE_TYPING: bool = True
 PLATFORMS: Dict[str, str] = dict()
 """Contains various config options for platforms"""
 
+LOG_FORMAT: str = '%(message)s'
+"""The format for error/warning log messages"""
+
 with open(os.path.join(BASE_PATH, 'config', 'platforms.json'), 'r') as f:
     PLATFORMS = json.load(f)
     dir: str = os.getenv('D4V1D_DIR')
