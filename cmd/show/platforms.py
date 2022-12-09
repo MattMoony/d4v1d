@@ -5,9 +5,8 @@ social-media platforms.
 
 from rich import print
 from rich.tree import Tree
-from cmd.cmd import Command
 from platforms import PLATFORMS
-from cmd._helper.clisessionstate import CLISessionState
+from platforms.platform.cmd import Command, CLISessionState
 from typing import *
 
 class ShowPlatforms(Command):

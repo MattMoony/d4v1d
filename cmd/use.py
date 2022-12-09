@@ -5,8 +5,7 @@ to switch between platforms
 
 import platforms
 from rich import print
-from cmd.cmd import Command
-from cmd._helper.clisessionstate import CLISessionState
+from platforms.platform.cmd import Command, CLISessionState
 from platforms.platform import Platform
 from typing import *
 

@@ -2,7 +2,7 @@
 Module providing the template for a command
 """
 
-from cmd._helper.clisessionstate import CLISessionState
+from .clisessionstate import CLISessionState
 from typing import *
 
 class Command(object):
@@ -13,6 +13,11 @@ class Command(object):
     def __init__(self, name: str, aliases: List[str] = [], description: str = ''):
         """
         Initializes a command with the specified name, aliases and description.
+
+        Args:
+            name (str): The name of the command
+            aliases (List[str], optional): The aliases of the command. Defaults to [].
+            description (str, optional): The description of the command. Defaults to ''.
         """
         self.name: str = name
         self.aliases: List[str] = aliases

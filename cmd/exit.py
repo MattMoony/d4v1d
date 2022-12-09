@@ -3,8 +3,7 @@ Module for the exit command
 """
 
 import sys
-from cmd.cmd import Command
-from cmd._helper.clisessionstate import CLISessionState
+from platforms.platform.cmd import Command, CLISessionState
 from typing import *
 
 class Exit(Command):

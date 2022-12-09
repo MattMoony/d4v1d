@@ -4,8 +4,7 @@ Module for the help command
 
 from rich import print
 from rich.tree import Tree
-from cmd.cmd import Command
-from cmd._helper.clisessionstate import CLISessionState
+from platforms.platform.cmd import Command, CLISessionState
 from typing import *
 
 class Help(Command):
