@@ -1,4 +1,4 @@
 {
-    "config_dir": "$D4V1D_DIR/config",
+    "conf_dir": "$D4V1D_DIR/config",
     "data_dir": "$D4V1D_DIR/data"
 }

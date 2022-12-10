@@ -6,6 +6,7 @@ entire application.
 import os
 import json
 import platform
+from .platforms import PlatformsConfig
 from typing import *
 
 BASE_PATH: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -32,16 +33,8 @@ LOG_LEVEL: str = 'WARNING'
 LOG_DATEFMT: str = '[%X]'
 """The date format for log messages"""
 
-with open(os.path.join(BASE_PATH, 'config', 'platforms.json'), 'r') as f:
-    PLATFORMS = json.load(f)
-    dir: str = os.getenv('D4V1D_DIR')
+PLATFORMS: PlatformsConfig
+"""Contains various config options for platforms"""
 
-    if not dir and ('dir' not in PLATFORMS.keys() or not PLATFORMS['dir']):
-        PLATFORMS['dir'] = os.path.join(BASE_PATH, '_')
-    if not os.path.isdir(PLATFORMS['dir']):
-        os.mkdir(PLATFORMS['dir'])
-    
-    for k, v in PLATFORMS.items():
-        v = v.replace('$D4V1D_DIR', PLATFORMS['dir'])
-        if k.endswith('_dir') and not os.path.isdir(v):
-            os.mkdir(v)
+with open(os.path.join(BASE_PATH, 'config', 'platforms.json'), 'r') as f:
+    PLATFORMS = PlatformsConfig.loadj(json.load(f))
