@@ -52,9 +52,13 @@ class InstagramConfig(object):
         Do cleanup, like saving the config, once instagram
         is unloaded
         """
+        log.debug(f'Cleaning up InstagramConfig ... ')
         if not self.__dont_save:
+            log.debug(f'Saving InstagramConfig, since __dont_save is not set ...')
             with open(os.path.join(self.cdir, 'conf.json'), 'w') as f:
                 json.dump(self.dumpj(), f)
+        else:
+            log.debug(f'Not saving InstagramConfig, since __dont_save is set ...')
 
     def dumpj(self) -> Dict[str, Any]:
         """

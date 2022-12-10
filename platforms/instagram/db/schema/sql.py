@@ -24,7 +24,7 @@ SQLSchema: Dict[str, Dict[str, str]] = {
         ],
     },
     'links': {
-        'id': 'INTEGER AUTOINCREMENT',
+        'id': 'INTEGER AUTO_INCREMENT',
         'url': 'VARCHAR(2048) NOT NULL',
         '.pk': [
             'id',
@@ -41,13 +41,13 @@ SQLSchema: Dict[str, Dict[str, str]] = {
         ],
     },
     'user_references': {
-        'from': 'INTEGER NOT NULL',
-        'to': 'INTEGER NOT NULL',
+        'referrer': 'INTEGER NOT NULL',
+        'referring': 'INTEGER NOT NULL',
         'timestamp': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
         'context': 'VARCHAR(16)',
         '.pk': [
-            'from',
-            'to',
+            'referrer',
+            'referring',
             'timestamp',
         ],
     },

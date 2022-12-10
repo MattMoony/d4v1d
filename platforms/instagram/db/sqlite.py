@@ -32,21 +32,35 @@ class SQLiteDatabase(Database):
         # at this point, because it is created in the init function
         # of this platform module
         self.path: str = path or os.path.join(config.PCONFIG._instagram.ddir, 'instagram.db')
-        # establish a connection to the database
-        self.con: sqlite3.Connection = sqlite3.connect(self.path)
-        # check the database for any schema errors
-        if not self.__health_check():
-            # close the connection to the old db
-            self.con.close()
-            # generate a new, unique backup id & move the file
-            bak: str = str(uuid.uuid4())
-            while os.path.exists(os.path.join(config.PCONFIG._instagram.ddir, f'{bak}.db')):
-                bak = str(uuid.uuid4())
-            log.warning(f'Database is not in a valid state - backing up to [bold]{config.PCONFIG._instagram.ddir}/{bak}.db[/bold] and creating a new database')
-            os.rename(os.path.join(config.PCONFIG._instagram.ddir, 'instagram.db'), os.path.join(config.PCONFIG._instagram.ddir, f'{bak}.db'))
+        # check if the db exists ... 
+        if os.path.isfile(self.path):
+            # establish a connection to the database
+            self.con: sqlite3.Connection = sqlite3.connect(self.path)
+            # check the database for any schema errors
+            if not self.__health_check():
+                # close the connection to the old db
+                self.con.close()
+                # generate a new, unique backup id & move the file
+                bak: str = str(uuid.uuid4())
+                while os.path.exists(os.path.join(config.PCONFIG._instagram.ddir, f'{bak}.db')):
+                    bak = str(uuid.uuid4())
+                log.warning(f'Database is not in a valid state - backing up to [bold]{config.PCONFIG._instagram.ddir}/{bak}.db[/bold] and creating a new database')
+                os.rename(os.path.join(config.PCONFIG._instagram.ddir, 'instagram.db'), os.path.join(config.PCONFIG._instagram.ddir, f'{bak}.db'))
+                # connect to the new db & create everything
+                self.con = sqlite3.connect(self.path)
+                self.__setup_database()
+        else:
             # connect to the new db & create everything
             self.con = sqlite3.connect(self.path)
             self.__setup_database()
+
+    def __del__(self) -> None:
+        """
+        Do some cleanup, once the platform is unloaded
+        in the d4v1d core
+        """
+        log.debug(f'Cleaning up Instagram database ... ')
+        self.con.close()
 
     def __health_check(self) -> bool:
         """
@@ -57,13 +71,16 @@ class SQLiteDatabase(Database):
         Returns:
             bool: True if the database is valid, False otherwise
         """
-        for table, spec in SQLSchema.items():
-            # check if the table exists
-            c: sqlite3.Cursor = self.con.cursor()
-            c.execute('SELECT name FROM sqlite_master WHERE type=? AND name=?', ('table', table))
-            if c.fetchone() is None:
-                return False
-        return True
+        try:
+            for table, spec in SQLSchema.items():
+                # check if the table exists
+                c: sqlite3.Cursor = self.con.cursor()
+                c.execute('SELECT name FROM sqlite_master WHERE type=? AND name=?', ('table', table))
+                if c.fetchone() is None:
+                    return False
+            return True
+        except Exception:
+            return False
 
     def __setup_database(self) -> None:
         """
@@ -76,20 +93,27 @@ class SQLiteDatabase(Database):
             # semi-safe for now - i'm well aware that
             # this is not the best code ... :P
             __safe: str = r'[\w\(\)\._ ]+'
-            def __burn_everything_to_the_ground(self, s: str) -> None:
-                raise ValueError(f'Invalid symbol in SQLite DB creation: {s}')
+            def __burn_everything_to_the_ground(s: str) -> None:
+                msg: str = f'Invalid symbol in SQLite DB creation: {s} - refusing to continue'
+                log.critical(msg)
+                log.critical(f'Crashing everything, since this shouldn\'t happen unless someone messed with the schema ([bold][red]danger of SQLi !!![/red][/bold])')
+                log.critical(f'Compare your schema ("{os.path.join(os.path.dirname(__file__), "schema", "sql.py")}") with the original')
+                raise ValueError(msg)
             if not re.match(__safe, table):
                 # crash everything - since this should DEFINITELY
                 # not happen unless someone messed with the schema
                 __burn_everything_to_the_ground(table)
-            if any(not (re.match(__safe, k) and re.match(__safe, v)) for k, v in spec.items()):
+            if any(not (re.match(__safe, k) and (re.match(__safe, v) if type(v) == str else all(re.match(__safe, pk) for pk in v))) for k, v in spec.items()):
                 __burn_everything_to_the_ground('')
             # create the table
             c: sqlite3.Cursor = self.con.cursor()
-            c.execute(f'''CREATE TABLE {table} (
+            qry: str = f'''CREATE TABLE {table} (
                 {", ".join([f"{k} {v}" for k, v in spec.items() if k[0] != "."])},
-                PRIMARY KEY ({", ".join(spec[".pk"])}")
-            )''')
+                PRIMARY KEY ({", ".join(spec[".pk"])})
+            )'''
+            log.debug(f'Creating table [bold]{table}[/bold] using ... ')
+            log.debug(qry)
+            c.execute(qry)
         self.con.commit()
 
     def store_user(self, user: User) -> None:
