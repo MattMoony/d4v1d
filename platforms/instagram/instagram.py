@@ -16,3 +16,10 @@ class Instagram(Platform):
         Creates a new Instagram object
         """
         super().__init__("Instagram", "Wrapper for https://www.instagram.com/")
+
+    def get_user_description(self, username: str) -> str:
+        """
+        Returns the description of the user with the given username
+        """
+        # check if user is already part of the db
+        pass
