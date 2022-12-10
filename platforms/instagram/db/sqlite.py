@@ -31,7 +31,7 @@ class SQLiteDatabase(Database):
         # we can assume that the data directory for instagram exists
         # at this point, because it is created in the init function
         # of this platform module
-        self.path: str = path or os.path.join(config.PLATFORMS['.instagram']['dir'], 'instagram.db')
+        self.path: str = path or os.path.join(config.PCONFIG._instagram.ddir, 'instagram.db')
         # establish a connection to the database
         self.con: sqlite3.Connection = sqlite3.connect(self.path)
         # check the database for any schema errors
@@ -40,10 +40,10 @@ class SQLiteDatabase(Database):
             self.con.close()
             # generate a new, unique backup id & move the file
             bak: str = str(uuid.uuid4())
-            while os.path.exists(os.path.join(config.PLATFORMS['.instagram']['dir'], f'{bak}.db')):
+            while os.path.exists(os.path.join(config.PCONFIG._instagram.ddir, f'{bak}.db')):
                 bak = str(uuid.uuid4())
-            log.warning(f'Database is not in a valid state - backing up to [bold]{config.PLATFORMS[".instagram"]["dir"]}/{bak}.db[/bold] and creating a new database')
-            os.rename(os.path.join(config.PLATFORMS['.instagram']['dir'], 'instagram.db'), os.path.join(config.PLATFORMS['.instagram']['dir'], f'{bak}.db'))
+            log.warning(f'Database is not in a valid state - backing up to [bold]{config.PCONFIG._instagram.ddir}/{bak}.db[/bold] and creating a new database')
+            os.rename(os.path.join(config.PCONFIG._instagram.ddir, 'instagram.db'), os.path.join(config.PCONFIG._instagram.ddir, f'{bak}.db'))
             # connect to the new db & create everything
             self.con = sqlite3.connect(self.path)
             self.__setup_database()
