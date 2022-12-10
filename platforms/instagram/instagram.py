@@ -5,6 +5,7 @@ the core and this platform-specific implementation.
 
 import config
 from log import log
+from .db.models import User
 from .db import Database, DATABASES
 from platforms.platform import Platform
 from typing import *
@@ -22,8 +23,7 @@ class Instagram(Platform):
         Creates a new Instagram object
         """
         super().__init__("Instagram", "Wrapper for https://www.instagram.com/")
-        # create a new database of the configured type/format
-        log.info(f'Initializing database of type "{config.PCONFIG._instagram.db_type}" ...')
+        log.debug(f'Initializing database of type "{config.PCONFIG._instagram.db_type}" ...')
         self.db = DATABASES[config.PCONFIG._instagram.db_type]()
 
     def __del__(self) -> None:
@@ -42,5 +42,10 @@ class Instagram(Platform):
         Args:
             username (str): The username of the user
         """
-        # check if user is already part of the db
-        pass
+        log.debug(f'Check if user ("{username}") is already part of the db')
+        user: Optional[User] = self.db.get_user(username)
+        if user:
+            log.debug(f'"{username}" is already part of the db')
+            return user.description
+        log.debug(f'"{username}" is not part of the db ... yet')
+        # TODO get user info from instagram
