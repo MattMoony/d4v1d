@@ -52,6 +52,8 @@ class PlatformsConfig(object):
         """
         self.__dict__['base_dir'] = base_dir
         self.__dict__['base_origin'] = base_origin
+        if not os.path.isdir(base_dir):
+            os.makedirs(base_dir)
         self.data_dir = data_dir
         self.conf_dir = conf_dir
 
@@ -71,6 +73,8 @@ class PlatformsConfig(object):
         if k in ('data_dir', 'conf_dir',):
             self.__dict__[f'__{k}'] = v
             self.__dict__[k] = v.replace('$D4V1D_DIR', self.base_dir)
+            if not os.path.isdir(self.__dict__[k]):
+                os.makedirs(self.__dict__[k])
         elif k == 'base_dir':
             self.__dict__[k] = v
             self.__dict__['base_origin'] = BaseOrigin.CONF
