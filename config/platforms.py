@@ -43,6 +43,12 @@ class PlatformsConfig(object):
     def __init__(self, base_dir: str, base_origin: BaseOrigin, data_dir: str, conf_dir: str):
         """
         Creates a new PlatformsConfig object
+
+        Args:
+            base_dir (str): The directory containing all platform-related content (base path) - nothing should be stored in here directly
+            base_origin (BaseOrigin): The origin of the base path
+            data_dir (str): The directory where data of all platforms should be stored
+            conf_dir (str): The directory where platforms can store configuration files
         """
         self.__dict__['base_dir'] = base_dir
         self.__dict__['base_origin'] = base_origin

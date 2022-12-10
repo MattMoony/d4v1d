@@ -33,8 +33,8 @@ LOG_LEVEL: str = 'WARNING'
 LOG_DATEFMT: str = '[%X]'
 """The date format for log messages"""
 
-PLATFORMS: PlatformsConfig
+PCONFIG: PlatformsConfig
 """Contains various config options for platforms"""
 
 with open(os.path.join(BASE_PATH, 'config', 'platforms.json'), 'r') as f:
-    PLATFORMS = PlatformsConfig.loadj(json.load(f))
+    PCONFIG = PlatformsConfig.loadj(json.load(f))
