@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="d4v1d" src="docs/media/logo.png" width="125" height="125" />
+  <img alt="d4v1d" src="docs/_static/logo.png" width="125" height="125" />
 </p>
 <h1 align="center">🅳4🆅1🅳</h1>
 <p align="center">
