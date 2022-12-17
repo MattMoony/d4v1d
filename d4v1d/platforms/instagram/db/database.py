@@ -5,7 +5,7 @@ should look like. This base class is extended
 by all specific database implementations.
 """
 
-from platforms.instagram.db.models import User
+from d4v1d.platforms.instagram.db.models import User
 from typing import *
 
 class Database(object):

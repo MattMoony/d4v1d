@@ -5,12 +5,12 @@ Database implementation for an SQLite database.
 import os
 import re
 import uuid
-import config
 import sqlite3
-from log import log
-from platforms.instagram.db.models import User
-from platforms.instagram.db.database import Database
-from platforms.instagram.db.schema.sql import SQLSchema
+from d4v1d.log import log
+import d4v1d.config as config
+from d4v1d.platforms.instagram.db.models import User
+from d4v1d.platforms.instagram.db.database import Database
+from d4v1d.platforms.instagram.db.schema.sql import SQLSchema
 from typing import *
 
 class SQLiteDatabase(Database):

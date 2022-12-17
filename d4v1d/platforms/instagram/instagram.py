@@ -3,11 +3,11 @@ Contains the Instagram class - the interface between
 the core and this platform-specific implementation.
 """
 
-import config
-from log import log
+from d4v1d.log import log
+import d4v1d.config as config
 from .db.models import User
 from .db import Database, DATABASES
-from platforms.platform import Platform
+from d4v1d.platforms.platform import Platform
 from typing import *
 
 class Instagram(Platform):

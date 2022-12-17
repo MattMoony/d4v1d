@@ -2,7 +2,7 @@
 Dummy code for the platform class.
 """
 
-from platforms.platform.info import Info
+from d4v1d.platforms.platform.info import Info
 from typing import *
 
 class Platform(object):

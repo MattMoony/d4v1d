@@ -4,11 +4,11 @@ Grants d4v1d access to Instagram.
 
 import os
 import json
-import config
-from log import log
+from d4v1d.log import log
+import d4v1d.config as config
 from .instagram import Instagram
 from .config import InstagramConfig
-from platforms.platform import Platform
+from d4v1d.platforms.platform import Platform
 
 def init() -> Platform:
     """

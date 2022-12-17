@@ -3,10 +3,10 @@ Module for the use command - used
 to switch between platforms
 """
 
-import platforms
 from rich import print
-from platforms.platform.cmd import Command, CLISessionState
-from platforms.platform import Platform
+import d4v1d.platforms as platforms
+from d4v1d.platforms.platform import Platform
+from d4v1d.platforms.platform.cmd import Command, CLISessionState
 from types import ModuleType
 from typing import *
 

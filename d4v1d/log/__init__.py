@@ -3,8 +3,8 @@ Provides the logger for all kinds of warning / error
 messages, etc.
 """
 
-import config
 import logging
+import d4v1d.config as config
 from rich.logging import RichHandler
 
 logging.basicConfig(

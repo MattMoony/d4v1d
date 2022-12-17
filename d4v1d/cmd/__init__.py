@@ -4,17 +4,17 @@ commands from the user.
 """
 
 import copy
-import config
-import platforms
 from rich import print
-from cmd._helper import CMDS
+import d4v1d.config as config
+import d4v1d.platforms as platform
+from d4v1d.cmd._helper import CMDS
 from prompt_toolkit import PromptSession
 from prompt_toolkit.document import Document
 from prompt_toolkit.formatted_text.html import HTML
 from prompt_toolkit.completion import NestedCompleter
-from platforms.platform.cmd import Command, CLISessionState
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.validation import Validator, ValidationError
+from d4v1d.platforms.platform.cmd import Command, CLISessionState
 from typing import *
 
 class CmdValidator(Validator):

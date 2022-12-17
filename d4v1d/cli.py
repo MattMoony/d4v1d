@@ -1,12 +1,11 @@
-#!/usr/bin/env python3
-
 """
-d4v1d.py - A social-media *social-engineering* tool
+The CLI module of the program - contains
+the main entry point of the program
 """
 
-import cmd
-import utils
-import config
+import d4v1d.cmd as cmd
+import d4v1d.utils as utils
+import d4v1d.config as config
 
 def main():
     """
