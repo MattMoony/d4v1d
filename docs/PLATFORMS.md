@@ -1,32 +1,6 @@
-<p align="center">
-  <img alt="d4v1d" src="media/logo.png" width="125" height="125" />
-</p>
-<h1 align="center">🅳4🆅1🅳 - Platforms</h1>
+# Platforms
 
 > This gives an overview of how platforms are implemented in d4v1d - in case you want to add your own.
-
-## 📖 Table of Contents
-
-- [📖 Table of Contents](#-table-of-contents)
-- [1️⃣ What are platforms?](#1️⃣-what-are-platforms)
-- [2️⃣ How are platforms integrated?](#2️⃣-how-are-platforms-integrated)
-- [3️⃣ How are platforms implemented?](#3️⃣-how-are-platforms-implemented)
-  - [📦 Platform Module](#-platform-module)
-    - [`init`](#init)
-  - [🚉 Platform class](#-platform-class)
-    - [`get_user_description`](#get_user_description)
-    - [`get_user_profile_pic`](#get_user_profile_pic)
-    - [`get_user_followers`](#get_user_followers)
-    - [`get_user_following`](#get_user_following)
-    - [`get_user_number_posts`](#get_user_number_posts)
-  - [📊 Info Class](#-info-class)
-  - [🤖 Bot Class](#-bot-class)
-  - [👥 Group Class](#-group-class)
-  - [🗃️ Database Class](#️-database-class)
-  - [🕹️ Commands Module](#️-commands-module)
-    - [`get_cmds`](#get_cmds)
-    - [`CLISessionState`](#clisessionstate)
-    - [`Command`](#command)
 
 ## 1️⃣ What are platforms?
 
@@ -211,9 +185,3 @@ class Exit(Command):
         """
         sys.exit(0)
 ```
-
----
-
-[⬆️ Back to top](#📖-table-of-contents)
-
-... m4ttm00ny (December 2022)

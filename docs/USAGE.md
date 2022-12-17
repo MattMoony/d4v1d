@@ -1,19 +1,6 @@
-<p align="center">
-  <img alt="d4v1d" src="media/logo.png" width="125" height="125" />
-</p>
-<h1 align="center">🅳4🆅1🅳 - Usage</h1>
+# Usage
 
 > This is an overview of all commands included in d4v1d, and how to use them.
-
-## 📖 Table of Contents
-
-- [📖 Table of Contents](#-table-of-contents)
-- [🎲 General commands](#-general-commands)
-  - [`help`](#help)
-  - [`exit`](#exit)
-  - [`show`](#show)
-    - [`show platforms`](#show-platforms)
-  - [`use [<PLATFORM>]`](#use-platform)
 
 ## 🎲 General commands
 
@@ -44,9 +31,3 @@ Shows a list of all available platforms.
 **Aliases:** `switch`
 
 Switches to the given platform; allows you to interact with this social-media platform specifically. If `<PLATFORM>` is omitted, the currently selected platform will be de-selected.
-
----
-
-[⬆️ Back to top](#📖-table-of-contents)
-
-... m4ttm00ny (December 2022)
