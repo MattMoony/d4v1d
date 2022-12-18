@@ -8,4 +8,6 @@ class Bot(object):
     """
     Template bot class - template automated user.
     """
-    pass
+    
+    anonymous: bool
+    """Whether or not the bot is an authenticated user"""
