@@ -24,22 +24,13 @@ For more info on how `d4v1d` works, how to extend it and how to use it, take a l
 
 *To run the older, but last complete version, `v2`, checkout the [`legacy`](https://github.com/MattMoony/d4v1d/tree/legacy) branch of this repository. It has its own `README.md` with all necessary setup steps.*
 
-At the moment - as the current "version" of this tool isn't finished yet and therefore has no proper release, just *clone* the repo, install all pip dependencies and run `d4v1d.py` to be greated with an interactive shell.
-
-### 🐧 Linux / macOS
+At the moment, since `d4v1d` is still under active development, just clone the repo and run the following command ...
 
 ```bash
-python3 -m pip install ./requirements-unix.txt
-chmod 755 ./d4v1d.py
-./d4v1d.py
+pip install .
 ```
 
-### 🪟 Windows
-
-```bash
-python -m pip install .\requirements-win.txt
-python .\d4v1d.py
-```
+... in the future, as soon as the first release is available, you will be able to simply install `d4v1d` from PyPI or from [releases](https://github.com/MattMoony/d4v1d/releases).
 
 ## 🎮 Usage
 
