@@ -120,7 +120,7 @@ def start() -> None:
     state: CLISessionState = CLISessionState()
     while True:
         try:
-            prompt: HTML = HTML(config.PROMPT.replace('%%', f' <aaa fg="DarkGrey">{state.platform}</aaa>' if state.platform else ''))
+            prompt: HTML = HTML(config.PROMPT.replace('%%', f'<aaa fg="Grey">:</aaa>{state.platform}' if state.platform else ''))
             handle(session.prompt(prompt), state)
         except KeyboardInterrupt:
             continue

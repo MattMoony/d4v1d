@@ -13,6 +13,7 @@ BASE_PATH: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 """The path to the root folder of this application"""
 
 PROMPT: str = f'<b><aaa fg="Tomato">[{os.getlogin()}@{platform.node()}</aaa> d4v1d%%<aaa fg="Tomato">]$</aaa></b> '
+PROMPT: str = f'<b>{platform.node()}/{os.getlogin()} <u>d4v1d<aaa fg="Tomato">%%</aaa></u> <aaa fg="Grey"># </aaa></b>'
 """The prompt to be displayed to the user"""
 
 COMPLETE_WHILE_TYPING: bool = True
