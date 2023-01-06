@@ -17,9 +17,9 @@ from prompt_toolkit.validation import Validator, ValidationError
 from d4v1d.platforms.platform.cmd import Command, CLISessionState
 from typing import *
 
-__CMDS: Dict[str, Any]
+__CMDS: Dict[str, Any] = {}
 """Local copy of all available commands - with expanded aliases"""
-__COMPLETER_CMDS: Dict[str, Any]
+__COMPLETER_CMDS: Dict[str, Any] = {}
 """Completer dictionary of all commands"""
 
 class CmdValidator(Validator):

@@ -18,18 +18,25 @@ class Platform(object):
     groups: List[Group]
     """The groups of the platform"""
     
-    def __init__(self, name: str, desc: str, groups: List[Group] = []):
+    def __init__(self, name: str, desc: str, groups: Optional[List[Group]] = None):
         """
         Creates a new platform
 
         Args:
             name (str): The name of the platform
             desc (str): A description of the platform
-            groups (List[Group]): The groups of the platform
+            groups (Optional[List[Group]]): The groups of the platform
         """
         self.name = name
         self.desc = desc
-        self.groups = groups
+        self.groups = groups or []
+
+    def add_group(self, name: str) -> str:
+        """
+        Create and add a new group with
+        the given name.
+        """
+        raise NotImplementedError()
 
     @classmethod
     def get_user_description(cls, username: str) -> Info:

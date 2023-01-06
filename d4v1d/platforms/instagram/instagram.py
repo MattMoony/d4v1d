@@ -38,6 +38,16 @@ class Instagram(Platform):
         del config.PCONFIG._instagram
         del self.db
 
+    def add_group(self, name: str) -> None:
+        """
+        Adds a new group with the given name
+
+        Args:
+            name (str): The name of the group
+        """
+        log.debug(f'Adding group "{name}" ... ')
+        self.groups.append(InstagramGroup(name))
+
     def get_user(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[User]:
         """
         Returns the user with the given username

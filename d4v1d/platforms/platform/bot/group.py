@@ -18,17 +18,17 @@ class Group(object):
     bots: List[Bot]
     """The bots in the group"""
 
-    def __init__(self, name: str, bots: List[Bot] = []):
+    def __init__(self, name: str, bots: Optional[List[Bot]] = None):
         """
         Initialize the group with a name and an 
         optional list of bots.
 
         Args:
             name (str): The name of the group
-            bots (List[Bot], optional): The bots in the group. Defaults to [].
+            bots (Optional[List[Bot]]): The bots in the group
         """
         self.name = name
-        self.bots = bots
+        self.bots = bots or []
 
     def add(self, bot: Bot):
         """
