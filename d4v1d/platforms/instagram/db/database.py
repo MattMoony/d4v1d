@@ -5,6 +5,7 @@ should look like. This base class is extended
 by all specific database implementations.
 """
 
+from d4v1d.platforms.platform.info import Info
 from d4v1d.platforms.instagram.db.models import User
 from typing import *
 
@@ -22,7 +23,7 @@ class Database(object):
         """
         raise NotImplementedError()
 
-    def get_user(self, username: str) -> Optional[User]:
+    def get_user(self, username: str) -> Optional[Info[User]]:
         """
         Gets a user from the database
 
@@ -30,6 +31,6 @@ class Database(object):
             username (str): The username of the user
 
         Returns:
-            Optional[User]: The user if it exists, None otherwise
+            Optional[Info[User]]: The user if it exists, None otherwise
         """
         raise NotImplementedError()

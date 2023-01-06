@@ -28,15 +28,18 @@ class User(object):
     """Path to the profile picture (local)"""
     private: bool
     """Is this a private profile?"""
-    category_name: str
+    number_posts: int
+    """Number of posts"""
+    category_name: Optional[str]
     """Name of the category, to which this "business" belongs"""
     pronouns: str
     """The user's pronouns"""
 
     def __init__(self, id: int, fbid: int, username: str, 
                  full_name: str, bio: str, no_followers: int, 
-                 no_following: int, profile_pic: str, private: bool, 
-                 category_name: str, pronouns: str):
+                 no_following: int, profile_pic: str, private: bool,
+                 number_posts: int, category_name: Optional[str] = None, 
+                 pronouns: str = ''):
         """
         Create a new user with the given info
         """
@@ -49,6 +52,7 @@ class User(object):
         self.no_following = no_following
         self.profile_pic = profile_pic
         self.private = private
+        self.number_posts = number_posts
         self.category_name = category_name
         self.pronouns = pronouns
 
@@ -66,6 +70,7 @@ class User(object):
             'no_following': self.no_following,
             'profile_pic': self.profile_pic,
             'private': self.private,
+            'number_posts': self.number_posts,
             'category_name': self.category_name,
             'pronouns': self.pronouns,
         }
@@ -76,8 +81,8 @@ class User(object):
         """
         return (self.id, self.fbid, self.username, self.full_name, 
                 self.bio, self.no_followers, self.no_following, 
-                self.profile_pic, self.private, self.category_name, 
-                self.pronouns)
+                self.profile_pic, self.private, self.number_posts,
+                self.category_name, self.pronouns)
 
     def __str__(self):
         """
@@ -86,14 +91,25 @@ class User(object):
         return f'InstagramUser({self.username}#{self.id})'
 
     @classmethod
-    def loadj(cls, obj: Dict[str, Any]) -> "User":
+    def loadj(cls, obj: Dict[str, Any], api: bool = False, profile_pic: Optional[str] = None) -> "User":
         """
         Load a user from a JSON object
+
+        Args:
+            obj: The JSON object
+            api: Parsing the API response?
+            profile_pic: The path to the profile picture (if this is an API response)
         """
+        if api:
+            return User(obj['id'], obj['fbid'], obj['username'],
+                        obj['full_name'], obj['biography'], obj['edge_followed_by']['count'],
+                        obj['edge_follow']['count'], profile_pic, obj['is_private'],
+                        obj['edge_owner_to_timeline_media']['count'],
+                        obj['category_name'], '/'.join(obj['pronouns']))
         return User(obj['id'], obj['fbid'], obj['username'], 
                     obj['full_name'], obj['bio'], obj['no_followers'], 
                     obj['no_following'], obj['profile_pic'], obj['private'], 
-                    obj['category_name'], obj['pronouns'])
+                    obj['number_posts'], obj['category_name'], obj['pronouns'])
 
     @classmethod
     def loadt(cls, obj: Tuple[Any, ...]) -> "User":

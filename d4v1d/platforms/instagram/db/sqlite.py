@@ -8,6 +8,7 @@ import uuid
 import sqlite3
 from d4v1d.log import log
 import d4v1d.config as config
+from d4v1d.platforms.platform.info import Info
 from d4v1d.platforms.instagram.db.models import User
 from d4v1d.platforms.instagram.db.database import Database
 from d4v1d.platforms.instagram.db.schema.sql import SQLSchema
@@ -126,14 +127,14 @@ class SQLiteDatabase(Database):
         c: sqlite3.Cursor = self.con.cursor()
         c.execute('''INSERT INTO users (
             id, fbid, username, full_name, bio, followers,
-            following, profile_pic_local, private, category_name,
-            pronouns
+            following, profile_pic_local, private, number_posts,
+            category_name, pronouns
         ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )''', user.tuple())
         self.con.commit()
 
-    def get_user(self, username: str) -> Optional[User]:
+    def get_user(self, username: str) -> Optional[Info[User]]:
         """
         Gets a user from the database
 
@@ -141,16 +142,16 @@ class SQLiteDatabase(Database):
             username (str): The username of the user
 
         Returns:
-            Optional[User]: The user if it exists, None otherwise
+            Optional[Info[User]]: The user if it exists, None otherwise
         """
         c: sqlite3.Cursor = self.con.cursor()
-        c.execute('''SELECT ( 
-                        id, fbid, username, full_name, bio, followers,
-                        following, profile_pic_local, private, category_name,
-                        pronouns
-                     ) FROM users 
+        c.execute('''SELECT
+                        timestamp, id, fbid, username, full_name, bio, followers,
+                        following, profile_pic_local, private, number_posts,
+                        category_name, pronouns
+                     FROM users 
                      WHERE username=?''', (username,))
         row: Optional[Tuple] = c.fetchone()
         if row is None:
             return None
-        return User(*row)
+        return Info(User(*row[1:]), row[0])

@@ -2,6 +2,7 @@
 Dummy code for the platform class.
 """
 
+from d4v1d.platforms.platform.bot.group import Group
 from d4v1d.platforms.platform.info import Info
 from typing import *
 
@@ -9,17 +10,26 @@ class Platform(object):
     """
     Represents a social-media platform
     """
+
+    name: str
+    """The name of the platform"""
+    desc: str
+    """A description of the platform"""
+    groups: List[Group]
+    """The groups of the platform"""
     
-    def __init__(self, name: str, desc: str):
+    def __init__(self, name: str, desc: str, groups: List[Group] = []):
         """
         Creates a new platform
 
         Args:
             name (str): The name of the platform
             desc (str): A description of the platform
+            groups (List[Group]): The groups of the platform
         """
-        self.name: str = name
-        self.desc: str = desc
+        self.name = name
+        self.desc = desc
+        self.groups = groups
 
     @classmethod
     def get_user_description(cls, username: str) -> Info:

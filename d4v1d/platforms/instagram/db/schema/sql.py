@@ -16,6 +16,7 @@ SQLSchema: Dict[str, Dict[str, str]] = {
         'following': 'INTEGER',
         'profile_pic_local': 'VARCHAR(256)',
         'private': 'BOOLEAN',
+        'number_posts': 'INTEGER',
         'category_name': 'VARCHAR(32)',
         'pronouns': 'VARCHAR(16)',
         '.pk': [

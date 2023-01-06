@@ -29,3 +29,21 @@ class Group(object):
         """
         self.name = name
         self.bots = bots
+
+    def add(self, bot: Bot):
+        """
+        Adds a bot to the group
+
+        Args:
+            bot (Bot): The bot to add
+        """
+        self.bots.append(bot)
+
+    def remove(self, bot: Bot):
+        """
+        Removes a bot from the group
+
+        Args:
+            bot (Bot): The bot to remove
+        """
+        self.bots.remove(bot)

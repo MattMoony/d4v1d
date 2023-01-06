@@ -17,6 +17,11 @@ from prompt_toolkit.validation import Validator, ValidationError
 from d4v1d.platforms.platform.cmd import Command, CLISessionState
 from typing import *
 
+__CMDS: Dict[str, Any]
+"""Local copy of all available commands - with expanded aliases"""
+__COMPLETER_CMDS: Dict[str, Any]
+"""Completer dictionary of all commands"""
+
 class CmdValidator(Validator):
     """
     Validator for the command prompt
@@ -37,28 +42,39 @@ class CmdValidator(Validator):
 
 def __build_aliases() -> None:
     """
-    Extends the CMDS dictionary with aliases
+    Extends the __CMDS dictionary with aliases
     (at the moment, only "top-level" aliases
     are supported)
     """
-    for k, v in CMDS.copy().items():
+    global __CMDS
+    __CMDS = copy.deepcopy(CMDS)
+    for k, v in __CMDS.copy().items():
         if isinstance(v, Command):
             for a in v.aliases:
-                CMDS[a] = v
+                __CMDS[a] = v
 
-def __build_completer(cmds: Dict[str, Any]) -> None:
+def __reset_completer() -> None:
+    """
+    Reset the completer dictionary of all commands
+    """
+    for k, v in __COMPLETER_CMDS.items():
+        del __COMPLETER_CMDS[k]
+
+def __build_completer(compl: Dict[str, Any], cmds: Dict[str, Any]) -> None:
     """
     Builds a completer dictionary from the specified
     dictionary of commands.
 
     Args:
+        compl (Dict[str, Any]): The completer dictionary of commands
         cmds (Dict[str, Any]): The dictionary of commands
     """
     for k, v in cmds.items():
         if isinstance(v, Command):
-            cmds[k] = None
+            compl[k] = None
         else:
-            __build_completer(v)
+            compl[k] = {}
+            __build_completer(compl[k], cmds[k])
 
 def get_cmd(cmd: str) -> Tuple[Command, List[str]]:
     """
@@ -69,7 +85,7 @@ def get_cmd(cmd: str) -> Tuple[Command, List[str]]:
         cmd (str): The command to get
     """
     args: List[str] = cmd.split()
-    d: Union[Dict[str, Any], Command] = CMDS
+    d: Union[Dict[str, Any], Command] = __CMDS
     while isinstance(d, dict) and len(args) > 0:
         cu: str = args.pop(0)
         if cu not in d:
@@ -84,9 +100,18 @@ def completer() -> NestedCompleter:
     Returns a NestedCompleter object with all
     available commands.
     """
-    d: Dict[str, Any] = copy.deepcopy(CMDS)
-    __build_completer(d)
-    return NestedCompleter.from_nested_dict(d)
+    global __COMPLETER_CMDS
+    __build_completer(__COMPLETER_CMDS, __CMDS)
+    return NestedCompleter.from_nested_dict(__COMPLETER_CMDS)
+
+def refresh() -> None:
+    """
+    Refresh the session - since the available commands
+    have changed
+    """
+    __build_aliases()
+    __reset_completer()
+    __build_completer(__COMPLETER_CMDS, __CMDS)
 
 def handle(inp: str, state: CLISessionState) -> None:
     """
