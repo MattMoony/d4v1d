@@ -11,7 +11,7 @@ from d4v1d.cmd._helper import CMDS
 from prompt_toolkit import PromptSession
 from prompt_toolkit.document import Document
 from prompt_toolkit.formatted_text.html import HTML
-from prompt_toolkit.completion import NestedCompleter
+from prompt_toolkit.completion.nested import NestedCompleter, NestedDict
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.validation import Validator, ValidationError
 from d4v1d.platforms.platform.cmd import Command, CLISessionState
@@ -26,6 +26,7 @@ class CmdValidator(Validator):
     """
     Validator for the command prompt
     """
+    
     def validate(self, document: Document) -> None:
         """
         Validate some input
@@ -40,6 +41,56 @@ class CmdValidator(Validator):
         except ValueError as e:
             raise ValidationError(message=str(e))
 
+class CmdCompleter(NestedCompleter):
+    """
+    Custom completer - to allow updating
+    commands on the fly.
+    """
+
+    raw_data: NestedDict
+
+    @classmethod
+    def from_nested_dict(cls, data: NestedDict) -> "NestedCompleter":
+        completer = super().from_nested_dict(data)
+        completer.raw_data = data
+        return completer
+
+    def update(self, data: NestedDict) -> None:
+        """
+        Update the completer with new commands.
+
+        Args:
+            data (NestedDict): The new commands
+        """
+        self.options = NestedCompleter.from_nested_dict(data).options
+
+    def reset(self) -> None:
+        """
+        Reset the completer to the original commands
+        """
+        self.options = NestedCompleter.from_nested_dict(self.raw_data).options
+
+class CmdSession(PromptSession):
+    """
+    Custom prompt session - to allow updating
+    commands on the fly.
+    """
+
+    completer: CmdCompleter
+
+def build_aliases(cmds: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extends the given CMD dictionary with entries
+    for all aliases (at the moment only top-level
+    aliases).
+    """
+    __cmds: Dict[str, Any] = copy.deepcopy(cmds)
+    for v in __cmds.copy().values():
+        if isinstance(v, Command):
+            for a in v.aliases:
+                __cmds[a] = v
+    return __cmds
+
 def __build_aliases() -> None:
     """
     Extends the __CMDS dictionary with aliases
@@ -47,11 +98,7 @@ def __build_aliases() -> None:
     are supported)
     """
     global __CMDS
-    __CMDS = copy.deepcopy(CMDS)
-    for k, v in __CMDS.copy().items():
-        if isinstance(v, Command):
-            for a in v.aliases:
-                __CMDS[a] = v
+    __CMDS = build_aliases(CMDS)
 
 def __reset_completer() -> None:
     """
@@ -60,7 +107,7 @@ def __reset_completer() -> None:
     for k, v in __COMPLETER_CMDS.items():
         del __COMPLETER_CMDS[k]
 
-def __build_completer(compl: Dict[str, Any], cmds: Dict[str, Any]) -> None:
+def build_completer(compl: Dict[str, Any], cmds: Dict[str, Any]) -> None:
     """
     Builds a completer dictionary from the specified
     dictionary of commands.
@@ -74,7 +121,7 @@ def __build_completer(compl: Dict[str, Any], cmds: Dict[str, Any]) -> None:
             compl[k] = None
         else:
             compl[k] = {}
-            __build_completer(compl[k], cmds[k])
+            build_completer(compl[k], cmds[k])
 
 def get_cmd(cmd: str) -> Tuple[Command, List[str]]:
     """
@@ -101,8 +148,8 @@ def completer() -> NestedCompleter:
     available commands.
     """
     global __COMPLETER_CMDS
-    __build_completer(__COMPLETER_CMDS, __CMDS)
-    return NestedCompleter.from_nested_dict(__COMPLETER_CMDS)
+    build_completer(__COMPLETER_CMDS, __CMDS)
+    return CmdCompleter.from_nested_dict(__COMPLETER_CMDS)
 
 def refresh() -> None:
     """
@@ -111,7 +158,7 @@ def refresh() -> None:
     """
     __build_aliases()
     __reset_completer()
-    __build_completer(__COMPLETER_CMDS, __CMDS)
+    build_completer(__COMPLETER_CMDS, __CMDS)
 
 def handle(inp: str, state: CLISessionState) -> None:
     """
@@ -142,7 +189,7 @@ def start() -> None:
         validator=CmdValidator(),
         auto_suggest=AutoSuggestFromHistory(),
     )
-    state: CLISessionState = CLISessionState()
+    state: CLISessionState = CLISessionState(session)
     while True:
         try:
             prompt: HTML = HTML(config.PROMPT.replace('%%', f'<aaa fg="Grey">:</aaa>{state.platform}' if state.platform else ''))

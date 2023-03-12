@@ -22,22 +22,25 @@ class Help(Command):
         super().__init__('help', aliases=['?',], description='Shows this help message')
         self.cmds: Dict[str, Any] = cmds
 
-    def __build_tree(self, cmds: Dict[str, Any], tree: Tree) -> None:
+    def __build_tree(self, cmds: Dict[str, Any], tree: Tree, state: CLISessionState) -> None:
         """
         Builds a tree of commands from the specified dictionary
 
         Args:
             cmds (Dict[str, Any]): The dictionary of commands
             tree (Tree): The tree to build
+            state (CLISessionState): The current cli session state
         """
         done: List[Command] = []
         for k, v in cmds.items():
-            if isinstance(v, Command) and v not in done:
+            if isinstance(v, Command) and v.available(state) and v not in done:
                 tree.add(f'[bold]{v.name}[/bold]: {v.description}')
                 done.append(v)
             elif isinstance(v, dict):
-                t: Tree = tree.add(k)
-                self.__build_tree(v, t)
+                t: Tree = Tree(k)
+                self.__build_tree(v, t, state)
+                if t.children:
+                    tree.add(t)
 
     def execute(self, args: List[str], state: CLISessionState) -> None:
         """
@@ -45,7 +48,7 @@ class Help(Command):
         """
         if len(args) == 0:
             cmd_tree: Tree = Tree('[bold grey53][*][/bold grey53] Available commands:')
-            self.__build_tree(self.cmds, cmd_tree)
+            self.__build_tree(self.cmds, cmd_tree, state)
             print(cmd_tree)
         else:
             cmd: str = args.pop(0)

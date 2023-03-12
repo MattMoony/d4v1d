@@ -2,8 +2,10 @@
 Dummy code for the platform class.
 """
 
-from d4v1d.platforms.platform.bot.group import Group
 from d4v1d.platforms.platform.info import Info
+from d4v1d.platforms.platform.db import Database
+from d4v1d.platforms.platform.bot.group import Group
+from prompt_toolkit.completion.nested import NestedDict
 from typing import *
 
 class Platform(object):
@@ -17,6 +19,10 @@ class Platform(object):
     """A description of the platform"""
     groups: List[Group]
     """The groups of the platform"""
+    db: Database
+    """The database for storing platform info"""
+    cmds: NestedDict = {}
+    """Dictionary of custom commands the platform offers - if any."""
     
     def __init__(self, name: str, desc: str, groups: Optional[List[Group]] = None):
         """
@@ -35,6 +41,12 @@ class Platform(object):
         """
         Create and add a new group with
         the given name.
+        """
+        raise NotImplementedError()
+    
+    def rm_group(self, name: str) -> str:
+        """
+        Removes the group with the given name
         """
         raise NotImplementedError()
 

@@ -23,6 +23,12 @@ class ShowDescription(Command):
         """
         super().__init__('show description', description='Show a users description (from the currently enabled platform).')
 
+    def available(self, state: CLISessionState) -> bool:
+        """
+        Can it be used rn?
+        """
+        return bool(state.platform)
+
     def execute(self, args: List[str], state: CLISessionState) -> None:
         """
         Executes the command.

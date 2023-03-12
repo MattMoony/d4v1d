@@ -22,6 +22,12 @@ class ShowGroups(Command):
         """
         super().__init__('show groups', description='Show a list of all groups defined for the current platform.')
 
+    def available(self, state: CLISessionState) -> bool:
+        """
+        Can it be used rn?
+        """
+        return bool(state.platform)
+
     def execute(self, args: List[str], state: CLISessionState) -> None:
         """
         Executes the command.

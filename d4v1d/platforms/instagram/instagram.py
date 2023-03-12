@@ -48,6 +48,16 @@ class Instagram(Platform):
         log.debug(f'Adding group "{name}" ... ')
         self.groups.append(InstagramGroup(name))
 
+    def rm_group(self, name: str) -> None:
+        """
+        Removes the group with the given name
+
+        Args:
+            name (str): The name of the group
+        """
+        log.debug(f'Removing group "{name}" ... ')
+        self.groups = [g for g in self.groups if g.name != name]
+
     def get_user(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[User]:
         """
         Returns the user with the given username

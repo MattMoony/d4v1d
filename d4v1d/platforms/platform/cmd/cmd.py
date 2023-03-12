@@ -23,6 +23,20 @@ class Command(object):
         self.aliases: List[str] = aliases
         self.description: str = description
 
+    def available(self, state: CLISessionState) -> bool:
+        """
+        Should the command be shown in help given the current
+        session state - i.e. is the command usable considering
+        the current cli session state?
+
+        Args:
+            state (CLISessionState): The current session state.
+        
+        Returns:
+            bool: Available or not?
+        """
+        return True
+
     def execute(self, args: List[str], state: CLISessionState) -> None:
         """
         Executes the command with the specified arguments.
