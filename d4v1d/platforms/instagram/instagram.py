@@ -46,7 +46,7 @@ class Instagram(Platform):
             name (str): The name of the group
         """
         log.debug(f'Adding group "{name}" ... ')
-        self.groups.append(InstagramGroup(name))
+        self.groups[name] = InstagramGroup(name)
 
     def rm_group(self, name: str) -> None:
         """
@@ -56,7 +56,7 @@ class Instagram(Platform):
             name (str): The name of the group
         """
         log.debug(f'Removing group "{name}" ... ')
-        self.groups = [g for g in self.groups if g.name != name]
+        del self.groups[name]
 
     def get_user(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[User]:
         """
@@ -77,7 +77,7 @@ class Instagram(Platform):
         log.debug(f'Fetching user info from instagram ... ')
         if not group and not self.groups:
             raise NoGroupsError('No groups available for fetching user info')
-        user = (group or self.groups[0]).get_user(username)
+        user = (group or self.groups.values()[0]).get_user(username)
         if not user:
             log.debug(f'"{username}" is not known to instagram')
             raise UnknownUserError(f'"{username}" is not known to instagram')

@@ -34,7 +34,7 @@ class RemoveGroup(Command):
         if not args:
             io.e(f'Missing group name. [bold]Usage:[/bold] rm group <group name>')
             return
-        if args[0] not in [g.name for g in state.platform.groups]:
+        if args[0] not in state.platform.groups:
             io.e(f'Group [bold]{args[0]}[/bold] doesn\'t exist.')
             return
         state.platform.rm_group(args[0])

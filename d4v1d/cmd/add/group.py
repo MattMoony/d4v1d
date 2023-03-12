@@ -34,7 +34,7 @@ class AddGroup(Command):
         if not args:
             io.e(f'Missing group name. [bold]Usage:[/bold] add group <group name>')
             return
-        if args[0] in [g.name for g in state.platform.groups]:
+        if args[0] in state.platform.groups:
             io.e(f'Group [bold]{args[0]}[/bold] already exists.')
             return
         state.platform.add_group(args[0])

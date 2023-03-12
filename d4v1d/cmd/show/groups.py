@@ -39,6 +39,6 @@ class ShowGroups(Command):
             io.w(f'No groups defined for platform [bold]{state.platform.name}[/bold].')
             return
         tr: Tree = Tree('[bold grey53][*][/bold grey53] Available platforms:')
-        for g in state.platform.groups:
+        for g in state.platform.groups.values():
             tr.add(f'[bold]{g.name} ({len(g.bots)} bots)[/bold]')
         print(tr)

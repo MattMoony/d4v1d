@@ -17,25 +17,25 @@ class Platform(object):
     """The name of the platform"""
     desc: str
     """A description of the platform"""
-    groups: List[Group]
+    groups: Dict[str, Group]
     """The groups of the platform"""
     db: Database
     """The database for storing platform info"""
     cmds: NestedDict = {}
     """Dictionary of custom commands the platform offers - if any."""
     
-    def __init__(self, name: str, desc: str, groups: Optional[List[Group]] = None):
+    def __init__(self, name: str, desc: str, groups: Optional[Dict[str, Group]] = None):
         """
         Creates a new platform
 
         Args:
             name (str): The name of the platform
             desc (str): A description of the platform
-            groups (Optional[List[Group]]): The groups of the platform
+            groups (Optional[Dict[str, Group]]): The groups of the platform
         """
         self.name = name
         self.desc = desc
-        self.groups = groups or []
+        self.groups = groups or {}
 
     def add_group(self, name: str) -> str:
         """
