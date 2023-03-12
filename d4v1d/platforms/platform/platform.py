@@ -2,6 +2,7 @@
 Dummy code for the platform class.
 """
 
+from d4v1d.log import log
 from d4v1d.platforms.platform.info import Info
 from d4v1d.platforms.platform.db import Database
 from d4v1d.platforms.platform.bot.group import Group
@@ -47,6 +48,30 @@ class Platform(object):
     def rm_group(self, name: str) -> str:
         """
         Removes the group with the given name
+        """
+        raise NotImplementedError()
+
+    def dumpj(self) -> Dict[str, Any]:
+        """
+        Returns the platform in save-able dictionary
+        format.
+
+        Returns:
+            Dict[str, Any]: The platform in save-able dictionary format
+        """
+        raise NotImplementedError()
+    
+    @classmethod
+    def loadj(cls, data: Dict[str, Any]) -> "Platform":
+        """
+        Loads the platform from its save-able,
+        dictionary format.
+
+        Args:
+            data (Dict[str, Any]): The saved format (dumpj)
+        
+        Returns:
+            Platform: The re-constructed platform
         """
         raise NotImplementedError()
 

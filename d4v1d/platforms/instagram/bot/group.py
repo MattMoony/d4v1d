@@ -36,3 +36,33 @@ class InstagramGroup(Group):
         _minr: int = min(b.requests for b in self.bots)
         bot: InstagramBot = [ b for b in self.bots if b.requests == _minr ][0]
         return bot.get_user(username)
+
+    def dumpj(self) -> Dict[str, Any]:
+        """
+        Returns the group in saveable format.
+
+        Returns:
+            Dict[str, Any]: The group in saveable dictionary format
+        """
+        return {
+            'name': self.name,
+            'bots': [ b.dumpj() for b in self.bots ],
+        }
+    
+    @classmethod
+    def loadj(cls, data: Dict[str, Any]) -> "InstagramGroup":
+        """
+        Loads the group from its saveable,
+        dictionary format.
+
+        Args:
+            data (Dict[str, Any]): The saved format (dumpj)
+        
+        Returns:
+            Platform: The re-constructed group
+        """
+        g: InstagramGroup = cls(
+            name=data['name'],
+        )
+        g.bots = [ InstagramBot.loadj(b, g) for b in data['bots'] ]
+        return g

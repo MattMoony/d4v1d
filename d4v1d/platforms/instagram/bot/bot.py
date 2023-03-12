@@ -72,3 +72,38 @@ class InstagramBot(Bot):
             f.write(r.content)
         u: User = User.loadj(_u, api=True, profile_pic=ppath)
         return Info(u, stmp)
+
+    def dumpj(self) -> Dict[str, Any]:
+        """
+        Returns the bot in saveable format.
+
+        Returns:
+            Dict[str, Any]: The bot in saveable dictionary format
+        """
+        return {
+            'anonymous': self.anonymous,
+            'user_agent': self.session.headers['User-Agent'],
+            'headers': self.session.headers,
+            'creds': (self.username, self.password) if not self.anonymous else None,
+        }
+    
+    @classmethod
+    def loadj(cls, data: Dict[str, Any], group: "Group") -> "InstagramBot":
+        """
+        Loads the bot from its saveable,
+        dictionary format.
+
+        Args:
+            data (Dict[str, Any]): The saved format (dumpj)
+            group: The group the bot belongs to
+        
+        Returns:
+            Platform: The re-constructed bot
+        """
+        return InstagramBot(
+            group,
+            not data['creds'],
+            data['user_agent'],
+            data['headers'],
+            creds=data['creds'],
+        )

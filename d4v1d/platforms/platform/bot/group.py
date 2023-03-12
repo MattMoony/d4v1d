@@ -47,3 +47,26 @@ class Group(object):
             bot (Bot): The bot to remove
         """
         self.bots.remove(bot)
+
+    def dumpj(self) -> Dict[str, Any]:
+        """
+        Returns the group in saveable format.
+
+        Returns:
+            Dict[str, Any]: The group in saveable dictionary format
+        """
+        raise NotImplementedError()
+    
+    @classmethod
+    def loadj(cls, data: Dict[str, Any]) -> "Group":
+        """
+        Loads the group from its saveable,
+        dictionary format.
+
+        Args:
+            data (Dict[str, Any]): The saved format (dumpj)
+        
+        Returns:
+            Platform: The re-constructed group
+        """
+        raise NotImplementedError()

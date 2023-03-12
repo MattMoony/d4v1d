@@ -3,6 +3,8 @@ Contains the Instagram class - the interface between
 the core and this platform-specific implementation.
 """
 
+import os
+import json
 from d4v1d.log import log
 import d4v1d.config as config
 from d4v1d.platforms.instagram.bot.group import InstagramGroup
@@ -35,6 +37,9 @@ class Instagram(Platform):
         in the d4v1d core
         """
         log.debug(f'Cleaning up Instagram ... ')
+        with open(os.path.join(config.PCONFIG._instagram.cdir, 'instagram.json'), 'w') as f:
+            log.debug(f'Backing up configured groups to "{f.name}" ...')
+            json.dump(self.dumpj(), f)
         del config.PCONFIG._instagram
         del self.db
 
@@ -126,3 +131,25 @@ class Instagram(Platform):
         if i:
             return Info(i.value.number_posts, i.date, self)
         return None
+
+    def dumpj(self) -> Dict[str, Any]:
+        """
+        To save-able format.
+        """
+        return {
+            'groups': [ g.dumpj() for g in self.groups.values() ],
+        }
+    
+    @classmethod
+    def loadj(cls, data: Dict[str, Any]) -> "Platform":
+        """
+        Load saved data.
+        """
+        i: Instagram = Instagram()
+        try:
+            for v in data['groups']:
+                g: InstagramGroup = InstagramGroup.loadj(v)
+                i.groups[g.name] = g
+        except Exception:
+            log.error(f'Instagram plaform file seems to be corrupted - continuing without saved groups, etc.')
+        return i

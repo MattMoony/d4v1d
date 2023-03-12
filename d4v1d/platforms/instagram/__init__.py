@@ -43,4 +43,12 @@ def init() -> Platform:
     if not os.path.isdir(conf.ddir):
         os.mkdir(conf.ddir)
     # initialize platform handler
+    if os.path.isfile(os.path.join(conf.cdir, 'instagram.json')):
+        log.debug(f'Loading Instagram data from "{os.path.join(conf.cdir, "instagram.json")}" ...')
+        with open(os.path.join(conf.cdir, 'instagram.json'), 'r') as f:
+            try:
+                return Instagram.loadj(json.load(f))
+            except json.JSONDecodeError:
+                log.error(f'Instagram data file is corrupted - using default data ...')
+                log.error(f'If you want to reset your data, delete "{os.path.join(conf.cdir, "instagram.json")}"')
     return Instagram()
