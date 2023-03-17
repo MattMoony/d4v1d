@@ -18,6 +18,7 @@ CMDS: Dict[str, Any] = {
         'group': AddGroup(),
     },
     'exit': Exit(),
+    'help': Help(),
     'show': {
         'description': ShowDescription(),
         'groups': ShowGroups(),
@@ -28,4 +29,3 @@ CMDS: Dict[str, Any] = {
     },
     'use': Use(),
 }
-CMDS['help'] = Help(CMDS)

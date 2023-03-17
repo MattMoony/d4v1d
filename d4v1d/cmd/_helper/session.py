@@ -96,7 +96,7 @@ class CmdSession(PromptSession):
         """
         self.__cmds.clear()
         for v in self.cmds.values():
-            self.__merge(self.__cmds, self.__build_aliases(v))
+            self.deep_merge(self.__cmds, self.__build_aliases(v))
         self.completer.update(self.completer_dict())
 
     def extend(self, coll_name: str, cmds: Dict[str, Union[Command, Dict[str, Any]]]) -> None:
@@ -131,7 +131,7 @@ class CmdSession(PromptSession):
         self.__build_completer(compl, self.__cmds)
         return compl
 
-    def __merge(self, a: Dict[str, Any], b: Dict[str, Any]) -> None:
+    def deep_merge(self, a: Dict[str, Any], b: Dict[str, Any]) -> None:
         """
         Deep merges two dictionaries into the first one.
 
@@ -141,11 +141,37 @@ class CmdSession(PromptSession):
         """
         for k, v in b.items():
             if isinstance(v, dict):
-                self.__merge(a.setdefault(k, {}), v)
+                self.deep_merge(a.setdefault(k, {}), v)
             else:
                 # overwrite earlier entries w later ones
                 # per default ...
                 a[k] = v
+
+    def parse(self, args: List[str]) -> Tuple[Union[Command, Dict[str, Union[Command, Dict[str, Any]]]], List[str]]:
+        """
+        Get a command / command dictionary in case of
+        subcommands from the session.
+
+        Args:
+            args (List[str]): The CLI args.
+
+        Raises:
+            ValueError: If the command does not exist.
+
+        Returns:
+            Tuple[Command, List[str]]: The command / command dictionary and all
+                remaining args.
+        """
+        args = args.copy()
+        d: Dict[str, Union[Command, Dict[str, Any]]] = self.__cmds
+        while isinstance(d, dict) and len(args) > 0:
+            cu: str = args.pop(0)
+            if cu not in d:
+                raise KeyError(f'Unknown command: "{" ".join(args)}"')
+            d = d[cu]
+        if not isinstance(d, dict) and not isinstance(d, Command):
+            raise KeyError(f'Incomplete command: "{" ".join(args)}"')
+        return d, args
 
     def __build_aliases(self, cmds: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -188,19 +214,14 @@ class CmdSession(PromptSession):
 
         Raises:
             ValueError: If the command does not exist.
+            TypeError: If the command actually requires sub-commands.
 
         Returns:
             Tuple[Command, List[str]]: The command & all args.
         """
-        args: List[str] = cmd.split()
-        d: Dict[str, Union[Command, Dict[str, Any]]] = self.__cmds
-        while isinstance(d, dict) and len(args) > 0:
-            cu: str = args.pop(0)
-            if cu not in d:
-                raise KeyError(f'Unknown command: "{cmd}"')
-            d = d[cu]
-        if not isinstance(d, Command):
-            raise KeyError(f'Incomplete command: "{cmd}"')
+        d, args = self.parse(cmd.split())
+        if isinstance(d, dict):
+            raise TypeError(f'"{cmd}" has several sub-commands!')
         return d, args
     
     def __iadd__(self, other: Tuple[str, Dict[str, Union[Command, Dict[str, Any]]]]) -> "CmdSession":

@@ -2,25 +2,24 @@
 Module for the help command
 """
 
+from typing import *
+
 from rich import print
 from rich.tree import Tree
-from d4v1d.platforms.platform.cmd import Command, CLISessionState
-from typing import *
+
+from d4v1d.platforms.platform.cmd import CLISessionState, Command
+
 
 class Help(Command):
     """
     The help command
     """
 
-    def __init__(self, cmds: Dict[str, Any]):
+    def __init__(self):
         """
         Initializes the help command
-
-        Args:
-            cmds (Dict[str, Any]): The dictionary of commands
         """
         super().__init__('help', aliases=['?',], description='Shows this help message')
-        self.cmds: Dict[str, Any] = cmds
 
     def __build_tree(self, cmds: Dict[str, Any], tree: Tree, state: CLISessionState) -> None:
         """
@@ -46,20 +45,26 @@ class Help(Command):
         """
         Executes the help command
         """
+        cmds: Dict[str, Union[Command, Dict[str, Any]]] = {}
+        for v in state.session.cmds.values():
+            state.session.deep_merge(cmds, v)
+
         if len(args) == 0:
+            # seems a little redunant, but keeps aliases
+            # out of the top-level overview, at least ...
             cmd_tree: Tree = Tree('[bold grey53][*][/bold grey53] Available commands:')
-            self.__build_tree(self.cmds, cmd_tree, state)
+            self.__build_tree(cmds, cmd_tree, state)
             print(cmd_tree)
         else:
-            cmd: str = args.pop(0)
-            if cmd in self.cmds:
-                c: Command = self.cmds[cmd]
+            try:
+                c, _ = state.session.parse(args)
                 if isinstance(c, Command):
                     print(f'[bold grey53][*][/bold grey53] [bold]{c.name}[/bold]: {c.description}')
                     if len(c.aliases) > 0:
                         print(f'    └── Aliases: [bold]{", ".join(c.aliases)}[/bold]')
                 else:
-                    # TODO: Add support for subcommands
-                    print(f'[bold grey53][*][/bold grey53] [italic]TODO[/italic]')
-            else:
-                print(f'[bold red][-][/bold red] Unknown command: [italic]{cmd}[/italic]. Enter [bold]help[/bold] to see all available commands ...')
+                    cmd_tree: Tree = Tree('[bold grey53][*][/bold grey53] Available sub-commands:')
+                    self.__build_tree(c, cmd_tree, state)
+                    print(cmd_tree)
+            except KeyError:
+                print(f'[bold red][-][/bold red] Unknown command: [italic]{" ".join(args)}[/italic]. Enter [bold]help[/bold] to see all available commands ...')

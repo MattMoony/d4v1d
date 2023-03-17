@@ -16,7 +16,7 @@ class RemoveGroup(Command):
         """
         Initializes the command.
         """
-        super().__init__('add group', description='Remove a group from the currently selected platform.')
+        super().__init__('rm group', description='Remove a group from the currently selected platform.')
 
     def available(self, state: CLISessionState) -> bool:
         """
