@@ -2,10 +2,14 @@
 Removes a group
 """
 
-from rich import print
-from d4v1d.utils import io
-from d4v1d.platforms.platform.cmd import Command, CLISessionState
 from typing import *
+
+from prompt_toolkit.completion.nested import NestedDict
+from rich import print
+
+from d4v1d.platforms.platform.cmd import CLISessionState, Command
+from d4v1d.utils import io
+
 
 class RemoveGroup(Command):
     """
@@ -23,6 +27,12 @@ class RemoveGroup(Command):
         Can this command be used right now?
         """
         return bool(state.platform)
+    
+    def completer(self, state: CLISessionState) -> Optional[NestedDict]:
+        """
+        Custom completer behaviour.
+        """
+        return { g: None for g in state.platform.groups }
 
     def execute(self, args: List[str], state: CLISessionState) -> None:
         """

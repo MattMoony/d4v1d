@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.completion.nested import NestedDict
 from prompt_toolkit.formatted_text.html import HTML
 from rich import print
 
@@ -32,6 +33,8 @@ class CmdSession(PromptSession):
     """Validator to validate commands"""
     state: CLISessionState
     """The current state of the CLI session"""
+    compl_dict: NestedDict
+    """Dictionary for command completion"""
 
     __cmds: Dict[str, Union[Command, Dict[str, Any]]] = {}
     """All current commands - with expanded aliases"""
@@ -50,6 +53,7 @@ class CmdSession(PromptSession):
                          validator=CmdValidator(self),
                          complete_while_typing=config.COMPLETE_WHILE_TYPING,
                          auto_suggest=AutoSuggestFromHistory(), **kwargs)
+        self.completer.session = self
         self.cmds = {
             '__init__': cmds,
         }
@@ -97,7 +101,8 @@ class CmdSession(PromptSession):
         self.__cmds.clear()
         for v in self.cmds.values():
             self.deep_merge(self.__cmds, self.__build_aliases(v))
-        self.completer.update(self.completer_dict())
+        self.compl_dict = self.completer_dict()
+        self.completer.update(self.compl_dict)
 
     def extend(self, coll_name: str, cmds: Dict[str, Union[Command, Dict[str, Any]]]) -> None:
         """
@@ -120,14 +125,14 @@ class CmdSession(PromptSession):
         self.cmds.pop(coll_name)
         self.refresh()
 
-    def completer_dict(self) -> Dict[str, Union[None, Dict[str, Any]]]:
+    def completer_dict(self) -> NestedDict:
         """
         Get a dictionary of commands for the completer.
 
         Returns:
-            Dict[str, Union[None, Dict[str, Any]]]: The dictionary of commands.
+            NestedDict: The dictionary of commands.
         """
-        compl: Dict[str, Union[None, Dict[str, Any]]] = {}
+        compl: NestedDict = {}
         self.__build_completer(compl, self.__cmds)
         return compl
 
@@ -205,6 +210,25 @@ class CmdSession(PromptSession):
                 compl[k] = {}
                 self.__build_completer(compl[k], cmds[k])
 
+    def __completer_parent(self, cmd: str) -> Dict[str, Union[Command, Dict[str, Any]]]:
+        """
+        Get the parent dictionary in the completer
+        dictionary for the given command.
+
+        Args:
+            cmd (str): The command to look for.
+
+        Returns:
+            Dict[str, Union[Command, Dict[str, Any]]]: The parent dictionary.
+        """
+        args: List[str] = cmd.split()
+        # sanity check
+        c, _ = self.parse(args)
+        d: Union[Dict[str, Union[Command, Dict[str, Any]]], Command] = self.__cmds
+        while len(args) > 1 and not isinstance(d, Command):
+            d = d[args.pop(0)]
+        return d
+
     def __getitem__(self, cmd: str) -> Tuple[Command, List[str]]:
         """
         Get a command from the session.
@@ -219,7 +243,7 @@ class CmdSession(PromptSession):
         Returns:
             Tuple[Command, List[str]]: The command & all args.
         """
-        d, args = self.parse(cmd.split())
+        d, args = self.parse(cmd.strip().split())
         if isinstance(d, dict):
             raise TypeError(f'"{cmd}" has several sub-commands!')
         return d, args

@@ -3,12 +3,16 @@ Module for the use command - used
 to switch between platforms
 """
 
-from rich import print
-import d4v1d.platforms as platforms
-from d4v1d.platforms.platform import Platform
-from d4v1d.platforms.platform.cmd import Command, CLISessionState
 from types import ModuleType
 from typing import *
+
+from prompt_toolkit.completion.nested import NestedDict
+from rich import print
+
+import d4v1d.platforms as platforms
+from d4v1d.platforms.platform import Platform
+from d4v1d.platforms.platform.cmd import CLISessionState, Command
+
 
 class Use(Command):
     """
@@ -20,6 +24,12 @@ class Use(Command):
         Initializes the use command
         """
         super().__init__('use', aliases=['switch',], description='Switches between platforms')
+
+    def completer(self, state: CLISessionState) -> Optional[NestedDict]:
+        """
+        Custom completer behaviour.
+        """
+        return { n.lower(): None for n in platforms.PLATFORMS.keys() }
 
     def execute(self, args: List[str], state: CLISessionState) -> None:
         """

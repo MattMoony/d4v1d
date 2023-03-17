@@ -4,6 +4,7 @@ Module for the help command
 
 from typing import *
 
+from prompt_toolkit.completion.nested import NestedDict
 from rich import print
 from rich.tree import Tree
 
@@ -40,6 +41,12 @@ class Help(Command):
                 self.__build_tree(v, t, state)
                 if t.children:
                     tree.add(t)
+
+    def completer(self, state: CLISessionState) -> Optional[NestedDict]:
+        """
+        Custom completer behaviour.
+        """
+        return state.session.compl_dict
 
     def execute(self, args: List[str], state: CLISessionState) -> None:
         """

@@ -2,8 +2,12 @@
 Module providing the template for a command
 """
 
-from .clisessionstate import CLISessionState
 from typing import *
+
+from prompt_toolkit.completion.nested import NestedDict
+
+from .clisessionstate import CLISessionState
+
 
 class Command(object):
     """
@@ -36,6 +40,21 @@ class Command(object):
             bool: Available or not?
         """
         return True
+    
+    def completer(self, state: CLISessionState) -> Optional[NestedDict]:
+        """
+        This method can be used to provide more information
+        about the commands structure - i.e. it can be used
+        to provide the terminal user with autocomplete
+        functionality in case of some enum-like values.
+
+        Args:
+            state (CLISessionState): The current session state.
+
+        Returns:
+            Optional[NestedDict]: Optionally, completer information.
+        """
+        return None
 
     def execute(self, args: List[str], state: CLISessionState) -> None:
         """
