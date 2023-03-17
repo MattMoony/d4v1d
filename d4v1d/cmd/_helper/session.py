@@ -162,16 +162,16 @@ class CmdSession(PromptSession):
             Tuple[Command, List[str]]: The command / command dictionary and all
                 remaining args.
         """
-        args = args.copy()
+        _args: List[str] = args.copy()
         d: Dict[str, Union[Command, Dict[str, Any]]] = self.__cmds
-        while isinstance(d, dict) and len(args) > 0:
-            cu: str = args.pop(0)
+        while isinstance(d, dict) and len(_args) > 0:
+            cu: str = _args.pop(0)
             if cu not in d:
                 raise KeyError(f'Unknown command: "{" ".join(args)}"')
             d = d[cu]
         if not isinstance(d, dict) and not isinstance(d, Command):
             raise KeyError(f'Incomplete command: "{" ".join(args)}"')
-        return d, args
+        return d, _args
 
     def __build_aliases(self, cmds: Dict[str, Any]) -> Dict[str, Any]:
         """

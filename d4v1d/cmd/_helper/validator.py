@@ -35,5 +35,7 @@ class CmdValidator(Validator):
             return
         try:
             self.session[document.text]
+        except TypeError as e:
+            raise ValidationError(message=str(e))
         except KeyError as e:
             raise ValidationError(message=str(e))
