@@ -1,0 +1,235 @@
+"""
+Custom prompt session - to allow updating
+commands on the fly.
+"""
+
+import copy
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+from prompt_toolkit import PromptSession
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.formatted_text.html import HTML
+from rich import print
+
+from d4v1d import config
+from d4v1d.cmd._helper.completer import CmdCompleter
+from d4v1d.cmd._helper.validator import CmdValidator
+from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
+from d4v1d.platforms.platform.cmd.cmd import Command
+
+
+class CmdSession(PromptSession):
+    """
+    Custom prompt session - to allow updating
+    commands on the fly.
+    """
+
+    cmds: Dict[str, Dict[str, Union[Command, Dict[str, Any]]]]
+    """Cmd collections"""
+    completer: CmdCompleter
+    """Custom completer to auto-complete commands"""
+    validator: CmdValidator
+    """Validator to validate commands"""
+    state: CLISessionState
+    """The current state of the CLI session"""
+
+    __cmds: Dict[str, Union[Command, Dict[str, Any]]] = {}
+    """All current commands - with expanded aliases"""
+    
+    def __init__(self, cmds: Dict[str, Union[Command, Dict[str, Any]]], *args, 
+                 complete_while_typing: Optional[bool] = None, **kwargs):
+        """
+        Create a new command prompt session.
+
+        Args:
+            cmds (Dict[str, Union[Command, Dict[str, Any]]]): The original commands to use.
+            complete_while_tpying (Optional[bool]): Passed on to super(). 
+                Default is using config.COMPLETE_WHILE_TYPING.
+        """
+        super().__init__(*args, completer=CmdCompleter.from_nested_dict({}),
+                         validator=CmdValidator(self),
+                         complete_while_typing=config.COMPLETE_WHILE_TYPING,
+                         auto_suggest=AutoSuggestFromHistory(), **kwargs)
+        self.cmds = {
+            '__init__': cmds,
+        }
+        self.state = CLISessionState(self)
+        self.refresh()
+
+    def handle_forever(self) -> None:
+        """
+        Keep prompting the user for commands until they
+        end the program.
+        """
+        while True:
+            try:
+                prompt: HTML = HTML(config.PROMPT.replace('%%', f'<aaa fg="Grey">:</aaa>{self.state.platform}' if self.state.platform else ''))
+                self.handle(self.prompt(prompt))
+            except KeyboardInterrupt:
+                continue
+            except EOFError:
+                break
+
+    def handle(self, cmdline: str) -> None:
+        """
+        Handle some user input on the command line.
+
+        Args:
+            cmdline (str): The user's input.
+        """
+        if not cmdline.strip():
+            return
+
+        try:
+            cmd, args = self[cmdline]
+            cmd(args, state=self.state)
+        except KeyError as e:
+            # should never happen, since commands should
+            # be validated before being executed
+            print(f'[bold red][-][/bold red] {e}')
+
+    def refresh(self) -> None:
+        """
+        Flush current collection of commands
+        to sub-components - i.e. tell the validator
+        and completer to update their commands.
+        """
+        self.__cmds.clear()
+        for v in self.cmds.values():
+            self.__merge(self.__cmds, self.__build_aliases(v))
+        self.completer.update(self.completer_dict())
+
+    def extend(self, coll_name: str, cmds: Dict[str, Union[Command, Dict[str, Any]]]) -> None:
+        """
+        Extend the session with more commands.
+
+        Args:
+            coll_name (str): The name of the command collection.
+            cmds (Dict[str, Union[Command, Dict[str, Any]]]): The new commands.
+        """
+        self.cmds[coll_name] = cmds
+        self.refresh()
+
+    def remove(self, coll_name: str) -> None:
+        """
+        Remove a collection of commands.
+
+        Args:
+            coll_name (str): The name of the command collection.
+        """
+        self.cmds.pop(coll_name)
+        self.refresh()
+
+    def completer_dict(self) -> Dict[str, Union[None, Dict[str, Any]]]:
+        """
+        Get a dictionary of commands for the completer.
+
+        Returns:
+            Dict[str, Union[None, Dict[str, Any]]]: The dictionary of commands.
+        """
+        compl: Dict[str, Union[None, Dict[str, Any]]] = {}
+        self.__build_completer(compl, self.__cmds)
+        return compl
+
+    def __merge(self, a: Dict[str, Any], b: Dict[str, Any]) -> None:
+        """
+        Deep merges two dictionaries into the first one.
+
+        Args:
+            a (Dict[str, Any]): Dict a.
+            b (Dict[str, Any]): Dict b.
+        """
+        for k, v in b.items():
+            if isinstance(v, dict):
+                self.__merge(a.setdefault(k, {}), v)
+            else:
+                # overwrite earlier entries w later ones
+                # per default ...
+                a[k] = v
+
+    def __build_aliases(self, cmds: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Extends the given CMD dictionary with entries
+        for all aliases (at the moment only top-level
+        aliases).
+
+        Args:
+            cmds (Dict[str, Any]): The dictionary of commands.
+        """
+        __cmds: Dict[str, Any] = copy.deepcopy(cmds)
+        for v in __cmds.copy().values():
+            if isinstance(v, Command):
+                for a in v.aliases:
+                    __cmds[a] = v
+        return __cmds
+
+    def __build_completer(self, compl: Dict[str, Union[None, Dict[str, Any]]], cmds: Dict[str, Union[Command, Dict[str, Any]]]) -> None:
+        """
+        Builds a completer dictionary from the specified
+        dictionary of commands.
+
+        Args:
+            compl (Dict[str, Union[None, Dict[str, Any]]]): The completer dictionary of commands.
+            cmds (Dict[str, Union[Command, Dict[str, Any]]]): The dictionary of commands.
+        """
+        for k, v in cmds.items():
+            if isinstance(v, Command):
+                compl[k] = None
+            else:
+                compl[k] = {}
+                self.__build_completer(compl[k], cmds[k])
+
+    def __getitem__(self, cmd: str) -> Tuple[Command, List[str]]:
+        """
+        Get a command from the session.
+
+        Args:
+            cmd (str): The name of the command.
+
+        Raises:
+            ValueError: If the command does not exist.
+
+        Returns:
+            Tuple[Command, List[str]]: The command & all args.
+        """
+        args: List[str] = cmd.split()
+        d: Dict[str, Union[Command, Dict[str, Any]]] = self.__cmds
+        while isinstance(d, dict) and len(args) > 0:
+            cu: str = args.pop(0)
+            if cu not in d:
+                raise KeyError(f'Unknown command: "{cmd}"')
+            d = d[cu]
+        if not isinstance(d, Command):
+            raise KeyError(f'Incomplete command: "{cmd}"')
+        return d, args
+    
+    def __iadd__(self, other: Tuple[str, Dict[str, Union[Command, Dict[str, Any]]]]) -> "CmdSession":
+        """
+        Extend the session with more commands.
+
+        Args:
+            other (Tuple[str, Dict[str, Union[Command, Dict[str, Any]]]]): Name of the new command
+                collection plus new commands.
+
+        Returns:
+            CmdSession: The session.
+        """
+        if not type(other) == tuple or len(other) != 2 or not type(other[0]) == str or not type(other[1]) == dict:
+            raise ValueError('Invalid type for extending session - has to be a tuple of (<collection name>, <cmd collection>).')
+        self.extend(*other)
+        return self
+
+    def __isub__(self, other: str) -> "CmdSession":
+        """
+        Remove a collection of commands.
+
+        Args:
+            other (str): The name of the command collection.
+
+        Returns:
+            CmdSession: The session.
+        """
+        if not type(other) == str:
+            raise ValueError('Invalid type for removing collection - has to be a string (name of the collection).')
+        self.remove(other)
+        return self
