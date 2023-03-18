@@ -6,10 +6,9 @@ from typing import List, Optional
 
 from prompt_toolkit.completion.nested import NestedDict
 
+from d4v1d.platforms.platform.cmd.argparser import ArgParser, ArgumentError
+from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
 from d4v1d.utils import io
-
-from .argparser import ArgParser, ArgumentError
-from .clisessionstate import CLISessionState
 
 
 class Command(object):

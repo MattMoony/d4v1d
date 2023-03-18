@@ -2,13 +2,15 @@
 Grants d4v1d access to Instagram.
 """
 
-import os
 import json
-from d4v1d.log import log
+import os
+
 import d4v1d.config as config
-from .instagram import Instagram
-from .config import InstagramConfig
+from d4v1d.log import log
+from d4v1d.platforms.instagram.config import InstagramConfig
+from d4v1d.platforms.instagram.instagram import Instagram
 from d4v1d.platforms.platform import Platform
+
 
 def init() -> Platform:
     """

@@ -7,4 +7,4 @@ In this template module, only a dummy base class is
 included.
 """
 
-from .database import Database
+from d4v1d.platforms.platform.db.database import Database

@@ -5,8 +5,10 @@ a collection of automated users / anonymous
 browsers.
 """
 
-from .bot import Bot
 from typing import *
+
+from d4v1d.platforms.platform.bot.bot import Bot
+
 
 class Group(object):
     """

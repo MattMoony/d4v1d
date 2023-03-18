@@ -2,15 +2,17 @@
 Contains configuration specific to the Instagram platform.
 """
 
-import os
 import json
-from d4v1d.log import log
+import os
+from typing import *
+
 import d4v1d.config as config
 # unusual, but I was getting weird import
 # behaviour otherwise ...
 from d4v1d.config import *
-from .dbtype import InstagramDBType
-from typing import *
+from d4v1d.log import log
+from d4v1d.platforms.instagram.config.dbtype import InstagramDBType
+
 
 class InstagramConfig(object):
     """

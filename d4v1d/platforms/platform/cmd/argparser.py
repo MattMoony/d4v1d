@@ -6,7 +6,7 @@ session instead of only when launching python scripts.
 
 import sys
 from argparse import Action, ArgumentError, ArgumentParser
-from typing import IO, Optional
+from typing import IO, List, Optional
 
 from rich import print
 
@@ -30,7 +30,7 @@ class ArgParser(ArgumentParser):
         Args:
             name (str): The name of the command.
         """
-        super().__init__(prog=name, exit_on_error=False)
+        super().__init__(prog=name, exit_on_error=False, conflict_handler='resolve')
 
     @property
     def usage(self) -> str:
@@ -85,11 +85,13 @@ class ArgParser(ArgumentParser):
         Returns:
             str: The help string.
         """
+        positional: List[Action] = [ a for a in self._actions if not a.option_strings ]
+        options: List[Action] = [ a for a in self._actions if a.option_strings ]
         return io._l(f'{"" if no_style else "[bold]"}Usage:{"" if no_style else "[/bold]"} {self.format_usage(no_style=no_style)}') +\
-               '\n' + io._l(f'{"" if no_style else "[bold]"}Positional arguments:{"" if no_style else "[/bold]"}') +\
-               '\n' + '\n'.join(self.__positional_help(a, no_style=no_style) for a in self._actions if not a.option_strings) +\
-               '\n' + io._l(f'{"" if no_style else "[bold]"}Options:{"" if no_style else "[/bold]"}') +\
-               '\n' + '\n'.join(self.__option_help(a, no_style=no_style) for a in self._actions if a.option_strings)
+               ('\n' + io._l(f'{"" if no_style else "[bold]"}Positional arguments:{"" if no_style else "[/bold]"}') +\
+               '\n' + '\n'.join(self.__positional_help(a, no_style=no_style) for a in positional) if positional else '') +\
+               ('\n' + io._l(f'{"" if no_style else "[bold]"}Options:{"" if no_style else "[/bold]"}') +\
+               '\n' + '\n'.join(self.__option_help(a, no_style=no_style) for a in options) if options else '')
 
     def error(self, message: str) -> None:
         """
@@ -169,7 +171,7 @@ class ArgParser(ArgumentParser):
         Returns:
             str: The string representation.
         """
-        return io.__(f'{"" if no_style else "[bold]"}{action.dest.ljust(24)}{"" if no_style else "[/bold]"} {action.help}')
+        return io.__(f'{"" if no_style else "[bold]"}{action.dest.ljust(24)}{"" if no_style else "[/bold]"} {self.__action_help_sub(action, no_style=no_style)}')
     
     def __option_help(self, action: Action, no_style: bool = False) -> str:
         """
@@ -183,7 +185,22 @@ class ArgParser(ArgumentParser):
         Returns:
             str: The string representation.
         """
-        return io.__(f'{"" if no_style else "[bold]"}{"/".join(action.option_strings).ljust(24)}{" required." if action.required else ""}{"" if no_style else "[/bold]"} {action.help if action.help else ""}')
+        return io.__(f'{"" if no_style else "[bold]"}{"/".join(action.option_strings).ljust(24)}{" required." if action.required else ""}{"" if no_style else "[/bold]"} {self.__action_help_sub(action, no_style=no_style)}')
+
+    def __action_help_sub(self, action: Action, no_style: bool = False) -> str:
+        """
+        Generate the help string for an action as used in the
+        ``help`` command - used by positional & optional args.
+
+        Args:
+            action (Action): The action.
+            no_style (bool, optional): Don't use ``rich`` style tags. Defaults to using them.
+        
+        Returns:
+            str: The string representation.
+        """
+        return f'{action.help if action.help else ""}' +\
+               (f' {"" if no_style else "[dim]"}Default is {"" if no_style else "[italic]"}{action.default}.{"" if no_style else "[/italic][/dim]"}' if action.default is not None and action.dest != 'help' else '')
 
     def __str__(self) -> str:
         """

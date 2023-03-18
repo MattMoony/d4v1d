@@ -3,17 +3,21 @@ Contains the Instagram class - the interface between
 the core and this platform-specific implementation.
 """
 
-import os
 import json
-from d4v1d.log import log
-import d4v1d.config as config
-from d4v1d.platforms.instagram.bot.group import InstagramGroup
-from d4v1d.platforms.platform.errors import NoGroupsError, UnknownUserError
-from .db.models import User
-from .db import Database, DATABASES
-from d4v1d.platforms.platform import Platform
-from d4v1d.platforms.platform.info import Info
+import os
 from typing import *
+
+import d4v1d.config as config
+from d4v1d.log import log
+from d4v1d.platforms.instagram.bot.group import InstagramGroup
+from d4v1d.platforms.instagram.cmd.add.bot import AddBot
+from d4v1d.platforms.instagram.db import DATABASES, Database
+from d4v1d.platforms.instagram.db.models import User
+from d4v1d.platforms.platform import Platform
+from d4v1d.platforms.platform.cmd.cmd import Command
+from d4v1d.platforms.platform.errors import NoGroupsError, UnknownUserError
+from d4v1d.platforms.platform.info import Info
+
 
 class Instagram(Platform):
     """
@@ -21,7 +25,13 @@ class Instagram(Platform):
     """
 
     db: Database
-    """The database for instagram info"""
+    """The database for instagram info."""
+    cmds: Dict[str, Union[Command, Dict[str, Any]]] = {
+        'add': {
+            'bot': AddBot(),
+        },
+    }
+    """The commands for this platform."""
 
     def __init__(self):
         """

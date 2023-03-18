@@ -2,4 +2,4 @@
 Contains model classes useful for Instagram.
 """
 
-from .user import User
+from d4v1d.platforms.instagram.db.models.user import User

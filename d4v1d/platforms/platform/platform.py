@@ -2,12 +2,13 @@
 Dummy code for the platform class.
 """
 
-from d4v1d.log import log
-from d4v1d.platforms.platform.info import Info
-from d4v1d.platforms.platform.db import Database
-from d4v1d.platforms.platform.bot.group import Group
-from prompt_toolkit.completion.nested import NestedDict
 from typing import *
+
+from d4v1d.log import log
+from d4v1d.platforms.platform.bot.group import Group
+from d4v1d.platforms.platform.db import Database
+from d4v1d.platforms.platform.info import Info
+
 
 class Platform(object):
     """
@@ -22,7 +23,7 @@ class Platform(object):
     """The groups of the platform"""
     db: Database
     """The database for storing platform info"""
-    cmds: NestedDict = {}
+    cmds: Dict[str, Union["Command", Dict[str, Any]]] = {}
     """Dictionary of custom commands the platform offers - if any."""
     
     def __init__(self, name: str, desc: str, groups: Optional[Dict[str, Group]] = None):

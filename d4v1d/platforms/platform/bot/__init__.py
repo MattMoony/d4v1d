@@ -5,5 +5,5 @@ is where all interactions (i.e. requests, etc.) are
 made.
 """
 
-from .bot import Bot
-from .group import Group
+from d4v1d.platforms.platform.bot.bot import Bot
+from d4v1d.platforms.platform.bot.group import Group

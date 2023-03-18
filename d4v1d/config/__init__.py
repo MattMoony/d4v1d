@@ -3,11 +3,12 @@ Some basic parameters important / useful to the
 entire application.
 """
 
-import os
 import json
+import os
 import platform
-from .platforms import PlatformsConfig
 from typing import *
+
+from d4v1d.config.platforms import PlatformsConfig
 
 BASE_PATH: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 """The path to the root folder of this application"""

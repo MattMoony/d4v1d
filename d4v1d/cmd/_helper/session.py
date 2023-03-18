@@ -210,25 +210,6 @@ class CmdSession(PromptSession):
                 compl[k] = {}
                 self.__build_completer(compl[k], cmds[k])
 
-    def __completer_parent(self, cmd: str) -> Dict[str, Union[Command, Dict[str, Any]]]:
-        """
-        Get the parent dictionary in the completer
-        dictionary for the given command.
-
-        Args:
-            cmd (str): The command to look for.
-
-        Returns:
-            Dict[str, Union[Command, Dict[str, Any]]]: The parent dictionary.
-        """
-        args: List[str] = cmd.split()
-        # sanity check
-        c, _ = self.parse(args)
-        d: Union[Dict[str, Union[Command, Dict[str, Any]]], Command] = self.__cmds
-        while len(args) > 1 and not isinstance(d, Command):
-            d = d[args.pop(0)]
-        return d
-
     def __getitem__(self, cmd: str) -> Tuple[Command, List[str]]:
         """
         Get a command from the session.

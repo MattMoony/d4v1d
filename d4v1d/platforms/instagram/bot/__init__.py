@@ -5,5 +5,5 @@ is where all interactions (i.e. requests, etc.) are
 made.
 """
 
-from .bot import InstagramBot
-from .group import InstagramGroup
+from d4v1d.platforms.instagram.bot.bot import InstagramBot
+from d4v1d.platforms.instagram.bot.group import InstagramGroup

@@ -43,6 +43,10 @@ class InstagramBot(Bot):
         """
         super().__init__(group, anonymous)
         if not anonymous:
+            if not isinstance(creds, tuple):
+                raise TypeError('`creds` must be tuple of (<username>, <password>)!')
+            elif not creds:
+                raise ValueError('`creds` must consist of <username> and <password>!')
             self.username, self.password = creds
 
         self.session = req.Session()
