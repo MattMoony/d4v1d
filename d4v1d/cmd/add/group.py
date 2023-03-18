@@ -20,6 +20,7 @@ class AddGroup(Command):
         Initializes the command.
         """
         super().__init__('add group', description='Create a new group for the currently selected platform.')
+        self.add_argument('group_name', type=str, help='The name of the group to create. (e.g. "mygroup")')
 
     def available(self, state: CLISessionState) -> bool:
         """
@@ -27,18 +28,21 @@ class AddGroup(Command):
         """
         return bool(state.platform)
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
+    def execute(self, group_name: str, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
         """
         Executes the command.
+
+        Args:
+            group_name (str): The name of the group to create.
+            raw_args (List[str]): The raw arguments passed to the command.
+            argv (List[str]): The extra arguments that weren't parsed.
+            state (CLISessionState): The current session state.
         """
         if not state.platform:
             io.e('No platform selected. Use [bold]use[/bold] to select a platform.')
             return
-        if not raw_args:
-            io.e(f'Missing group name. [bold]Usage:[/bold] add group <group name>')
+        if group_name in state.platform.groups:
+            io.e(f'Group [bold]{group_name}[/bold] already exists.')
             return
-        if raw_args[0] in state.platform.groups:
-            io.e(f'Group [bold]{raw_args[0]}[/bold] already exists.')
-            return
-        state.platform.add_group(raw_args[0])
-        print(f'[green]Successfully created group [bold]{raw_args[0]}[/bold] for platform [bold]{state.platform.name}[/bold].[/green]')
+        state.platform.add_group(group_name)
+        print(f'[green]Successfully created group [bold]{group_name}[/bold] for platform [bold]{state.platform.name}[/bold].[/green]')

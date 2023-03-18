@@ -9,10 +9,10 @@ from typing import *
 from prompt_toolkit.completion.nested import NestedDict
 from rich import print
 
-from d4v1d.utils import io
 import d4v1d.platforms as platforms
 from d4v1d.platforms.platform import Platform
 from d4v1d.platforms.platform.cmd import CLISessionState, Command
+from d4v1d.utils import io
 
 
 class Use(Command):
@@ -37,8 +37,9 @@ class Use(Command):
         Executes the use command
 
         Args:
-            args (List[str]): The arguments
-            state (CLISessionState): The session state
+            raw_args (List[str]): The raw arguments passed to the command.
+            argv (List[str]): The extra arguments that weren't parsed.
+            state (CLISessionState): The current session state.
         """
         if len(raw_args) == 0:
             if state.platform is not None:

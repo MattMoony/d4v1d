@@ -21,6 +21,7 @@ class RemoveGroup(Command):
         Initializes the command.
         """
         super().__init__('rm group', description='Remove a group from the currently selected platform.')
+        self.add_argument('group_name', type=str, help='The name of the group to remove. (e.g. "mygroup")')
 
     def available(self, state: CLISessionState) -> bool:
         """
@@ -34,18 +35,21 @@ class RemoveGroup(Command):
         """
         return { g: None for g in state.platform.groups }
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
+    def execute(self, group_name: str, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
         """
         Executes the command.
+
+        Args:
+            group_name (str): The name of the group to remove.
+            raw_args (List[str]): The raw arguments passed to the command.
+            argv (List[str]): The extra arguments that weren't parsed.
+            state (CLISessionState): The current session state.
         """
         if not state.platform:
             io.e('No platform selected. Use [bold]use[/bold] to select a platform.')
             return
-        if not raw_args:
-            io.e(f'Missing group name. [bold]Usage:[/bold] rm group <group name>')
+        if group_name not in state.platform.groups:
+            io.e(f'Group [bold]{group_name}[/bold] doesn\'t exist.')
             return
-        if raw_args[0] not in state.platform.groups:
-            io.e(f'Group [bold]{raw_args[0]}[/bold] doesn\'t exist.')
-            return
-        state.platform.rm_group(raw_args[0])
-        print(f'[green]Successfully removed group [bold]{raw_args[0]}[/bold] from platform [bold]{state.platform.name}[/bold].[/green]')
+        state.platform.rm_group(group_name)
+        print(f'[green]Successfully removed group [bold]{group_name}[/bold] from platform [bold]{state.platform.name}[/bold].[/green]')

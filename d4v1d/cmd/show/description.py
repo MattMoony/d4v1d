@@ -39,15 +39,12 @@ class ShowDescription(Command):
             args (List[str]): The raw arguments passed to the command.
             state (CLISessionState): The current session state.
         """
-        if not raw_args:
-            io.e('Missing username. [bold]Usage:[/bold] show description <username>')
-            return
         if not state.platform:
             io.e('No platform loaded. Enable one with the [bold]use[/bold] command.')
             return
         try:
-            d: Info[str] = state.platform.get_user_description(raw_args[0])
-            print(f'[bold]Description of {raw_args[0]} @ {d.date.isoformat()}:[/bold]\n{d.value}')
+            d: Info[str] = state.platform.get_user_description(username)
+            print(f'[bold]Description of {username} @ {d.date.isoformat()}:[/bold]\n{d.value}')
         except PlatformError as e:
             io.e(f'[bold]{e.__class__.__name__}{":[/bold] "+str(e) if str(e) else "[/bold]"}')
             return

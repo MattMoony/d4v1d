@@ -96,9 +96,12 @@ class Command(object):
             args (List[str]): The raw arguments that were passed to the command.
             state (CLISessionState): The current session state.
         """
-        try:
-            p_args, argv = self._parser.parse_known_args(args)
-            self.execute(raw_args=args, argv=argv, state=state,
-                        **{ k: v for k, v in p_args._get_kwargs() })
-        except (ValueError or ArgumentError) as e:
-            io.e(e)
+        if self._needs_parsing:
+            try:
+                p_args, argv = self._parser.parse_known_args(args)
+                self.execute(raw_args=args, argv=argv, state=state,
+                            **{ k: v for k, v in p_args._get_kwargs() })
+            except (ValueError or ArgumentError) as e:
+                io.e(e)
+        else:
+            self.execute(raw_args=args, argv=args, state=state)
