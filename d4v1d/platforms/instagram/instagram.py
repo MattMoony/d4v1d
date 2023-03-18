@@ -82,7 +82,7 @@ class Instagram(Platform):
         log.debug(f'Fetching user info from instagram ... ')
         if not group and not self.groups:
             raise NoGroupsError('No groups available for fetching user info')
-        user = (group or self.groups.values()[0]).get_user(username)
+        user = (group or list(self.groups.values())[0]).get_user(username)
         if not user:
             log.debug(f'"{username}" is not known to instagram')
             raise UnknownUserError(f'"{username}" is not known to instagram')
