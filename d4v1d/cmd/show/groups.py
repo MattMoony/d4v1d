@@ -28,7 +28,7 @@ class ShowGroups(Command):
         """
         return bool(state.platform)
 
-    def execute(self, args: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
         """
         Executes the command.
         """
@@ -38,7 +38,7 @@ class ShowGroups(Command):
         if not state.platform.groups:
             io.w(f'No groups defined for platform [bold]{state.platform.name}[/bold].')
             return
-        tr: Tree = Tree('[bold grey53][*][/bold grey53] Available platforms:')
+        tr: Tree = Tree(io._l('Available platforms:'))
         for g in state.platform.groups.values():
             tr.add(f'[bold]{g.name} ({len(g.bots)} bots)[/bold]')
         print(tr)

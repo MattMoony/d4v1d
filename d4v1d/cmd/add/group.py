@@ -27,18 +27,18 @@ class AddGroup(Command):
         """
         return bool(state.platform)
 
-    def execute(self, args: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
         """
         Executes the command.
         """
         if not state.platform:
             io.e('No platform selected. Use [bold]use[/bold] to select a platform.')
             return
-        if not args:
+        if not raw_args:
             io.e(f'Missing group name. [bold]Usage:[/bold] add group <group name>')
             return
-        if args[0] in state.platform.groups:
-            io.e(f'Group [bold]{args[0]}[/bold] already exists.')
+        if raw_args[0] in state.platform.groups:
+            io.e(f'Group [bold]{raw_args[0]}[/bold] already exists.')
             return
-        state.platform.add_group(args[0])
-        print(f'[green]Successfully created group [bold]{args[0]}[/bold] for platform [bold]{state.platform.name}[/bold].[/green]')
+        state.platform.add_group(raw_args[0])
+        print(f'[green]Successfully created group [bold]{raw_args[0]}[/bold] for platform [bold]{state.platform.name}[/bold].[/green]')

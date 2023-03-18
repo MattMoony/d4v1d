@@ -17,7 +17,7 @@ class Exit(Command):
         """
         super().__init__('exit', aliases=['quit',], description='Exits the program')
 
-    def execute(self, args: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
         """
         Executes the exit command
         """

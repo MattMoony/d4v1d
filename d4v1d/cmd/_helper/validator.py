@@ -39,3 +39,5 @@ class CmdValidator(Validator):
             raise ValidationError(message=str(e))
         except KeyError as e:
             raise ValidationError(message=str(e))
+        except ValueError as e:
+            raise ValidationError(message=str(e))

@@ -8,6 +8,7 @@ from prompt_toolkit.completion.nested import NestedDict
 from rich import print
 from rich.tree import Tree
 
+from d4v1d.utils import io
 from d4v1d.platforms.platform.cmd import CLISessionState, Command
 
 
@@ -48,7 +49,7 @@ class Help(Command):
         """
         return state.session.compl_dict
 
-    def execute(self, args: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
         """
         Executes the help command
         """
@@ -56,22 +57,22 @@ class Help(Command):
         for v in state.session.cmds.values():
             state.session.deep_merge(cmds, v)
 
-        if len(args) == 0:
+        if len(raw_args) == 0:
             # seems a little redunant, but keeps aliases
             # out of the top-level overview, at least ...
-            cmd_tree: Tree = Tree('[bold grey53][*][/bold grey53] Available commands:')
+            cmd_tree: Tree = Tree(io._l('Available commands:'))
             self.__build_tree(cmds, cmd_tree, state)
             print(cmd_tree)
         else:
             try:
-                c, _ = state.session.parse(args)
+                c, _ = state.session.parse(raw_args)
                 if isinstance(c, Command):
-                    print(f'[bold grey53][*][/bold grey53] [bold]{c.name}[/bold]: {c.description}')
+                    io.l(f'[bold]{c.name}[/bold]: {c.description}')
                     if len(c.aliases) > 0:
-                        print(f'    └── Aliases: [bold]{", ".join(c.aliases)}[/bold]')
+                        io._(f'Aliases: [bold]{", ".join(c.aliases)}[/bold]')
                 else:
-                    cmd_tree: Tree = Tree('[bold grey53][*][/bold grey53] Available sub-commands:')
+                    cmd_tree: Tree = Tree(io._l('Available sub-commands:'))
                     self.__build_tree(c, cmd_tree, state)
                     print(cmd_tree)
             except KeyError:
-                print(f'[bold red][-][/bold red] Unknown command: [italic]{" ".join(args)}[/italic]. Enter [bold]help[/bold] to see all available commands ...')
+                io.e(f'Unknown command: [italic]{" ".join(raw_args)}[/italic]. Enter [bold]help[/bold] to see all available commands ...')

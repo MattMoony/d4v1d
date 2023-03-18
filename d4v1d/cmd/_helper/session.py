@@ -246,6 +246,8 @@ class CmdSession(PromptSession):
         d, args = self.parse(cmd.strip().split())
         if isinstance(d, dict):
             raise TypeError(f'"{cmd}" has several sub-commands!')
+        if not d.available(self.state):
+            raise ValueError(f'"{cmd}" is not usable in the current context!')
         return d, args
     
     def __iadd__(self, other: Tuple[str, Dict[str, Union[Command, Dict[str, Any]]]]) -> "CmdSession":

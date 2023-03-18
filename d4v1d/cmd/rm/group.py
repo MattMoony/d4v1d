@@ -34,18 +34,18 @@ class RemoveGroup(Command):
         """
         return { g: None for g in state.platform.groups }
 
-    def execute(self, args: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
         """
         Executes the command.
         """
         if not state.platform:
             io.e('No platform selected. Use [bold]use[/bold] to select a platform.')
             return
-        if not args:
+        if not raw_args:
             io.e(f'Missing group name. [bold]Usage:[/bold] rm group <group name>')
             return
-        if args[0] not in state.platform.groups:
-            io.e(f'Group [bold]{args[0]}[/bold] doesn\'t exist.')
+        if raw_args[0] not in state.platform.groups:
+            io.e(f'Group [bold]{raw_args[0]}[/bold] doesn\'t exist.')
             return
-        state.platform.rm_group(args[0])
-        print(f'[green]Successfully removed group [bold]{args[0]}[/bold] from platform [bold]{state.platform.name}[/bold].[/green]')
+        state.platform.rm_group(raw_args[0])
+        print(f'[green]Successfully removed group [bold]{raw_args[0]}[/bold] from platform [bold]{state.platform.name}[/bold].[/green]')

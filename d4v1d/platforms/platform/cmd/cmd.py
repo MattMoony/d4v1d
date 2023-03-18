@@ -2,10 +2,13 @@
 Module providing the template for a command
 """
 
-from typing import *
+from typing import List, Optional
 
 from prompt_toolkit.completion.nested import NestedDict
 
+from d4v1d.utils import io
+
+from .argparser import ArgParser, ArgumentError
 from .clisessionstate import CLISessionState
 
 
@@ -13,6 +16,11 @@ class Command(object):
     """
     A template command
     """
+
+    _parser: ArgParser
+    """The argument parser for the command."""
+    _needs_parsing: bool = False
+    """Whether or not the command needs parsing."""
 
     def __init__(self, name: str, aliases: List[str] = [], description: str = ''):
         """
@@ -26,6 +34,14 @@ class Command(object):
         self.name: str = name
         self.aliases: List[str] = aliases
         self.description: str = description
+        self._parser = ArgParser(self.name)
+
+    def add_argument(self, *args, **kwargs) -> None:
+        """
+        Wrapper method for ``.parser.add_argument``.
+        """
+        self._needs_parsing = True
+        self._parser.add_argument(*args, **kwargs)
 
     def available(self, state: CLISessionState) -> bool:
         """
@@ -56,14 +72,33 @@ class Command(object):
         """
         return None
 
-    def execute(self, args: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, **kwargs) -> None:
         """
-        Executes the command with the specified arguments.
+        Executes the command with the given arguments.
+        The arguments defined in the argument parser are passed
+        to this function as keyword arguments.
+
+        Args:
+            raw_args (List[str]): The raw arguments that were passed to the command.
+            argv (List[str]): Extra arguments; i.e. arguments that weren't defined 
+                using the argument parser.
+            state (CLISessionState): The current session state.
         """
         pass
 
     def __call__(self, args: List[str], state: CLISessionState) -> None:
         """
-        Calls the execute method.
+        Execute this command - before doing so, however, parse
+        the given arguments with the argument parser and pass
+        them on as keyword arguments.
+
+        Args:
+            args (List[str]): The raw arguments that were passed to the command.
+            state (CLISessionState): The current session state.
         """
-        self.execute(args, state=state)
+        try:
+            p_args, argv = self._parser.parse_known_args(args)
+            self.execute(raw_args=args, argv=argv, state=state,
+                        **{ k: v for k, v in p_args._get_kwargs() })
+        except (ValueError or ArgumentError) as e:
+            io.e(e)
