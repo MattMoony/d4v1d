@@ -2,7 +2,7 @@
 Dummy code for the platform class.
 """
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from d4v1d.platforms.platform.bot.group import Group
 from d4v1d.platforms.platform.db import Database
@@ -60,8 +60,20 @@ class Platform:
             Dict[str, Any]: The platform in save-able dictionary format
         """
         raise NotImplementedError()
+    
+    def get_cached_usernames(self) -> List[str]:
+        """
+        Get a list of all usernames whose info has been cached
+        locally - so they've been crawled in the past.
 
-    def get_user_description(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+        Returns:
+            List[str]: The list of usernames of users whose
+                information has been collected in the past and
+                that are therfore now a part of the DB.
+        """
+        raise NotImplementedError()
+
+    def get_user_description(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
         """
         Gets the description of a user
 
@@ -75,7 +87,7 @@ class Platform:
         """
         raise NotImplementedError()
 
-    def get_user_profile_pic(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+    def get_user_profile_pic(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
         """
         Gets the profile picture of a user
 
@@ -89,7 +101,7 @@ class Platform:
         """
         raise NotImplementedError()
 
-    def get_user_followers(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+    def get_user_followers(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
         """
         Gets the followers of a user
 
@@ -103,7 +115,7 @@ class Platform:
         """
         raise NotImplementedError()
 
-    def get_user_following(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+    def get_user_following(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
         """
         Gets the following of a user
 
@@ -117,7 +129,7 @@ class Platform:
         """
         raise NotImplementedError()
 
-    def get_user_number_posts(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+    def get_user_number_posts(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
         """
         Gets the posts of a user
 

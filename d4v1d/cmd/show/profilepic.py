@@ -7,6 +7,7 @@ import shutil
 from typing import List, Optional
 
 from image import DrawImage
+from prompt_toolkit.completion.nested import NestedDict
 from rich import print  # pylint: disable=redefined-builtin
 from rich.panel import Panel
 
@@ -37,6 +38,12 @@ class ShowProfilePicture(Command):
         Can it be used rn?
         """
         return bool(state.platform)
+    
+    def completer(self, state: CLISessionState) -> Optional[NestedDict]:
+        """
+        Custom command auto-completion.
+        """
+        return { u: None for u in state.platform.get_cached_usernames() }
     
     def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
                 username: Optional[str] = None, refresh: bool = False,

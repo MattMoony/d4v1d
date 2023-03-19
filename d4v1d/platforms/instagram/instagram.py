@@ -5,7 +5,7 @@ the core and this platform-specific implementation.
 
 import json
 import os
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from d4v1d import config
 from d4v1d.log import log
@@ -102,6 +102,16 @@ class Instagram(Platform):
         log.debug('Adding user to db ... ')
         self.db.store_user(user.value)
         return Info(user.value, user.date, self)
+    
+    def get_cached_usernames(self) -> List[str]:
+        """
+        Returns the list of usernames whose info has been cached
+        locally.
+
+        Returns:
+            List[str]: The list of usernames.
+        """
+        return [ u.value.username for u in self.db.get_users() ]
 
     def get_user_description(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[str]:
         """

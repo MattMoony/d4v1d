@@ -6,7 +6,7 @@ import os
 import re
 import sqlite3
 import uuid
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 from datetime import datetime
 
 from d4v1d import config
@@ -160,3 +160,23 @@ class SQLiteDatabase(Database):
         if row is None:
             return None
         return Info(User(*row[1:]), datetime.fromtimestamp(int(row[0])))
+
+    def get_users(self) -> List[Info[User]]:
+        """
+        Get a list of all users in the DB.
+
+        Returns:
+            List[Info[User]]: List of all user infos in the db (normally ordered by username).
+        """
+        c: sqlite3.Cursor = self.con.cursor()
+        c.execute('''SELECT
+                        STRFTIME('%s', timestamp), id, fbid, username, full_name, bio, followers,
+                        following, profile_pic_local, private, number_posts,
+                        category_name, pronouns
+                     FROM users u
+                     WHERE timestamp = (SELECT MAX(timestamp)
+                                        FROM users
+                                        WHERE id = u.id)
+                     ORDER BY username;
+                  ''')
+        return [ Info(User(*row[1:]), datetime.fromtimestamp(int(row[0]))) for row in c.fetchall() ]

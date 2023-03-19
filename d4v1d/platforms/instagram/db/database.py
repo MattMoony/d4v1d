@@ -5,7 +5,7 @@ should look like. This base class is extended
 by all specific database implementations.
 """
 
-from typing import Optional
+from typing import List, Optional
 
 from d4v1d.platforms.instagram.db.models import User
 from d4v1d.platforms.platform.info import Info
@@ -34,5 +34,14 @@ class Database:
 
         Returns:
             Optional[Info[User]]: The user if it exists, None otherwise
+        """
+        raise NotImplementedError()
+    
+    def get_users(self) -> List[Info[User]]:
+        """
+        Get a list of users stored in the DB.
+
+        Returns:
+            List[Info[User]]: List of info about users.
         """
         raise NotImplementedError()

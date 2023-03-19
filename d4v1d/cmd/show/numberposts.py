@@ -5,6 +5,8 @@ on the currently selected platform.
 
 from typing import List, Optional
 
+from prompt_toolkit.completion.nested import NestedDict
+
 from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
 from d4v1d.platforms.platform.cmd.cmd import Command
 from d4v1d.platforms.platform.errors import PlatformError
@@ -32,6 +34,12 @@ class ShowNumberPosts(Command):
         Can it be used rn?
         """
         return bool(state.platform)
+    
+    def completer(self, state: CLISessionState) -> Optional[NestedDict]:
+        """
+        Custom command auto-completion.
+        """
+        return { u: None for u in state.platform.get_cached_usernames() }
     
     def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
                 username: Optional[str] = None, refresh: bool = False,
@@ -62,7 +70,7 @@ class ShowNumberPosts(Command):
             group = state.platform.groups[group_name]
         try:
             d: Info[str] = state.platform.get_user_number_posts(username, refresh=refresh, group=group)
-            io.l(f'User "{username}" has posted [bold]{d.value} time{"s" if d.value > 1 else ""}[/bold] up until {d.date.isoformat()}.')
+            io.l(f'User "{username}" has posted [bold]{d.value} time{"s" if d.value > 1 else ""}[/bold] up until "{d.date.isoformat()}".')
         except PlatformError as e:
             io.e(f'[bold]{e.__class__.__name__}{":[/bold] "+str(e) if str(e) else "[/bold]"}')
             return

@@ -13,6 +13,7 @@ from d4v1d.cmd.show.groups import ShowGroups
 from d4v1d.cmd.show.numberposts import ShowNumberPosts
 from d4v1d.cmd.show.platforms import ShowPlatforms
 from d4v1d.cmd.show.profilepic import ShowProfilePicture
+from d4v1d.cmd.show.users import ShowUsers
 from d4v1d.cmd.use import Use
 
 CMDS: Dict[str, Any] = {
@@ -27,6 +28,7 @@ CMDS: Dict[str, Any] = {
         'groups': ShowGroups(),
         'platforms': ShowPlatforms(),
         'profilepic': ShowProfilePicture(),
+        'users': ShowUsers(),
     },
     'rm': {
         'group': RemoveGroup(),
