@@ -10,6 +10,7 @@ from d4v1d.cmd.help import Help
 from d4v1d.cmd.rm.group import RemoveGroup
 from d4v1d.cmd.show.description import ShowDescription
 from d4v1d.cmd.show.groups import ShowGroups
+from d4v1d.cmd.show.numberposts import ShowNumberPosts
 from d4v1d.cmd.show.platforms import ShowPlatforms
 from d4v1d.cmd.show.profilepic import ShowProfilePicture
 from d4v1d.cmd.use import Use
@@ -21,6 +22,7 @@ CMDS: Dict[str, Any] = {
     'exit': Exit(),
     'help': Help(),
     'show': {
+        '#posts': ShowNumberPosts(),
         'description': ShowDescription(),
         'groups': ShowGroups(),
         'platforms': ShowPlatforms(),

@@ -117,7 +117,7 @@ class Platform:
         """
         raise NotImplementedError()
 
-    def get_user_posts(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+    def get_user_number_posts(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
         """
         Gets the posts of a user
 
