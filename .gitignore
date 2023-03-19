@@ -5,6 +5,10 @@
 venv
 __pycache__
 
+# for python build
+build
+d4v1d.egg-info
+
 # for vscode
 .vscode
 
