@@ -29,3 +29,4 @@ CMDS: Dict[str, Any] = {
     },
     'use': Use(),
 }
+"""All standard commands."""

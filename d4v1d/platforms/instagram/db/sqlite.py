@@ -82,7 +82,7 @@ class SQLiteDatabase(Database):
                 if c.fetchone() is None:
                     return False
             return True
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             return False
 
     def __setup_database(self) -> None:

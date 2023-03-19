@@ -64,5 +64,5 @@ class CmdCompleter(NestedCompleter):
                             Document(re.search(r'\s+'.join(args)+r'$', document.text).group()),
                             complete_event):
                 yield comp
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             pass

@@ -26,7 +26,7 @@ class InstagramConfig:
     """The headers to use for requests"""
     user_agents: List[str]
     """The user agents to use for requests"""
-    __dont_save: bool = False
+    dont_save: bool = False
     """Set, if the config shouldn't be saved - e.g. if it was corrupted"""
 
     def __init__(self, ddir: str, cdir: str,  db_type: InstagramDBType, headers: Dict[str, str], user_agents: List[str]):
@@ -52,7 +52,7 @@ class InstagramConfig:
         is unloaded
         """
         log.debug('Cleaning up InstagramConfig ... ')
-        if not self.__dont_save:
+        if not self.dont_save:
             log.debug('Saving InstagramConfig, since __dont_save is not set ...')
             with open(os.path.join(self.cdir, 'conf.json'), 'w', encoding='utf8') as f:
                 json.dump(self.dumpj(), f)
@@ -83,17 +83,19 @@ class InstagramConfig:
         try:
             _c: Optional[InstagramConfig] = None
             # check if the db type actually exists
-            if data['db_type'] not in InstagramDBType._member_names_:
+            try:
+                db_type: InstagramDBType = InstagramDBType[data['db_type']]
+            except KeyError:
                 _c = cls.default(dont_save=True)
                 log.error('Invalid database type used in your instagram config ("%s") - using default option "%s" for now ...', data["db_type"], _c.db_type.name)
                 log.error('To fix this error, choose an appropriate db type in "%s", i.e. one of: %s', os.path.join(cdir, "conf.json"), ', '.join(chr(0x22) + t.name + chr(0x22) for t in InstagramDBType))
-                data['db_type'] = _c.db_type.name
+                db_type = _c.db_type
 
             # try loading the config optimistically
             c = cls(
                 os.path.join(config.PCONFIG.data_dir, 'instagram'),
                 cdir,
-                InstagramDBType[data['db_type']],
+                db_type,
                 data['headers'],
                 data['user_agents']
             )
@@ -101,7 +103,7 @@ class InstagramConfig:
             # cleanup after *borked* db type
             if _c:
                 print('not  saving ....')
-                c.__dont_save = True
+                c.dont_save = True
                 del _c
         # should the config file be corrupted, we'll use the default one
         except KeyError:
@@ -129,5 +131,5 @@ class InstagramConfig:
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:107.0) Gecko/20100101 Firefox/107.0',
             ]
         )
-        c.__dont_save = dont_save
+        c.dont_save = dont_save
         return c

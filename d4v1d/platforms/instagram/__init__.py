@@ -41,7 +41,7 @@ def init() -> Platform:
                 log.error('If you want to reset your config, delete "%s"', os.path.join(cdir, "conf.json"))
                 conf = InstagramConfig.default(dont_save=True)
     # add config to global config
-    config.PCONFIG._instagram = conf
+    config.PCONFIG._instagram = conf  # pylint: disable=protected-access
     # create data directory if it doesn't exist
     if not os.path.isdir(conf.ddir):
         os.mkdir(conf.ddir)

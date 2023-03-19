@@ -43,7 +43,7 @@ class Command:
         self._needs_parsing = True
         self._parser.add_argument(*args, **kwargs)
 
-    def available(self, state: CLISessionState) -> bool:
+    def available(self, state: CLISessionState) -> bool:  # pylint: disable=unused-argument
         """
         Should the command be shown in help given the current
         session state - i.e. is the command usable considering
@@ -57,7 +57,7 @@ class Command:
         """
         return True
 
-    def completer(self, state: CLISessionState) -> Optional[NestedDict]:
+    def completer(self, state: CLISessionState) -> Optional[NestedDict]:  # pylint: disable=unused-argument
         """
         This method can be used to provide more information
         about the commands structure - i.e. it can be used

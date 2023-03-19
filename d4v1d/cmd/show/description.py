@@ -3,7 +3,7 @@ Search the currently loaded platforms for the
 description of a specific user
 """
 
-from typing import List
+from typing import List, Optional
 
 from rich import print  # pylint: disable=redefined-builtin
 
@@ -33,7 +33,8 @@ class ShowDescription(Command):
         """
         return bool(state.platform)
 
-    def execute(self, username: str, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
+                username: Optional[str] = None, **kwargs) -> None:
         """
         Executes the command.
 
@@ -42,6 +43,10 @@ class ShowDescription(Command):
             args (List[str]): The raw arguments passed to the command.
             state (CLISessionState): The current session state.
         """
+        if not username:
+            # should NEVER happen
+            io.e('No username provided.')
+            return
         if not state.platform:
             io.e('No platform loaded. Enable one with the [bold]use[/bold] command.')
             return

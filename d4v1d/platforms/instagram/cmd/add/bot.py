@@ -52,24 +52,33 @@ class AddBot(Command):
         """
         return { g: None for g in state.platform.groups }
 
-    def execute(self, group_name: str, user_agent: str, raw_args: List[str], argv: List[str],
-                state: CLISessionState, *args, anonymous: bool = False, username: Optional[str] = None,
-                password: Optional[str] = None, headers: Optional[List[Tuple[str, str]]] = None, **kwargs) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
+                group_name: Optional[str] = None, user_agent: Optional[str] = None,
+                anonymous: bool = False, username: Optional[str] = None, password: Optional[str] = None,
+                headers: Optional[List[Tuple[str, str]]] = None, **kwargs) -> None:
         """
         Executes the command.
 
         Args:
-            group_name (str): The name of the group to add the bot to.
-            user_agent (str): The "User-Agent" the bot should use.
             raw_args (List[str]): The raw arguments passed to the command.
             argv (List[str]): The extra arguments that weren't parsed.
             state (CLISessionState): The current session state.
+            group_name (Optional[str]): The name of the group to add the bot to.
+            user_agent (Optional[str]): The "User-Agent" the bot should use.
             anonymous (bool, optional): Whether or not the bot should use the "anonymous" user; i.e. not login. Defaults to False.
             headers (List[Tuple[str, str]]): The headers to add to the bot's requests.
             username (Optional[str], optional): The username of the bot. Defaults to None.
             password (Optional[str], optional): The password of the bot. Defaults to None.
             headers (Optional[List[Tuple[str, str]]], optional): The headers to add to the bot's requests. Defaults to None.
         """
+        if not group_name:
+            # shouldn't happen
+            io.e('You must provide a group name!')
+            return
+        if not user_agent:
+            # shouldn't happen
+            io.e('There must be a user-agent!')
+            return
         if not anonymous and not (username and password):
             io.e('You must either set the --anonymous flag or provide username & password!')
             return

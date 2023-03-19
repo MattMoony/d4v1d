@@ -160,6 +160,6 @@ class Instagram(Platform):
             for v in data['groups']:
                 g: InstagramGroup = InstagramGroup.loadj(v)
                 i.groups[g.name] = g
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             log.error('Instagram plaform file seems to be corrupted - continuing without saved groups, etc.')
         return i

@@ -35,16 +35,21 @@ class RemoveGroup(Command):
         """
         return { g: None for g in state.platform.groups }
 
-    def execute(self, group_name: str, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
+                group_name: Optional[str] = None, **kwargs) -> None:
         """
         Executes the command.
 
         Args:
-            group_name (str): The name of the group to remove.
             raw_args (List[str]): The raw arguments passed to the command.
             argv (List[str]): The extra arguments that weren't parsed.
             state (CLISessionState): The current session state.
+            group_name (Optional[str]): The name of the group to remove.
         """
+        if not group_name:
+            # should NEVER happen
+            io.e('Missing group name.')
+            return
         if not state.platform:
             io.e('No platform selected. Use [bold]use[/bold] to select a platform.')
             return
