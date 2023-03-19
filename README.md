@@ -16,7 +16,7 @@ A social-media *social-engineering* tool. While originally inspired by one of my
 
 > After over a year of not working on this project, I've decided to come back to it and start developing `v5` - maybe even with some extra help.
 
-For more info on how `d4v1d` works, how to extend it and how to use it, take a look at the [docs](docs/README.md).
+For more info on how `d4v1d` works, how to extend it and how to use it, take a look at the [docs](https://mattmoony.github.io/d4v1d).
 
 > ❗ **Note:** This project is still in development, which is why it is not impossible for there to be bugs or other unwanted behaviour. If you find any, please report them in the [issues](https://github.com/MattMoony/d4v1d/issues) section. Of course you can also decide to contribute and start working on your own fix.
 
@@ -40,11 +40,11 @@ Simply run the main script (`d4v1d.py`) to enter `d4v1d`'s terminal-like environ
 python3 -m d4v1d
 ```
 
-To learn more about the commands and features you can use from here, take a look at the [docs](docs/USAGE.md).
+To learn more about the commands and features you can use from here, take a look at [USAGE.md](docs/USAGE.md).
 
 ## 🏗️ Structure
 
-The idea is to structure `d4v1d` as flexibly as possible, making it easy to exchange and add new components such as database connections, social-media platforms, etc.
+The idea is to structure `d4v1d` as flexibly as possible, making it easy to exchange and add new components such as database connections, social-media platforms, etc. More about the structure of platforms can be found in [PLATFORMS.md](docs/PLATFORMS.md).
 
 ## 🛣️ Roadmap
 

@@ -56,6 +56,13 @@ Get all locally cached users - i.e. users, whose information has been collected 
 
 Once again, the returned `User` objects should be instances of user classes that inherited from the `User` base class.
 
+#### `cmds`
+
+> `cmds: Dict[str, Union[Command, Dict[str, Any]]]`
+
+It **isn't required** to override this attribute - use it only, if you want to add custom commands to your platform. Actually that isn't quite true, you should to override this, in order to at least provide access
+to the `add bot` command, since that one can't really be provided by `d4v1d` as bots can be very platform specific and hard to generalize the creation of.
+
 ### 📊 Info Class
 
 > `d4v1d.platforms.platform.info.Info`
@@ -112,14 +119,6 @@ If you want, you can even let the user decide between multiple database formats 
 > `d4v1d.platforms.platform.cmd`
 
 The commands module contains all the commands that are available for the platform. These commands are then used by the `d4v1d` core to grant the user access to them.
-
-#### `get_cmds`
-
-> `get_cmds () -> Dict[str, Any]`
-
-This method returns a dictionary containing all the commands that are available for the platform. The keys of the dictionary are the names of the commands, and the values are the actual commands (= instances of subclasses of the `d4v1d.platforms.platform.cmd.Command` class).
-
-It is used by the `d4v1d` upon switching to a platform environment using the `use` command, to get all the commands that are available for the platform.
 
 #### `CLISessionState`
 
