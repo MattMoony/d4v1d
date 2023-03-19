@@ -34,35 +34,27 @@ It should return an instance of the [`Platform` class](#🚉-platform-class).
 
 Every platform **needs to extend this class**, and implement at least the following methods, since `d4v1d` makes use of them, to allow for some sort of **cross-platform data collection & analysis**:
 
-#### `get_user_description`
+#### `group`
 
-> `get_user_description (cls, username: str) -> d4v1d.platforms.platform.info.Info<str>`
+> `group (self, name: str) -> d4v1d.platforms.platform.group.Group`
 
-Get a brief summary of the user - usually something like a bio exists, in which case, this can simply be returned.
+Create a new platform-specific group - i.e. a collection of bots for the platform that can be used to scrape new data.
 
-#### `get_user_profile_pic`
+#### `user`
 
-> `get_user_profile_pic (cls,  username: str) -> d4v1d.platforms.platform.info.Info<str>`
+> `user (self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info[User]`
 
-Get the users' profile picture. The return value being the path to the image file.
+Get generic information about a user of the social-media platform. 
 
-#### `get_user_followers`
+Note that this returns info on a `User` object - you can, and probably should, of course use your own user classes with more platform-specific info, however, just make sure to inherit from `User` and fill all its required fields, since they represent info that should generally be available on **all** social-media platforms.
 
-> `get_user_followers (cls, username: str) -> d4v1d.platforms.platform.info.Info<List[str]>`
+#### `users`
 
-Get a list of the usernames of all the users' followers. These usernames can then be used to get more information about the followers, and so on.
+> `users (self) -> List[Info[User]]`
 
-#### `get_user_following`
+Get all locally cached users - i.e. users, whose information has been collected and locally stored in the past. 
 
-> `get_user_following (cls, username: str) -> d4v1d.platforms.platform.info.Info<List[str]>`
-
-Get a list of the usernames of all users that the specified user follows. Just like the usernames retrieved with `get_user_followers`, these usernames can then be used to get more information, ...
-
-#### `get_user_number_posts`
-
-> `get_user_number_posts (cls, username: str) -> d4v1d.platforms.platform.info.Info<int>`
-
-Get the number of posts that the user has made.
+Once again, the returned `User` objects should be instances of user classes that inherited from the `User` base class.
 
 ### 📊 Info Class
 
@@ -77,6 +69,15 @@ This class is used to wrap the information that is retrieved from the platform. 
 ```
 
 This class has been introduced, because it seems rather reasonable to assume that the information retrieved from a platform is **not static**, but rather **changes over time**.
+
+### 🧑 User Class
+
+> `d4v1d.platforms.platform.user.User`
+
+This class is the base class for all kinds of social-media users of all kinds of social-media platforms. 
+
+Any new platforms should define own
+user classes that extend this one and **always** contain values for at least the attributes defined in this class, as they're meant to be common across social-media platforms.
 
 ### 🤖 Bot Class
 
