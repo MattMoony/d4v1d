@@ -12,7 +12,7 @@ from datetime import datetime
 from d4v1d import config
 from d4v1d.log import log
 from d4v1d.platforms.instagram.db.database import Database
-from d4v1d.platforms.instagram.db.models import User
+from d4v1d.platforms.instagram.db.models import InstagramUser
 from d4v1d.platforms.instagram.db.schema.sql import SQLSchema
 from d4v1d.platforms.platform.info import Info
 
@@ -120,7 +120,7 @@ class SQLiteDatabase(Database):
             c.execute(qry)
         self.con.commit()
 
-    def store_user(self, user: User) -> None:
+    def store_user(self, user: InstagramUser) -> None:
         """
         Stores a user in the database
 
@@ -137,7 +137,7 @@ class SQLiteDatabase(Database):
         )''', user.dumpt())
         self.con.commit()
 
-    def get_user(self, username: str) -> Optional[Info[User]]:
+    def get_user(self, username: str) -> Optional[Info[InstagramUser]]:
         """
         Gets a user from the database
 
@@ -159,9 +159,9 @@ class SQLiteDatabase(Database):
         row: Optional[Tuple] = c.fetchone()
         if row is None:
             return None
-        return Info(User(*row[1:]), datetime.fromtimestamp(int(row[0])))
+        return Info(InstagramUser(*row[1:]), datetime.fromtimestamp(int(row[0])))
 
-    def get_users(self) -> List[Info[User]]:
+    def get_users(self) -> List[Info[InstagramUser]]:
         """
         Get a list of all users in the DB.
 
@@ -179,4 +179,4 @@ class SQLiteDatabase(Database):
                                         WHERE id = u.id)
                      ORDER BY username;
                   ''')
-        return [ Info(User(*row[1:]), datetime.fromtimestamp(int(row[0]))) for row in c.fetchall() ]
+        return [ Info(InstagramUser(*row[1:]), datetime.fromtimestamp(int(row[0]))) for row in c.fetchall() ]

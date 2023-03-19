@@ -15,6 +15,7 @@ from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
 from d4v1d.platforms.platform.cmd.cmd import Command
 from d4v1d.platforms.platform.errors import PlatformError
 from d4v1d.platforms.platform.info import Info
+from d4v1d.platforms.platform.user import User
 from d4v1d.utils import io
 
 
@@ -43,7 +44,7 @@ class ShowProfilePicture(Command):
         """
         Custom command auto-completion.
         """
-        return { u: None for u in state.platform.get_cached_usernames() }
+        return { i.value.username: None for i in state.platform.users() }
     
     def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
                 username: Optional[str] = None, refresh: bool = False,
@@ -73,13 +74,13 @@ class ShowProfilePicture(Command):
                 return
             group = state.platform.groups[group_name]
         try:
-            d: Info[str] = state.platform.get_user_profile_pic(username, refresh=refresh, group=group)
-            img: DrawImage = DrawImage.from_file(d.value, 
+            i: Info[User] = state.platform.user(username, refresh=refresh, group=group)
+            img: DrawImage = DrawImage.from_file(i.value.profile_pic, 
                                                  size=(
                                                     shutil.get_terminal_size().columns//4, 
                                                     shutil.get_terminal_size().columns//8,
                                                  ))
-            print(Panel(d.value, title=f'Profile picture of {username} on {state.platform.name}'))
+            print(Panel(i.value.profile_pic, title=f'Profile picture of {username} on {state.platform.name}'))
             img.draw_image()
         except PlatformError as e:
             io.e(f'[bold]{e.__class__.__name__}{":[/bold] "+str(e) if str(e) else "[/bold]"}')

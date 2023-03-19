@@ -8,7 +8,7 @@ browsers.
 from typing import Any, Dict, Optional
 
 from d4v1d.platforms.instagram.bot.bot import InstagramBot
-from d4v1d.platforms.instagram.db.models.user import User
+from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.bot.group import Group
 from d4v1d.platforms.platform.errors import EmptyGroupError
 from d4v1d.platforms.platform.info import Info
@@ -19,7 +19,7 @@ class InstagramGroup(Group):
     Group class - collection of Instagram bots.
     """
 
-    def get_user(self, username: str) -> Optional[Info[User]]:
+    def get_user(self, username: str) -> Optional[Info[InstagramUser]]:
         """
         Fetches info for the user with the given username
 

@@ -12,7 +12,7 @@ from d4v1d.log import log
 from d4v1d.platforms.instagram.bot.group import InstagramGroup
 from d4v1d.platforms.instagram.cmd.add.bot import AddBot
 from d4v1d.platforms.instagram.db import DATABASES, Database
-from d4v1d.platforms.instagram.db.models import User
+from d4v1d.platforms.instagram.db.models import InstagramUser
 from d4v1d.platforms.platform import Platform
 from d4v1d.platforms.platform.cmd.cmd import Command
 from d4v1d.platforms.platform.errors import NoGroupsError, UnknownUserError
@@ -33,7 +33,7 @@ class Instagram(Platform):
     }
     """The commands for this platform."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Creates a new Instagram object.
         """
@@ -63,9 +63,9 @@ class Instagram(Platform):
         log.debug('Creating new group "%s" ... ', name)
         return InstagramGroup(name)
 
-    def get_user(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[User]:
+    def user(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[InstagramUser]:
         """
-        Returns the user with the given username
+        Returns the user with the given username.
 
         Args:
             username (str): The username of the user.
@@ -77,7 +77,7 @@ class Instagram(Platform):
         """
         if not refresh:
             log.debug('Check if user ("%s") is already part of the db', username)
-            user: Optional[Info[User]] = self.db.get_user(username)
+            user: Optional[Info[InstagramUser]] = self.db.get_user(username)
             if user:
                 log.debug('"%s" is already part of the db', username)
                 return Info(user.value, user.date, self)
@@ -93,66 +93,14 @@ class Instagram(Platform):
         self.db.store_user(user.value)
         return Info(user.value, user.date, self)
     
-    def get_cached_usernames(self) -> List[str]:
+    def users(self) -> List[Info[InstagramUser]]:
         """
-        Returns the list of usernames whose info has been cached
-        locally.
+        Returns the list of locally cached users.
 
         Returns:
-            List[str]: The list of usernames.
+            List[str]: The list of local userrs.
         """
-        return [ u.value.username for u in self.db.get_users() ]
-
-    def get_user_description(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[str]:
-        """
-        Returns the description of the user with the given username.
-
-        Args:
-            username (str): The username of the user.
-            refresh (bool): Whether to force refresh the user info.
-            group (Optional[InstagramGroup]): The group to use for fetching the user.
-
-        Returns:
-            Info[str]: The description of the user.
-        """
-        i: Info[User] = self.get_user(username, refresh=refresh, group=group)
-        if i:
-            return Info(i.value.bio, i.date, self)
-        return None
-
-    def get_user_profile_pic(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[str]:
-        """
-        Returns the profile picture of the user with the given username.
-
-        Args:
-            username (str): The username of the user.
-            refresh (bool): Whether to force refresh the user info.
-            group (Optional[InstagramGroup]): The group to use for fetching the user.
-
-        Returns:
-            Info[str]: The profile picture of the user.
-        """
-        i: Info[User] = self.get_user(username, refresh=refresh, group=group)
-        if i:
-            return Info(i.value.profile_pic, i.date, self)
-        return None
-
-    def get_user_number_posts(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[int]:
-        """
-        Returns the number of posts of the user with the given username.
-
-        Args:
-            username (str): The username of the user.
-            refresh (bool): Whether to force refresh the user info.
-            group (Optional[InstagramGroup]): The group to use for fetching the user.
-
-        Returns:
-            Info[int]: The number of posts of the user.
-        """
-        i: Info[User] = self.get_user(username, refresh=refresh, group=group)
-        if i:
-            return Info(i.value.number_posts, i.date, self)
-        return None
+        return self.db.get_users()
 
     def dumpj(self) -> Dict[str, Any]:
         """

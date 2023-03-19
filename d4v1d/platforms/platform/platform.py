@@ -8,6 +8,7 @@ from d4v1d.platforms.platform.bot.group import Group
 from d4v1d.platforms.platform.db import Database
 from d4v1d.platforms.platform.groups import Groups
 from d4v1d.platforms.platform.info import Info
+from d4v1d.platforms.platform.user import User
 
 
 class Platform:
@@ -26,7 +27,7 @@ class Platform:
     cmds: Dict[str, Union["Command", Dict[str, Any]]] = {}
     """Dictionary of custom commands the platform offers - if any."""
 
-    def __init__(self, name: str, desc: str, groups: Optional[Groups] = None):
+    def __init__(self, name: str, desc: str, groups: Optional[Groups] = None) -> None:
         """
         Creates a new platform
 
@@ -48,6 +49,34 @@ class Platform:
         """
         raise NotImplementedError()
 
+    def user(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info[User]:
+        """
+        Get the user with the given username from
+        the platform.
+
+        Args:
+            username (str): The user's username.
+            refresh (bool): Whether to force-refresh the user info.
+            group (Optional[Group]): Optionally, the group to use to refresh the info.
+
+        Returns:
+            Info[User]: The user info + the timestamp, when it was retrieved.
+
+        Raises:
+            KeyError: In case no user with this ``username`` was found.
+        """
+        raise NotImplementedError()
+
+    def users(self) -> List[Info[User]]:
+        """
+        Return a list of all locally cached users and
+        their info.
+
+        Returns:
+            List[Info[User]: List of user information.
+        """
+        raise NotImplementedError()
+
     def dumpj(self) -> Dict[str, Any]:
         """
         Returns the platform in save-able dictionary
@@ -55,88 +84,6 @@ class Platform:
 
         Returns:
             Dict[str, Any]: The platform in save-able dictionary format
-        """
-        raise NotImplementedError()
-    
-    def get_cached_usernames(self) -> List[str]:
-        """
-        Get a list of all usernames whose info has been cached
-        locally - so they've been crawled in the past.
-
-        Returns:
-            List[str]: The list of usernames of users whose
-                information has been collected in the past and
-                that are therfore now a part of the DB.
-        """
-        raise NotImplementedError()
-
-    def get_user_description(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
-        """
-        Gets the description of a user
-
-        Args:
-            username (str): The username of the user.
-            refresh (bool): Whether to force refresh the info.
-            group (Optional[Group]): The bot group to use to get the info.
-
-        Returns:
-            Info: The description of the user
-        """
-        raise NotImplementedError()
-
-    def get_user_profile_pic(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
-        """
-        Gets the profile picture of a user
-
-        Args:
-            username (str): The username of the user.
-            refresh (bool): Whether to force refresh the info.
-            group (Optional[Group]): The bot group to use to get the info.
-
-        Returns:
-            Info: The path to the profile picture of the user
-        """
-        raise NotImplementedError()
-
-    def get_user_followers(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
-        """
-        Gets the followers of a user
-
-        Args:
-            username (str): The username of the user.
-            refresh (bool): Whether to force refresh the info.
-            group (Optional[Group]): The bot group to use to get the info.
-
-        Returns:
-            Info: The followers of the user
-        """
-        raise NotImplementedError()
-
-    def get_user_following(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
-        """
-        Gets the following of a user
-
-        Args:
-            username (str): The username of the user.
-            refresh (bool): Whether to force refresh the info.
-            group (Optional[Group]): The bot group to use to get the info.
-
-        Returns:
-            Info: The following of the user
-        """
-        raise NotImplementedError()
-
-    def get_user_number_posts(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
-        """
-        Gets the posts of a user
-
-        Args:
-            username (str): The username of the user.
-            refresh (bool): Whether to force refresh the info.
-            group (Optional[Group]): The bot group to use to get the info.
-
-        Returns:
-            Info: The posts of the user
         """
         raise NotImplementedError()
 
@@ -162,3 +109,25 @@ class Platform:
             str: The string representation of the platform
         """
         return self.name
+
+    def __getitem__(self, username: str) -> User:
+        """
+        Get information about the user with the given 
+        username; will **always** try to get the user 
+        information from the local cache before scraping it.
+
+        To get new, refreshed user information use
+        the ``.user()`` method directly as it works
+        for such requirements.
+
+        Args:
+            username (str): The user's username.
+
+        Returns:
+            User: The info about the user matching the username.
+
+        Raises:
+            KeyError: In case no user with the given
+                username exists.
+        """
+        raise NotImplementedError()

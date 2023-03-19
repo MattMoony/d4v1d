@@ -7,7 +7,7 @@ by all specific database implementations.
 
 from typing import List, Optional
 
-from d4v1d.platforms.instagram.db.models import User
+from d4v1d.platforms.instagram.db.models import InstagramUser
 from d4v1d.platforms.platform.info import Info
 
 
@@ -16,7 +16,7 @@ class Database:
     Base class for all Instagram database interfaces.
     """
 
-    def store_user(self, user: User) -> None:
+    def store_user(self, user: InstagramUser) -> None:
         """
         Stores a user in the database
 
@@ -25,7 +25,7 @@ class Database:
         """
         raise NotImplementedError()
 
-    def get_user(self, username: str) -> Optional[Info[User]]:
+    def get_user(self, username: str) -> Optional[Info[InstagramUser]]:
         """
         Gets a user from the database
 
@@ -37,7 +37,7 @@ class Database:
         """
         raise NotImplementedError()
     
-    def get_users(self) -> List[Info[User]]:
+    def get_users(self) -> List[Info[InstagramUser]]:
         """
         Get a list of users stored in the DB.
 

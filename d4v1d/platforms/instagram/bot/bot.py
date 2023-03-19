@@ -12,7 +12,7 @@ from typing import Any, Dict, Optional, Tuple
 import requests as req
 
 from d4v1d import config
-from d4v1d.platforms.instagram.db.models.user import User
+from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.bot.bot import Bot
 from d4v1d.platforms.platform.bot.group import Group
 from d4v1d.platforms.platform.errors import BadAPIResponseError
@@ -54,7 +54,7 @@ class InstagramBot(Bot):
         self.session = req.Session()
         self.session.headers.update({ **headers, 'User-Agent': user_agent, })
 
-    def get_user(self, username: str) -> Optional[Info[User]]:
+    def get_user(self, username: str) -> Optional[Info[InstagramUser]]:
         """
         Fetches info for the user with the given username
 
@@ -76,7 +76,7 @@ class InstagramBot(Bot):
         ppath: str = os.path.join(config.PCONFIG._instagram.ddir, 'users', username, f'{str(stmp.timestamp()).replace(".", "_")}.jpg')  # pylint: disable=protected-access
         with open(ppath, 'wb') as f:
             f.write(r.content)
-        u: User = User.loadj(_u, api=True, profile_pic=ppath)
+        u: InstagramUser = InstagramUser.loadj(_u, api=True, profile_pic=ppath)
         return Info(u, stmp)
 
     def dumpj(self) -> Dict[str, Any]:

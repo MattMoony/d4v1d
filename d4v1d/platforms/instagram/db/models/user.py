@@ -3,9 +3,14 @@ Defines the attribute of an Instagram user
 account.
 """
 
+from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple
 
-class User:
+from d4v1d.platforms.platform.user import User
+
+
+@dataclass(init=False)
+class InstagramUser(User):
     """
     Represents an Instagram user account.
     """
@@ -14,25 +19,13 @@ class User:
     """The instagram user id"""
     fbid: int
     """The facebook user id"""
-    username: str
-    """The user's username"""
     full_name: str
     """The user's full name"""
-    bio: str
-    """The user's bio"""
-    no_followers: int
-    """Number of followers"""
-    no_following: int
-    """Number of following"""
-    profile_pic: str
-    """Path to the profile picture (local)"""
     private: bool
     """Is this a private profile?"""
-    number_posts: int
-    """Number of posts"""
-    category_name: Optional[str]
+    category_name: Optional[str] = None
     """Name of the category, to which this "business" belongs"""
-    pronouns: str
+    pronouns: str = ''
     """The user's pronouns"""
 
     def __init__(self, id: int, fbid: int, username: str,  # pylint: disable=redefined-builtin
@@ -43,13 +36,18 @@ class User:
         """
         Create a new user with the given info
         """
+        # TODO: auto-generate init with dataclass - needs
+        # some extra config tho, because of alphabetical ordering
+        # of arguments, etc.
+        # TODO: also, adjust order of parameters to better
+        # fit to the parent class it's inheriting from ...
         self.id = id
         self.fbid = fbid
         self.username = username
         self.full_name = full_name
-        self.bio = bio
-        self.no_followers = no_followers
-        self.no_following = no_following
+        self.description = bio
+        self.number_followers = no_followers
+        self.number_following = no_following
         self.profile_pic = profile_pic
         self.private = private
         self.number_posts = number_posts
@@ -65,9 +63,9 @@ class User:
             'fbid': self.fbid,
             'username': self.username,
             'full_name': self.full_name,
-            'bio': self.bio,
-            'no_followers': self.no_followers,
-            'no_following': self.no_following,
+            'bio': self.description,
+            'no_followers': self.number_followers,
+            'no_following': self.number_following,
             'profile_pic': self.profile_pic,
             'private': self.private,
             'number_posts': self.number_posts,
@@ -80,7 +78,7 @@ class User:
         Return the user as a tuple
         """
         return (self.id, self.fbid, self.username, self.full_name,
-                self.bio, self.no_followers, self.no_following,
+                self.description, self.number_followers, self.number_following,
                 self.profile_pic, self.private, self.number_posts,
                 self.category_name, self.pronouns)
 
@@ -91,7 +89,7 @@ class User:
         return f'InstagramUser({self.username}#{self.id})'
 
     @classmethod
-    def loadj(cls, obj: Dict[str, Any], api: bool = False, profile_pic: Optional[str] = None) -> "User":
+    def loadj(cls, obj: Dict[str, Any], api: bool = False, profile_pic: Optional[str] = None) -> "InstagramUser":
         """
         Load a user from a JSON object
 
@@ -101,19 +99,19 @@ class User:
             profile_pic: The path to the profile picture (if this is an API response)
         """
         if api:
-            return User(obj['id'], obj['fbid'], obj['username'],
+            return InstagramUser(obj['id'], obj['fbid'], obj['username'],
                         obj['full_name'], obj['biography'], obj['edge_followed_by']['count'],
                         obj['edge_follow']['count'], profile_pic, obj['is_private'],
                         obj['edge_owner_to_timeline_media']['count'],
                         obj['category_name'], '/'.join(obj['pronouns']))
-        return User(obj['id'], obj['fbid'], obj['username'],
+        return InstagramUser(obj['id'], obj['fbid'], obj['username'],
                     obj['full_name'], obj['bio'], obj['no_followers'],
                     obj['no_following'], obj['profile_pic'], obj['private'],
                     obj['number_posts'], obj['category_name'], obj['pronouns'])
 
     @classmethod
-    def loadt(cls, obj: Tuple[Any, ...]) -> "User":
+    def loadt(cls, obj: Tuple[Any, ...]) -> "InstagramUser":
         """
         Load a user from a tuple
         """
-        return User(*obj)
+        return InstagramUser(*obj)

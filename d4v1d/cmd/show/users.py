@@ -44,5 +44,5 @@ class ShowUsers(Command):
             state (CLISessionState): The current session state.
         """
         io.l(f'All users, whose info have been cached for "{state.platform.name}":')
-        for u in state.platform.get_cached_usernames():
-            io.n(u)
+        for i in state.platform.users():
+            io.n(f'[bold]{i.value.username}[/bold] @ [italic dim]"{i.date.isoformat()}"[/italic dim]')

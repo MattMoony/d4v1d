@@ -13,6 +13,7 @@ from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
 from d4v1d.platforms.platform.cmd.cmd import Command
 from d4v1d.platforms.platform.errors import PlatformError
 from d4v1d.platforms.platform.info import Info
+from d4v1d.platforms.platform.user import User
 from d4v1d.utils import io
 
 
@@ -41,7 +42,7 @@ class ShowDescription(Command):
         """
         Custom command auto-completion.
         """
-        return { u: None for u in state.platform.get_cached_usernames() }
+        return { i.value.username: None for i in state.platform.users() }
 
     def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
                 username: Optional[str] = None, refresh: bool = False, 
@@ -71,8 +72,8 @@ class ShowDescription(Command):
                 return
             group = state.platform.groups[group_name]
         try:
-            d: Info[str] = state.platform.get_user_description(username, refresh=refresh, group=group)
-            print(Panel(d.value, title=f'Description of {username} @ {d.date.isoformat()}'))
+            i: Info[User] = state.platform.user(username, refresh=refresh, group=group)
+            print(Panel(i.value.description, title=f'Description of {username} @ {i.date.isoformat()}'))
         except PlatformError as e:
             io.e(f'[bold]{e.__class__.__name__}{":[/bold] "+str(e) if str(e) else "[/bold]"}')
             return
