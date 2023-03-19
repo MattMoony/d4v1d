@@ -35,7 +35,7 @@ class Instagram(Platform):
 
     def __init__(self):
         """
-        Creates a new Instagram object
+        Creates a new Instagram object.
         """
         super().__init__("Instagram", "Wrapper for https://www.instagram.com/")
         log.debug('Initializing database of type "%s" ...', config.PCONFIG._instagram.db_type)
@@ -44,7 +44,7 @@ class Instagram(Platform):
     def __del__(self) -> None:
         """
         Do some cleanup, once the platform is unloaded
-        in the d4v1d core
+        in the d4v1d core.
         """
         log.debug('Cleaning up Instagram ... ')
         with open(os.path.join(config.PCONFIG._instagram.cdir, 'instagram.json'), 'w', encoding='utf8') as f:
@@ -55,20 +55,20 @@ class Instagram(Platform):
 
     def add_group(self, name: str) -> None:
         """
-        Adds a new group with the given name
+        Adds a new group with the given name.
 
         Args:
-            name (str): The name of the group
+            name (str): The name of the group.
         """
         log.debug('Adding group "%s" ... ', name)
         self.groups[name] = InstagramGroup(name)
 
     def rm_group(self, name: str) -> None:
         """
-        Removes the group with the given name
+        Removes the group with the given name.
 
         Args:
-            name (str): The name of the group
+            name (str): The name of the group.
         """
         log.debug('Removing group "%s" ... ', name)
         del self.groups[name]
@@ -78,9 +78,12 @@ class Instagram(Platform):
         Returns the user with the given username
 
         Args:
-            username (str): The username of the user
-            refresh (bool): Whether to force refresh the user info
-            group (Optional[InstagramGroup]): The group to use for fetching the user
+            username (str): The username of the user.
+            refresh (bool): Whether to force refresh the user info.
+            group (Optional[InstagramGroup]): The group to use for fetching the user.
+
+        Returns:
+            Info[User]: The user info.
         """
         if not refresh:
             log.debug('Check if user ("%s") is already part of the db', username)
@@ -102,12 +105,15 @@ class Instagram(Platform):
 
     def get_user_description(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[str]:
         """
-        Returns the description of the user with the given username
+        Returns the description of the user with the given username.
 
         Args:
-            username (str): The username of the user
-            refresh (bool): Whether to force refresh the user info
-            group (Optional[InstagramGroup]): The group to use for fetching the user
+            username (str): The username of the user.
+            refresh (bool): Whether to force refresh the user info.
+            group (Optional[InstagramGroup]): The group to use for fetching the user.
+
+        Returns:
+            Info[str]: The description of the user.
         """
         i: Info[User] = self.get_user(username, refresh=refresh, group=group)
         if i:
@@ -116,12 +122,15 @@ class Instagram(Platform):
 
     def get_user_profile_pic(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[str]:
         """
-        Returns the profile picture of the user with the given username
+        Returns the profile picture of the user with the given username.
 
         Args:
-            username (str): The username of the user
-            refresh (bool): Whether to force refresh the user info
-            group (Optional[InstagramGroup]): The group to use for fetching the user
+            username (str): The username of the user.
+            refresh (bool): Whether to force refresh the user info.
+            group (Optional[InstagramGroup]): The group to use for fetching the user.
+
+        Returns:
+            Info[str]: The profile picture of the user.
         """
         i: Info[User] = self.get_user(username, refresh=refresh, group=group)
         if i:
@@ -130,12 +139,15 @@ class Instagram(Platform):
 
     def get_user_number_posts(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[int]:
         """
-        Returns the number of posts of the user with the given username
+        Returns the number of posts of the user with the given username.
 
         Args:
-            username (str): The username of the user
-            refresh (bool): Whether to force refresh the user info
-            group (Optional[InstagramGroup]): The group to use for fetching the user
+            username (str): The username of the user.
+            refresh (bool): Whether to force refresh the user info.
+            group (Optional[InstagramGroup]): The group to use for fetching the user.
+
+        Returns:
+            Info[int]: The number of posts of the user.
         """
         i: Info[User] = self.get_user(username, refresh=refresh, group=group)
         if i:

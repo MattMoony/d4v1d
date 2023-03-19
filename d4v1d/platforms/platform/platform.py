@@ -61,6 +61,76 @@ class Platform:
         """
         raise NotImplementedError()
 
+    def get_user_description(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+        """
+        Gets the description of a user
+
+        Args:
+            username (str): The username of the user.
+            refresh (bool): Whether to force refresh the info.
+            group (Optional[Group]): The bot group to use to get the info.
+
+        Returns:
+            Info: The description of the user
+        """
+        raise NotImplementedError()
+
+    def get_user_profile_pic(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+        """
+        Gets the profile picture of a user
+
+        Args:
+            username (str): The username of the user.
+            refresh (bool): Whether to force refresh the info.
+            group (Optional[Group]): The bot group to use to get the info.
+
+        Returns:
+            Info: The path to the profile picture of the user
+        """
+        raise NotImplementedError()
+
+    def get_user_followers(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+        """
+        Gets the followers of a user
+
+        Args:
+            username (str): The username of the user.
+            refresh (bool): Whether to force refresh the info.
+            group (Optional[Group]): The bot group to use to get the info.
+
+        Returns:
+            Info: The followers of the user
+        """
+        raise NotImplementedError()
+
+    def get_user_following(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+        """
+        Gets the following of a user
+
+        Args:
+            username (str): The username of the user.
+            refresh (bool): Whether to force refresh the info.
+            group (Optional[Group]): The bot group to use to get the info.
+
+        Returns:
+            Info: The following of the user
+        """
+        raise NotImplementedError()
+
+    def get_user_posts(cls, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info:
+        """
+        Gets the posts of a user
+
+        Args:
+            username (str): The username of the user.
+            refresh (bool): Whether to force refresh the info.
+            group (Optional[Group]): The bot group to use to get the info.
+
+        Returns:
+            Info: The posts of the user
+        """
+        raise NotImplementedError()
+
     @classmethod
     def loadj(cls, data: Dict[str, Any]) -> "Platform":
         """
@@ -72,71 +142,6 @@ class Platform:
         
         Returns:
             Platform: The re-constructed platform
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def get_user_description(cls, username: str) -> Info:
-        """
-        Gets the description of a user
-
-        Args:
-            username (str): The username of the user
-
-        Returns:
-            Info: The description of the user
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def get_user_profile_pic(cls, username: str) -> Info:
-        """
-        Gets the profile picture of a user
-
-        Args:
-            username (str): The username of the user
-
-        Returns:
-            Info: The path to the profile picture of the user
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def get_user_followers(cls, username: str) -> Info:
-        """
-        Gets the followers of a user
-
-        Args:
-            username (str): The username of the user
-
-        Returns:
-            Info: The followers of the user
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def get_user_following(cls, username: str) -> Info:
-        """
-        Gets the following of a user
-
-        Args:
-            username (str): The username of the user
-
-        Returns:
-            Info: The following of the user
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def get_user_posts(cls, username: str) -> Info:
-        """
-        Gets the posts of a user
-
-        Args:
-            username (str): The username of the user
-
-        Returns:
-            Info: The posts of the user
         """
         raise NotImplementedError()
 

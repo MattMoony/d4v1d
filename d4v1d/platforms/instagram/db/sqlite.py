@@ -149,12 +149,14 @@ class SQLiteDatabase(Database):
         """
         c: sqlite3.Cursor = self.con.cursor()
         c.execute('''SELECT
-                        timestamp, id, fbid, username, full_name, bio, followers,
+                        STRFTIME('%s', timestamp), id, fbid, username, full_name, bio, followers,
                         following, profile_pic_local, private, number_posts,
                         category_name, pronouns
                      FROM users 
-                     WHERE username=?''', (username,))
+                     WHERE username=?
+                     ORDER BY timestamp DESC
+                     LIMIT 1''', (username,))
         row: Optional[Tuple] = c.fetchone()
         if row is None:
             return None
-        return Info(User(*row[1:]), datetime.fromisoformat(row[0]))
+        return Info(User(*row[1:]), datetime.fromtimestamp(int(row[0])))

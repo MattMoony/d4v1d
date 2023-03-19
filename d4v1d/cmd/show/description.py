@@ -27,6 +27,8 @@ class ShowDescription(Command):
         """
         super().__init__('show description', description='Show a users description (from the currently enabled platform).')
         self.add_argument('username', type=str, help='The username to search for. (e.g. "d4v1d")')
+        self.add_argument('-r', '--refresh', action='store_true', help='Refresh the description from the platform.')
+        self.add_argument('-g', '--group', dest='group_name', type=str, help='The group to use for the search.')
 
     def available(self, state: CLISessionState) -> bool:
         """
@@ -35,15 +37,20 @@ class ShowDescription(Command):
         return bool(state.platform)
 
     def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
-                username: Optional[str] = None, **kwargs) -> None:
+                username: Optional[str] = None, refresh: bool = False, 
+                group_name: Optional[str] = None, **kwargs) -> None:
         """
         Executes the command.
 
         Args:
-            username (str): The username to search for.
-            args (List[str]): The raw arguments passed to the command.
+            raw_args (List[str]): The raw arguments passed to the command.
+            argv (List[str]): The arguments passed to the command.
             state (CLISessionState): The current session state.
+            username (Optional[str]): The username to search for.
+            refresh (Optional[bool]): Refresh the description from the platform?
+            group_name (Optional[str]): The group to use for the search.
         """
+        group: Optional[group] = None
         if not username:
             # should NEVER happen
             io.e('No username provided.')
@@ -51,8 +58,13 @@ class ShowDescription(Command):
         if not state.platform:
             io.e('No platform loaded. Enable one with the [bold]use[/bold] command.')
             return
+        if group_name:
+            if group_name not in state.platform.groups:
+                io.e(f'Group "{group_name}" is unknown.')
+                return
+            group = state.platform.groups[group_name]
         try:
-            d: Info[str] = state.platform.get_user_description(username)
+            d: Info[str] = state.platform.get_user_description(username, refresh=refresh, group=group)
             print(Panel(d.value, title=f'Description of {username} @ {d.date.isoformat()}'))
         except PlatformError as e:
             io.e(f'[bold]{e.__class__.__name__}{":[/bold] "+str(e) if str(e) else "[/bold]"}')
