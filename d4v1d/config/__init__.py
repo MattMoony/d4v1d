@@ -8,6 +8,8 @@ import os
 import platform
 from typing import Dict
 
+import pkg_resources
+
 from d4v1d.config.platforms import PlatformsConfig
 
 BASE_PATH: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -38,5 +40,5 @@ LOG_DATEFMT: str = '[%X]'
 PCONFIG: PlatformsConfig
 """Contains various config options for platforms"""
 
-with open(os.path.join(BASE_PATH, 'config', 'platforms.json'), 'r', encoding='utf8') as f:
+with open(pkg_resources.resource_filename('d4v1d', 'data/platforms.conf.json'), 'r', encoding='utf8') as f:
     PCONFIG = PlatformsConfig.loadj(json.load(f))

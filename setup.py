@@ -46,10 +46,15 @@ setup(
             'd4v1d = d4v1d.cli:main',
         ],
     },
+    package_data={
+        '': [ 'data/*.json', ],
+    },
     install_requires=[
         'colorama',
         'prompt-toolkit',
+        'pyfiglet',
         'requests',
         'rich',
+        'terminal-img',
     ],
 )
