@@ -4,17 +4,14 @@ Contains configuration specific to the Instagram platform.
 
 import json
 import os
-from typing import *
+from typing import Any, Dict, List, Optional
 
-import d4v1d.config as config
-# unusual, but I was getting weird import
-# behaviour otherwise ...
-from d4v1d.config import *
+from d4v1d import config
 from d4v1d.log import log
 from d4v1d.platforms.instagram.config.dbtype import InstagramDBType
 
 
-class InstagramConfig(object):
+class InstagramConfig:
     """
     Configuration class for Instagram.
     """
@@ -54,13 +51,13 @@ class InstagramConfig(object):
         Do cleanup, like saving the config, once instagram
         is unloaded
         """
-        log.debug(f'Cleaning up InstagramConfig ... ')
+        log.debug('Cleaning up InstagramConfig ... ')
         if not self.__dont_save:
-            log.debug(f'Saving InstagramConfig, since __dont_save is not set ...')
-            with open(os.path.join(self.cdir, 'conf.json'), 'w') as f:
+            log.debug('Saving InstagramConfig, since __dont_save is not set ...')
+            with open(os.path.join(self.cdir, 'conf.json'), 'w', encoding='utf8') as f:
                 json.dump(self.dumpj(), f)
         else:
-            log.debug(f'Not saving InstagramConfig, since __dont_save is set ...')
+            log.debug('Not saving InstagramConfig, since __dont_save is set ...')
 
     def dumpj(self) -> Dict[str, Any]:
         """
@@ -88,8 +85,8 @@ class InstagramConfig(object):
             # check if the db type actually exists
             if data['db_type'] not in InstagramDBType._member_names_:
                 _c = cls.default(dont_save=True)
-                log.error(f'Invalid database type used in your instagram config ("{data["db_type"]}") - using default option "{_c.db_type.name}" for now ...')
-                log.error(f'To fix this error, choose an appropriate db type in "{os.path.join(cdir, "conf.json")}", i.e. one of: {", ".join(chr(0x22) + t.name + chr(0x22) for t in InstagramDBType)}')
+                log.error('Invalid database type used in your instagram config ("%s") - using default option "%s" for now ...', data["db_type"], _c.db_type.name)
+                log.error('To fix this error, choose an appropriate db type in "%s", i.e. one of: %s', os.path.join(cdir, "conf.json"), ', '.join(chr(0x22) + t.name + chr(0x22) for t in InstagramDBType))
                 data['db_type'] = _c.db_type.name
 
             # try loading the config optimistically
@@ -108,8 +105,8 @@ class InstagramConfig(object):
                 del _c
         # should the config file be corrupted, we'll use the default one
         except KeyError:
-            log.error(f'Instagram config file is corrupted - using default config ...')
-            log.error(f'If you want to reset your config, delete {os.path.join(cdir, "conf.json")}')
+            log.error('Instagram config file is corrupted - using default config ...')
+            log.error('If you want to reset your config, delete %s', os.path.join(cdir, "conf.json"))
             c = cls.default(dont_save=True)
         return c
 
@@ -125,7 +122,7 @@ class InstagramConfig(object):
             os.path.join(config.PCONFIG.data_dir, 'instagram'),
             os.path.join(config.PCONFIG.conf_dir, 'instagram'),
             InstagramDBType.SQLITE,
-            dict(),
+            {},
             [
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',

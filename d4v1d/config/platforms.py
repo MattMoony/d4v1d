@@ -5,7 +5,8 @@ options.
 
 import os
 from enum import Enum
-from typing import *
+from typing import Any, Dict
+
 
 class BaseOrigin(Enum):
     """
@@ -18,7 +19,7 @@ class BaseOrigin(Enum):
     DEFAULT = 3
     """The base path is the default one"""
 
-class PlatformsConfig(object):
+class PlatformsConfig:
     """
     Contains some configuration options for
     platforms.

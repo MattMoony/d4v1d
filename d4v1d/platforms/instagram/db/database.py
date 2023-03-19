@@ -5,15 +5,17 @@ should look like. This base class is extended
 by all specific database implementations.
 """
 
-from d4v1d.platforms.platform.info import Info
-from d4v1d.platforms.instagram.db.models import User
-from typing import *
+from typing import Optional
 
-class Database(object):
+from d4v1d.platforms.instagram.db.models import User
+from d4v1d.platforms.platform.info import Info
+
+
+class Database:
     """
     Base class for all Instagram database interfaces.
     """
-    
+
     def store_user(self, user: User) -> None:
         """
         Stores a user in the database

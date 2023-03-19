@@ -2,14 +2,14 @@
 Module for the help command
 """
 
-from typing import *
+from typing import Any, Dict, List, Optional, Union
 
 from prompt_toolkit.completion.nested import NestedDict
-from rich import print
+from rich import print  # pylint: disable=redefined-builtin
 from rich.tree import Tree
 
-from d4v1d.utils import io
 from d4v1d.platforms.platform.cmd import CLISessionState, Command
+from d4v1d.utils import io
 
 
 class Help(Command):
@@ -49,7 +49,7 @@ class Help(Command):
         """
         return state.session.compl_dict
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
         """
         Executes the help command
         """
@@ -60,7 +60,7 @@ class Help(Command):
         if len(raw_args) == 0:
             # seems a little redunant, but keeps aliases
             # out of the top-level overview, at least ...
-            cmd_tree: Tree = Tree(io._l('Available commands:'))
+            cmd_tree: Tree = Tree(io.fl('Available commands:'))
             self.__build_tree(cmds, cmd_tree, state)
             print(cmd_tree)
         else:
@@ -69,9 +69,9 @@ class Help(Command):
                 if isinstance(c, Command):
                     io.l(f'[bold]{c.name}[/bold]: {c.description}')
                     if len(c.aliases) > 0:
-                        io._(f'Aliases: [bold]{", ".join(c.aliases)}[/bold]')
+                        io.n(f'Aliases: [bold]{", ".join(c.aliases)}[/bold]')
                 else:
-                    cmd_tree: Tree = Tree(io._l('Available sub-commands:'))
+                    cmd_tree: Tree = Tree(io.fl('Available sub-commands:'))
                     self.__build_tree(c, cmd_tree, state)
                     print(cmd_tree)
             except KeyError:

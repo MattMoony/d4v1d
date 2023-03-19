@@ -3,18 +3,19 @@ Some simple utility functions like for printing
 fancy titles, coloring stuff, etc.
 """
 
-import shutil
 import random
-from pyfiglet import Figlet
-from typing import *
+import shutil
+from typing import List, Optional
 
 import colorama as cr
+from pyfiglet import Figlet
+
 cr.init()
 
-"""List of all of colorama's foreground colors"""
 FORE: List[str] = list(vars(cr.Fore).values())
-"""List of figlet fonts that can be used"""
+"""List of all of colorama's foreground colors"""
 FONTS: List[str] = [ 'smkeyboard', 'small', 'script', '3x5', 'chunky', 'computer', 'fuzzy', ]
+"""List of figlet fonts that can be used"""
 
 def rand_color() -> str:
     """
@@ -34,7 +35,7 @@ def random_font() -> str:
     Returns:
         str: The random font.
     """
-    return random.choice(FONTS)    
+    return random.choice(FONTS)
 
 def center_text(s: str, width: Optional[int] = None) -> str:
     """

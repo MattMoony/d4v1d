@@ -6,11 +6,11 @@ the target social-media platform.
 
 from typing import Dict, Any
 
-class Bot(object):
+class Bot:
     """
     Template bot class - template automated user.
     """
-    
+
     group: "Group"
     """The group the bot belongs to"""
     anonymous: bool
@@ -38,7 +38,7 @@ class Bot(object):
             Dict[str, Any]: The bot in saveable dictionary format
         """
         raise NotImplementedError()
-    
+
     @classmethod
     def loadj(cls, data: Dict[str, Any], group: "Group") -> "Bot":
         """

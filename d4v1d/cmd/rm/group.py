@@ -2,10 +2,10 @@
 Removes a group
 """
 
-from typing import *
+from typing import List, Optional
 
 from prompt_toolkit.completion.nested import NestedDict
-from rich import print
+from rich import print  # pylint: disable=redefined-builtin
 
 from d4v1d.platforms.platform.cmd import CLISessionState, Command
 from d4v1d.utils import io
@@ -15,7 +15,7 @@ class RemoveGroup(Command):
     """
     Removes a group
     """
-    
+
     def __init__(self):
         """
         Initializes the command.
@@ -28,14 +28,14 @@ class RemoveGroup(Command):
         Can this command be used right now?
         """
         return bool(state.platform)
-    
+
     def completer(self, state: CLISessionState) -> Optional[NestedDict]:
         """
         Custom completer behaviour.
         """
         return { g: None for g in state.platform.groups }
 
-    def execute(self, group_name: str, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
+    def execute(self, group_name: str, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
         """
         Executes the command.
 

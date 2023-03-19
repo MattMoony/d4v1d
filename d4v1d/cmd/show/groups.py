@@ -3,12 +3,14 @@ Show a list of all groups defined for the
 current platform
 """
 
-from rich import print
+from typing import List
+
+from rich import print  # pylint: disable=redefined-builtin
 from rich.tree import Tree
+
+from d4v1d.platforms.platform.cmd import CLISessionState, Command
 from d4v1d.utils import io
-from d4v1d.platforms import PLATFORMS
-from d4v1d.platforms.platform.cmd import Command, CLISessionState
-from typing import *
+
 
 class ShowGroups(Command):
     """
@@ -28,7 +30,7 @@ class ShowGroups(Command):
         """
         return bool(state.platform)
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
         """
         Executes the command.
         """
@@ -38,7 +40,7 @@ class ShowGroups(Command):
         if not state.platform.groups:
             io.w(f'No groups defined for platform [bold]{state.platform.name}[/bold].')
             return
-        tr: Tree = Tree(io._l('Available platforms:'))
+        tr: Tree = Tree(io.fl('Available platforms:'))
         for g in state.platform.groups.values():
             tr.add(f'[bold]{g.name} ({len(g.bots)} bots)[/bold]')
         print(tr)

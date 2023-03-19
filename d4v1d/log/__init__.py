@@ -4,8 +4,10 @@ messages, etc.
 """
 
 import logging
-import d4v1d.config as config
+
 from rich.logging import RichHandler
+
+from d4v1d import config
 
 logging.basicConfig(
     level=config.LOG_LEVEL,

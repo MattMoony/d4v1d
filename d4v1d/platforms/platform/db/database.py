@@ -6,8 +6,7 @@ module, that'd be real interfaces to real database
 systems - all of which'd extend this base class.
 """
 
-class Database(object):
+class Database:
     """
     Template database class - template base class.
     """
-    pass

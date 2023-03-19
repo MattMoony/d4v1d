@@ -4,7 +4,8 @@ commands on the fly.
 """
 
 from prompt_toolkit.document import Document
-from prompt_toolkit.validation import Validator, ValidationError
+from prompt_toolkit.validation import ValidationError, Validator
+
 
 class CmdValidator(Validator):
     """
@@ -23,7 +24,7 @@ class CmdValidator(Validator):
                 belongs to.
         """
         self.session = session
-    
+
     def validate(self, document: Document) -> None:
         """
         Validate some input
@@ -36,8 +37,8 @@ class CmdValidator(Validator):
         try:
             self.session[document.text]
         except TypeError as e:
-            raise ValidationError(message=str(e))
+            raise ValidationError(message=str(e)) from e
         except KeyError as e:
-            raise ValidationError(message=str(e))
+            raise ValidationError(message=str(e)) from e
         except ValueError as e:
-            raise ValidationError(message=str(e))
+            raise ValidationError(message=str(e)) from e

@@ -4,7 +4,7 @@ Creates a new group
 
 from typing import List
 
-from rich import print
+from rich import print  # pylint: disable=redefined-builtin
 
 from d4v1d.platforms.platform.cmd import CLISessionState, Command
 from d4v1d.utils import io
@@ -14,7 +14,7 @@ class AddGroup(Command):
     """
     Creates a new group
     """
-    
+
     def __init__(self):
         """
         Initializes the command.
@@ -28,7 +28,7 @@ class AddGroup(Command):
         """
         return bool(state.platform)
 
-    def execute(self, group_name: str, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
+    def execute(self, group_name: str, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
         """
         Executes the command.
 

@@ -5,9 +5,9 @@ the core and this platform-specific implementation.
 
 import json
 import os
-from typing import *
+from typing import Any, Dict, Optional, Union
 
-import d4v1d.config as config
+from d4v1d import config
 from d4v1d.log import log
 from d4v1d.platforms.instagram.bot.group import InstagramGroup
 from d4v1d.platforms.instagram.cmd.add.bot import AddBot
@@ -38,7 +38,7 @@ class Instagram(Platform):
         Creates a new Instagram object
         """
         super().__init__("Instagram", "Wrapper for https://www.instagram.com/")
-        log.debug(f'Initializing database of type "{config.PCONFIG._instagram.db_type}" ...')
+        log.debug('Initializing database of type "%s" ...', config.PCONFIG._instagram.db_type)
         self.db = DATABASES[config.PCONFIG._instagram.db_type]()
 
     def __del__(self) -> None:
@@ -46,9 +46,9 @@ class Instagram(Platform):
         Do some cleanup, once the platform is unloaded
         in the d4v1d core
         """
-        log.debug(f'Cleaning up Instagram ... ')
-        with open(os.path.join(config.PCONFIG._instagram.cdir, 'instagram.json'), 'w') as f:
-            log.debug(f'Backing up configured groups to "{f.name}" ...')
+        log.debug('Cleaning up Instagram ... ')
+        with open(os.path.join(config.PCONFIG._instagram.cdir, 'instagram.json'), 'w', encoding='utf8') as f:
+            log.debug('Backing up configured groups to "%s" ...', f.name)
             json.dump(self.dumpj(), f)
         del config.PCONFIG._instagram
         del self.db
@@ -60,7 +60,7 @@ class Instagram(Platform):
         Args:
             name (str): The name of the group
         """
-        log.debug(f'Adding group "{name}" ... ')
+        log.debug('Adding group "%s" ... ', name)
         self.groups[name] = InstagramGroup(name)
 
     def rm_group(self, name: str) -> None:
@@ -70,7 +70,7 @@ class Instagram(Platform):
         Args:
             name (str): The name of the group
         """
-        log.debug(f'Removing group "{name}" ... ')
+        log.debug('Removing group "%s" ... ', name)
         del self.groups[name]
 
     def get_user(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[User]:
@@ -83,20 +83,20 @@ class Instagram(Platform):
             group (Optional[InstagramGroup]): The group to use for fetching the user
         """
         if not refresh:
-            log.debug(f'Check if user ("{username}") is already part of the db')
+            log.debug('Check if user ("%s") is already part of the db', username)
             user: Optional[Info[User]] = self.db.get_user(username)
             if user:
-                log.debug(f'"{username}" is already part of the db')
+                log.debug('"%s" is already part of the db', username)
                 return Info(user.value, user.date, self)
-            log.debug(f'"{username}" is not part of the db ... yet')
-        log.debug(f'Fetching user info from instagram ... ')
+            log.debug('"%s" is not part of the db ... yet', username)
+        log.debug('Fetching user info from instagram ... ')
         if not group and not self.groups:
             raise NoGroupsError('No groups available for fetching user info')
         user = (group or list(self.groups.values())[0]).get_user(username)
         if not user:
-            log.debug(f'"{username}" is not known to instagram')
+            log.debug('"%s" is not known to instagram', username)
             raise UnknownUserError(f'"{username}" is not known to instagram')
-        log.debug(f'Adding user to db ... ')
+        log.debug('Adding user to db ... ')
         self.db.store_user(user.value)
         return Info(user.value, user.date, self)
 
@@ -149,7 +149,7 @@ class Instagram(Platform):
         return {
             'groups': [ g.dumpj() for g in self.groups.values() ],
         }
-    
+
     @classmethod
     def loadj(cls, data: Dict[str, Any]) -> "Platform":
         """
@@ -161,5 +161,5 @@ class Instagram(Platform):
                 g: InstagramGroup = InstagramGroup.loadj(v)
                 i.groups[g.name] = g
         except Exception:
-            log.error(f'Instagram plaform file seems to be corrupted - continuing without saved groups, etc.')
+            log.error('Instagram plaform file seems to be corrupted - continuing without saved groups, etc.')
         return i

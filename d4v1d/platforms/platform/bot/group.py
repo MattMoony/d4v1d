@@ -5,12 +5,12 @@ a collection of automated users / anonymous
 browsers.
 """
 
-from typing import *
+from typing import Any, Dict, List, Optional
 
 from d4v1d.platforms.platform.bot.bot import Bot
 
 
-class Group(object):
+class Group:
     """
     Template group class - template collection of bots.
     """
@@ -58,7 +58,7 @@ class Group(object):
             Dict[str, Any]: The group in saveable dictionary format
         """
         raise NotImplementedError()
-    
+
     @classmethod
     def loadj(cls, data: Dict[str, Any]) -> "Group":
         """

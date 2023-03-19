@@ -4,13 +4,11 @@ to switch between platforms
 """
 
 from types import ModuleType
-from typing import *
+from typing import List, Optional
 
 from prompt_toolkit.completion.nested import NestedDict
-from rich import print
 
-import d4v1d.platforms as platforms
-from d4v1d.platforms.platform import Platform
+from d4v1d import platforms
 from d4v1d.platforms.platform.cmd import CLISessionState, Command
 from d4v1d.utils import io
 
@@ -32,7 +30,7 @@ class Use(Command):
         """
         return { n.lower(): None for n in platforms.PLATFORMS.keys() }
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
         """
         Executes the use command
 

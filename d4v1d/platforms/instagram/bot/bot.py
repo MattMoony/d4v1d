@@ -4,18 +4,20 @@ i.e. an automated user / anonymous browser of
 Instagram.
 """
 
-import os
-import json
 import datetime
+import json
+import os
+from typing import Any, Dict, Optional, Tuple
+
 import requests as req
-import d4v1d.config as config
+
+from d4v1d import config
+from d4v1d.platforms.instagram.db.models.user import User
 from d4v1d.platforms.platform.bot.bot import Bot
 from d4v1d.platforms.platform.bot.group import Group
-from d4v1d.platforms.instagram.db.models.user import User
-from typing import *
 from d4v1d.platforms.platform.errors import BadAPIResponseError
-
 from d4v1d.platforms.platform.info import Info
+
 
 class InstagramBot(Bot):
     """
@@ -28,8 +30,8 @@ class InstagramBot(Bot):
     """The password of the bot"""
     session: req.Session
     """The session of the bot"""
-    
-    def __init__(self, group: Group, anonymous: bool, user_agent: str, headers: Dict[str, str] = {},
+
+    def __init__(self, group: Group, anonymous: bool, user_agent: str, headers: Dict[str, str] = {},  # pylint: disable=dangerous-default-value
                  creds: Optional[Tuple[str, str]] = None):
         """
         Creates a new InstagramBot object
@@ -45,7 +47,7 @@ class InstagramBot(Bot):
         if not anonymous:
             if not isinstance(creds, tuple):
                 raise TypeError('`creds` must be tuple of (<username>, <password>)!')
-            elif not creds:
+            if not creds:
                 raise ValueError('`creds` must consist of <username> and <password>!')
             self.username, self.password = creds
 
@@ -87,10 +89,10 @@ class InstagramBot(Bot):
         return {
             'anonymous': self.anonymous,
             'user_agent': self.session.headers['User-Agent'],
-            'headers': self.session.headers,
+            'headers': dict(self.session.headers),
             'creds': (self.username, self.password) if not self.anonymous else None,
         }
-    
+
     @classmethod
     def loadj(cls, data: Dict[str, Any], group: "Group") -> "InstagramBot":
         """

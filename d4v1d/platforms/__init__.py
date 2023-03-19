@@ -3,10 +3,10 @@ The plugin point for social-media platform
 speficic implementations
 """
 
-import pkgutil
 import importlib
+import pkgutil
 from types import ModuleType
-from typing import *
+from typing import Dict
 
 PLATFORMS: Dict[str, ModuleType] = {
     'instagram': importlib.import_module('d4v1d.platforms.instagram'),
@@ -17,3 +17,4 @@ PLATFORMS: Dict[str, ModuleType] = {
         if name.startswith('d4v1d_p_')
     },
 }
+"""Dictionary of all platforms available for/usable by d4v1d."""

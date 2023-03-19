@@ -2,7 +2,7 @@
 Collects all available commands
 """
 
-from typing import *
+from typing import Any, Dict
 
 from d4v1d.cmd.add.group import AddGroup
 from d4v1d.cmd.exit import Exit

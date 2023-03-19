@@ -2,7 +2,7 @@
 Really only exists to make the package executable
 """
 
-import d4v1d.cli as cli
+from d4v1d import cli
 
 if __name__ == '__main__':
     cli.main()

@@ -3,13 +3,16 @@ Search the currently loaded platforms for the
 description of a specific user
 """
 
-from rich import print
-from d4v1d.platforms.platform.errors import PlatformError
-from d4v1d.utils import io
-from d4v1d.platforms.platform.info import Info
+from typing import List
+
+from rich import print  # pylint: disable=redefined-builtin
+
 from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
 from d4v1d.platforms.platform.cmd.cmd import Command
-from typing import *
+from d4v1d.platforms.platform.errors import PlatformError
+from d4v1d.platforms.platform.info import Info
+from d4v1d.utils import io
+
 
 class ShowDescription(Command):
     """
@@ -30,7 +33,7 @@ class ShowDescription(Command):
         """
         return bool(state.platform)
 
-    def execute(self, username: str, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
+    def execute(self, username: str, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
         """
         Executes the command.
 

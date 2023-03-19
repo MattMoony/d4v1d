@@ -2,7 +2,7 @@
 Defines the database schema for SQL databases.
 """
 
-from typing import *
+from typing import Dict
 
 SQLSchema: Dict[str, Dict[str, str]] = {
     'users': {

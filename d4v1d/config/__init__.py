@@ -6,7 +6,7 @@ entire application.
 import json
 import os
 import platform
-from typing import *
+from typing import Dict
 
 from d4v1d.config.platforms import PlatformsConfig
 
@@ -20,7 +20,7 @@ PROMPT: str = f'<b>{platform.node()}/{os.getlogin()} <u>d4v1d<aaa fg="Tomato">%%
 COMPLETE_WHILE_TYPING: bool = True
 """Complete commands while typing?"""
 
-PLATFORMS: Dict[str, str] = dict()
+PLATFORMS: Dict[str, str] = {}
 """Contains various config options for platforms"""
 
 LOG_NAME: str = 'd4v1d'
@@ -38,5 +38,5 @@ LOG_DATEFMT: str = '[%X]'
 PCONFIG: PlatformsConfig
 """Contains various config options for platforms"""
 
-with open(os.path.join(BASE_PATH, 'config', 'platforms.json'), 'r') as f:
+with open(os.path.join(BASE_PATH, 'config', 'platforms.json'), 'r', encoding='utf8') as f:
     PCONFIG = PlatformsConfig.loadj(json.load(f))

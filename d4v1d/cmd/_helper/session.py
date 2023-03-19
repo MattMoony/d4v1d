@@ -3,6 +3,7 @@ Custom prompt session - to allow updating
 commands on the fly.
 """
 
+import sys
 import copy
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -10,7 +11,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion.nested import NestedDict
 from prompt_toolkit.formatted_text.html import HTML
-from rich import print
+from rich import print  # pylint: disable=redefined-builtin
 
 from d4v1d import config
 from d4v1d.cmd._helper.completer import CmdCompleter
@@ -38,8 +39,8 @@ class CmdSession(PromptSession):
 
     __cmds: Dict[str, Union[Command, Dict[str, Any]]] = {}
     """All current commands - with expanded aliases"""
-    
-    def __init__(self, cmds: Dict[str, Union[Command, Dict[str, Any]]], *args, 
+
+    def __init__(self, cmds: Dict[str, Union[Command, Dict[str, Any]]], *args,
                  complete_while_typing: Optional[bool] = None, **kwargs):
         """
         Create a new command prompt session.
@@ -60,6 +61,12 @@ class CmdSession(PromptSession):
         self.state = CLISessionState(self)
         self.refresh()
 
+    def __del__(self) -> None:
+        """
+        Clean-up before finally exiting.
+        """
+        self.exit()
+
     def handle_forever(self) -> None:
         """
         Keep prompting the user for commands until they
@@ -73,6 +80,19 @@ class CmdSession(PromptSession):
                 continue
             except EOFError:
                 break
+
+    def exit(self, code: int = 0) -> None:
+        """
+        Clean-up and stop prompting session.
+
+        Args:
+            code (int, optional): The exit code. Default is 0.
+        """
+        if self.state.platform is not None:
+            self.remove(self.state.platform.name)
+            del self.state.platform
+            self.state.platform = None
+        sys.exit(code)
 
     def handle(self, cmdline: str) -> None:
         """
@@ -230,7 +250,7 @@ class CmdSession(PromptSession):
         if not d.available(self.state):
             raise ValueError(f'"{cmd}" is not usable in the current context!')
         return d, args
-    
+
     def __iadd__(self, other: Tuple[str, Dict[str, Union[Command, Dict[str, Any]]]]) -> "CmdSession":
         """
         Extend the session with more commands.
@@ -242,7 +262,7 @@ class CmdSession(PromptSession):
         Returns:
             CmdSession: The session.
         """
-        if not type(other) == tuple or len(other) != 2 or not type(other[0]) == str or not type(other[1]) == dict:
+        if not isinstance(other, tuple) or len(other) != 2 or not isinstance(other[0], str) or not isinstance(other[1], dict):
             raise ValueError('Invalid type for extending session - has to be a tuple of (<collection name>, <cmd collection>).')
         self.extend(*other)
         return self
@@ -257,7 +277,7 @@ class CmdSession(PromptSession):
         Returns:
             CmdSession: The session.
         """
-        if not type(other) == str:
+        if not isinstance(other, str):
             raise ValueError('Invalid type for removing collection - has to be a string (name of the collection).')
         self.remove(other)
         return self

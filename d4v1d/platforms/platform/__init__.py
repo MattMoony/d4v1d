@@ -9,4 +9,10 @@ from d4v1d.platforms.platform.platform import Platform
 
 
 def init() -> Platform:
-    return Platform()
+    """
+    Initialize the platform and return it.
+
+    Returns:
+        Platform: The initialized platform.
+    """
+    return Platform('dummy', 'Dummy Platform.')

@@ -30,7 +30,7 @@ class CmdCompleter(NestedCompleter):
         """
         self.options = NestedCompleter.from_nested_dict(data).options
 
-    def get_completions(self, document: Document, 
+    def get_completions(self, document: Document,
                         complete_event: CompleteEvent) -> Iterable[Completion]:
         """
         Overwrite ``prompt_toolkit`` ``get_completion`` method
@@ -61,8 +61,8 @@ class CmdCompleter(NestedCompleter):
             # the spaces need to be preserved in order for the
             # completer to work properly apparently ...
             for comp in NestedCompleter.from_nested_dict(compl).get_completions(
-                            Document(re.search(r'\s+'.join(args)+r'$', document.text).group()), 
+                            Document(re.search(r'\s+'.join(args)+r'$', document.text).group()),
                             complete_event):
                 yield comp
-        except Exception as e:
+        except Exception:
             pass

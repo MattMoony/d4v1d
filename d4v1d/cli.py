@@ -3,9 +3,8 @@ The CLI module of the program - contains
 the main entry point of the program
 """
 
-import d4v1d.cmd as cmd
-import d4v1d.utils as utils
-import d4v1d.config as config
+from d4v1d import cmd, utils
+
 
 def main():
     """

@@ -2,15 +2,14 @@
 Dummy code for the platform class.
 """
 
-from typing import *
+from typing import Any, Dict, Optional, Union
 
-from d4v1d.log import log
 from d4v1d.platforms.platform.bot.group import Group
 from d4v1d.platforms.platform.db import Database
 from d4v1d.platforms.platform.info import Info
 
 
-class Platform(object):
+class Platform:
     """
     Represents a social-media platform
     """
@@ -25,7 +24,7 @@ class Platform(object):
     """The database for storing platform info"""
     cmds: Dict[str, Union["Command", Dict[str, Any]]] = {}
     """Dictionary of custom commands the platform offers - if any."""
-    
+
     def __init__(self, name: str, desc: str, groups: Optional[Dict[str, Group]] = None):
         """
         Creates a new platform
@@ -45,7 +44,7 @@ class Platform(object):
         the given name.
         """
         raise NotImplementedError()
-    
+
     def rm_group(self, name: str) -> str:
         """
         Removes the group with the given name
@@ -61,7 +60,7 @@ class Platform(object):
             Dict[str, Any]: The platform in save-able dictionary format
         """
         raise NotImplementedError()
-    
+
     @classmethod
     def loadj(cls, data: Dict[str, Any]) -> "Platform":
         """

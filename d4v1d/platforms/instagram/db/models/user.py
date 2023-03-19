@@ -3,9 +3,9 @@ Defines the attribute of an Instagram user
 account.
 """
 
-from typing import *
+from typing import Any, Dict, Optional, Tuple
 
-class User(object):
+class User:
     """
     Represents an Instagram user account.
     """
@@ -35,10 +35,10 @@ class User(object):
     pronouns: str
     """The user's pronouns"""
 
-    def __init__(self, id: int, fbid: int, username: str, 
-                 full_name: str, bio: str, no_followers: int, 
+    def __init__(self, id: int, fbid: int, username: str,  # pylint: disable=redefined-builtin
+                 full_name: str, bio: str, no_followers: int,
                  no_following: int, profile_pic: str, private: bool,
-                 number_posts: int, category_name: Optional[str] = None, 
+                 number_posts: int, category_name: Optional[str] = None,
                  pronouns: str = ''):
         """
         Create a new user with the given info
@@ -79,8 +79,8 @@ class User(object):
         """
         Return the user as a tuple
         """
-        return (self.id, self.fbid, self.username, self.full_name, 
-                self.bio, self.no_followers, self.no_following, 
+        return (self.id, self.fbid, self.username, self.full_name,
+                self.bio, self.no_followers, self.no_following,
                 self.profile_pic, self.private, self.number_posts,
                 self.category_name, self.pronouns)
 
@@ -106,9 +106,9 @@ class User(object):
                         obj['edge_follow']['count'], profile_pic, obj['is_private'],
                         obj['edge_owner_to_timeline_media']['count'],
                         obj['category_name'], '/'.join(obj['pronouns']))
-        return User(obj['id'], obj['fbid'], obj['username'], 
-                    obj['full_name'], obj['bio'], obj['no_followers'], 
-                    obj['no_following'], obj['profile_pic'], obj['private'], 
+        return User(obj['id'], obj['fbid'], obj['username'],
+                    obj['full_name'], obj['bio'], obj['no_followers'],
+                    obj['no_following'], obj['profile_pic'], obj['private'],
                     obj['number_posts'], obj['category_name'], obj['pronouns'])
 
     @classmethod

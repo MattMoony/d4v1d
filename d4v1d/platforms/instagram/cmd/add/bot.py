@@ -45,7 +45,7 @@ class AddBot(Command):
         """
         # bot cannot exist without a group
         return bool(state.platform.groups)
-    
+
     def completer(self, state: CLISessionState) -> Optional[NestedDict]:
         """
         Custom completer behaviour.
@@ -53,8 +53,8 @@ class AddBot(Command):
         return { g: None for g in state.platform.groups }
 
     def execute(self, group_name: str, user_agent: str, raw_args: List[str], argv: List[str],
-                state: CLISessionState, anonymous: bool = False, username: Optional[str] = None,
-                password: Optional[str] = None, headers: Optional[List[Tuple[str, str]]] = None) -> None:
+                state: CLISessionState, *args, anonymous: bool = False, username: Optional[str] = None,
+                password: Optional[str] = None, headers: Optional[List[Tuple[str, str]]] = None, **kwargs) -> None:
         """
         Executes the command.
 
@@ -80,6 +80,6 @@ class AddBot(Command):
             io.e(f'Group "{group_name}" does not exist!')
             return
         group: InstagramGroup = state.platform.groups[group_name]
-        bot: InstagramBot = InstagramBot(group, anonymous=anonymous, user_agent=user_agent, 
-                                         headers={k: v for k, v in headers or []}, creds=(username, password,))
+        bot: InstagramBot = InstagramBot(group, anonymous=anonymous, user_agent=user_agent,
+                                         headers=dict(headers or []), creds=(username, password,))
         group.add(bot)

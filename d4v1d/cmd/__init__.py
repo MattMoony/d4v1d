@@ -6,6 +6,7 @@ commands from the user.
 from d4v1d.cmd._helper import CMDS
 from d4v1d.cmd._helper.session import CmdSession
 
+
 def start() -> None:
     """
     Starts handling user input.

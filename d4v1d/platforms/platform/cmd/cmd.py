@@ -2,16 +2,17 @@
 Module providing the template for a command
 """
 
+from argparse import ArgumentError
 from typing import List, Optional
 
 from prompt_toolkit.completion.nested import NestedDict
 
-from d4v1d.platforms.platform.cmd.argparser import ArgParser, ArgumentError
+from d4v1d.platforms.platform.cmd.argparser import ArgParser
 from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
 from d4v1d.utils import io
 
 
-class Command(object):
+class Command:
     """
     A template command
     """
@@ -21,17 +22,17 @@ class Command(object):
     _needs_parsing: bool = False
     """Whether or not the command needs parsing."""
 
-    def __init__(self, name: str, aliases: List[str] = [], description: str = ''):
+    def __init__(self, name: str, aliases: Optional[List[str]] = None, description: str = ''):
         """
         Initializes a command with the specified name, aliases and description.
 
         Args:
             name (str): The name of the command
-            aliases (List[str], optional): The aliases of the command. Defaults to [].
+            aliases (Optional[List[str]]): The aliases of the command. Defaults to None.
             description (str, optional): The description of the command. Defaults to ''.
         """
         self.name: str = name
-        self.aliases: List[str] = aliases
+        self.aliases: List[str] = aliases if aliases is not None else []
         self.description: str = description
         self._parser = ArgParser(self.name)
 
@@ -55,7 +56,7 @@ class Command(object):
             bool: Available or not?
         """
         return True
-    
+
     def completer(self, state: CLISessionState) -> Optional[NestedDict]:
         """
         This method can be used to provide more information
@@ -71,7 +72,7 @@ class Command(object):
         """
         return None
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, **kwargs) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
         """
         Executes the command with the given arguments.
         The arguments defined in the argument parser are passed
@@ -83,7 +84,6 @@ class Command(object):
                 using the argument parser.
             state (CLISessionState): The current session state.
         """
-        pass
 
     def __call__(self, args: List[str], state: CLISessionState) -> None:
         """
@@ -99,8 +99,8 @@ class Command(object):
             try:
                 p_args, argv = self._parser.parse_known_args(args)
                 self.execute(raw_args=args, argv=argv, state=state,
-                            **{ k: v for k, v in p_args._get_kwargs() })
-            except (ValueError or ArgumentError) as e:
+                            **dict(p_args._get_kwargs()))
+            except (ValueError, ArgumentError) as e:
                 io.e(e)
         else:
             self.execute(raw_args=args, argv=args, state=state)

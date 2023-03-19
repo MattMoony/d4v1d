@@ -2,9 +2,10 @@
 Module for the exit command
 """
 
-import sys
-from d4v1d.platforms.platform.cmd import Command, CLISessionState
-from typing import *
+from typing import List
+
+from d4v1d.platforms.platform.cmd import CLISessionState, Command
+
 
 class Exit(Command):
     """
@@ -17,8 +18,8 @@ class Exit(Command):
         """
         super().__init__('exit', aliases=['quit',], description='Exits the program')
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
         """
         Executes the exit command
         """
-        sys.exit(0)
+        state.session.exit(code=0)

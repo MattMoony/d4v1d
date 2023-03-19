@@ -4,7 +4,7 @@ information relating to a social network.
 """
 
 from datetime import datetime
-from typing import *
+from typing import Generic, Optional, TypeVar
 
 T = TypeVar('T')
 
@@ -20,7 +20,7 @@ class Info(Generic[T]):
     platform: Optional["Platform"]
     """Optionally, the platform the info is from"""
 
-    def __init__(self, value: T, date: datetime, platform: Optional["Platform"]):
+    def __init__(self, value: T, date: datetime, platform: Optional["Platform"] = None):
         """
         Creates a new piece of information
 

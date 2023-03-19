@@ -3,12 +3,12 @@ Responsible for storing some information
 about the state of the CLI session
 """
 
-from typing import *
+from typing import Optional
 
 from d4v1d.platforms.platform.platform import Platform
 
 
-class CLISessionState(object):
+class CLISessionState:
     """
     Stores some data about the current 
     state of the CLI

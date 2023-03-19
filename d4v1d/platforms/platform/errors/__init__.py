@@ -7,7 +7,6 @@ class PlatformError(Exception):
     """
     Generic exception for platforms
     """
-    pass
 
 class EmptyGroupError(PlatformError):
     """
@@ -15,25 +14,21 @@ class EmptyGroupError(PlatformError):
     to a group, but the group is asked to
     perform a task
     """
-    pass
 
 class NoGroupsError(PlatformError):
     """
     Thrown, when no groups of bots have been
     created for a platform
     """
-    pass
 
 class UnknownUserError(PlatformError):
     """
     Thrown, when a user is not known to the
     platform
     """
-    pass
 
 class BadAPIResponseError(PlatformError):
     """
     Thrown, when the API responds in an
     unexpected way or doesn't respond at all
     """
-    pass

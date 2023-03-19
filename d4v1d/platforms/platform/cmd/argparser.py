@@ -5,10 +5,10 @@ session instead of only when launching python scripts.
 """
 
 import sys
-from argparse import Action, ArgumentError, ArgumentParser
+from argparse import Action, ArgumentParser
 from typing import IO, List, Optional
 
-from rich import print
+from rich import print  # pylint: disable=redefined-builtin
 
 from d4v1d.utils import io
 
@@ -74,7 +74,7 @@ class ArgParser(ArgumentParser):
         """
         return self.__usage if self.__usage is not None \
                else f'{self.prog} {" ".join(self.__markup_action(a, no_style=no_style) for a in self._actions)}'
-    
+
     def format_help(self, no_style: bool = False) -> str:
         """
         Get the help string for the command.
@@ -87,10 +87,10 @@ class ArgParser(ArgumentParser):
         """
         positional: List[Action] = [ a for a in self._actions if not a.option_strings ]
         options: List[Action] = [ a for a in self._actions if a.option_strings ]
-        return io._l(f'{"" if no_style else "[bold]"}Usage:{"" if no_style else "[/bold]"} {self.format_usage(no_style=no_style)}') +\
-               ('\n' + io._l(f'{"" if no_style else "[bold]"}Positional arguments:{"" if no_style else "[/bold]"}') +\
+        return io.fl(f'{"" if no_style else "[bold]"}Usage:{"" if no_style else "[/bold]"} {self.format_usage(no_style=no_style)}') +\
+               ('\n' + io.fl(f'{"" if no_style else "[bold]"}Positional arguments:{"" if no_style else "[/bold]"}') +\
                '\n' + '\n'.join(self.__positional_help(a, no_style=no_style) for a in positional) if positional else '') +\
-               ('\n' + io._l(f'{"" if no_style else "[bold]"}Options:{"" if no_style else "[/bold]"}') +\
+               ('\n' + io.fl(f'{"" if no_style else "[bold]"}Options:{"" if no_style else "[/bold]"}') +\
                '\n' + '\n'.join(self.__option_help(a, no_style=no_style) for a in options) if options else '')
 
     def error(self, message: str) -> None:
@@ -103,8 +103,8 @@ class ArgParser(ArgumentParser):
             message (str): Some error message.
         """
         raise ValueError(f'{message} (use -h for help). [bold]Usage:[/bold] {self.format_usage()}')
-    
-    def exit(self, message: Optional[str] = None, status: int = 0, *args, **kwargs) -> None:
+
+    def exit(self, status: int = 0, message: Optional[str] = None) -> None:
         """
         Helper method for overriding part of the ``argparse.ArgumentParser``
         to NOT MAKE IT EXIT ON ERROR; because the option alone doesn't seem
@@ -114,7 +114,6 @@ class ArgParser(ArgumentParser):
             message (Optional[str]): Some error message.
             status (int, optional): The exit status. Defaults to 0.
         """
-        pass
 
     def print_usage(self, file: IO[str] | None = None) -> None:
         """
@@ -158,7 +157,7 @@ class ArgParser(ArgumentParser):
                     if action.option_strings \
                     else f'<{action.dest}>'
         return mark if no_style or action.required else f'[dim]{mark}[/dim]'
-    
+
     def __positional_help(self, action: Action, no_style: bool = False) -> str:
         """
         Generate the help string for a positional argument
@@ -171,8 +170,8 @@ class ArgParser(ArgumentParser):
         Returns:
             str: The string representation.
         """
-        return io.__(f'{"" if no_style else "[bold]"}{action.dest.ljust(24)}{"" if no_style else "[/bold]"} {self.__action_help_sub(action, no_style=no_style)}')
-    
+        return io.fn(f'{"" if no_style else "[bold]"}{action.dest.ljust(24)}{"" if no_style else "[/bold]"} {self.__action_help_sub(action, no_style=no_style)}')
+
     def __option_help(self, action: Action, no_style: bool = False) -> str:
         """
         Generate the help string for an option as used in the
@@ -185,7 +184,7 @@ class ArgParser(ArgumentParser):
         Returns:
             str: The string representation.
         """
-        return io.__(f'{"" if no_style else "[bold]"}{"/".join(action.option_strings).ljust(24)}{" required." if action.required else ""}{"" if no_style else "[/bold]"} {self.__action_help_sub(action, no_style=no_style)}')
+        return io.fn(f'{"" if no_style else "[bold]"}{"/".join(action.option_strings).ljust(24)}{" required." if action.required else ""}{"" if no_style else "[/bold]"} {self.__action_help_sub(action, no_style=no_style)}')
 
     def __action_help_sub(self, action: Action, no_style: bool = False) -> str:
         """

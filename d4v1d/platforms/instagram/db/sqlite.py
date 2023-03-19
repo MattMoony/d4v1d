@@ -4,15 +4,17 @@ Database implementation for an SQLite database.
 
 import os
 import re
-import uuid
 import sqlite3
+import uuid
+from typing import Optional, Tuple
+
+from d4v1d import config
 from d4v1d.log import log
-import d4v1d.config as config
-from d4v1d.platforms.platform.info import Info
-from d4v1d.platforms.instagram.db.models import User
 from d4v1d.platforms.instagram.db.database import Database
+from d4v1d.platforms.instagram.db.models import User
 from d4v1d.platforms.instagram.db.schema.sql import SQLSchema
-from typing import *
+from d4v1d.platforms.platform.info import Info
+
 
 class SQLiteDatabase(Database):
     """
@@ -33,7 +35,7 @@ class SQLiteDatabase(Database):
         # at this point, because it is created in the init function
         # of this platform module
         self.path: str = path or os.path.join(config.PCONFIG._instagram.ddir, 'instagram.db')
-        # check if the db exists ... 
+        # check if the db exists ...
         if os.path.isfile(self.path):
             # establish a connection to the database
             self.con: sqlite3.Connection = sqlite3.connect(self.path)
@@ -45,7 +47,7 @@ class SQLiteDatabase(Database):
                 bak: str = str(uuid.uuid4())
                 while os.path.exists(os.path.join(config.PCONFIG._instagram.ddir, f'{bak}.db')):
                     bak = str(uuid.uuid4())
-                log.warning(f'Database is not in a valid state - backing up to [bold]{config.PCONFIG._instagram.ddir}/{bak}.db[/bold] and creating a new database')
+                log.warning('Database is not in a valid state - backing up to [bold]%s/%s.db[/bold] and creating a new database', config.PCONFIG._instagram.ddir, bak)
                 os.rename(os.path.join(config.PCONFIG._instagram.ddir, 'instagram.db'), os.path.join(config.PCONFIG._instagram.ddir, f'{bak}.db'))
                 # connect to the new db & create everything
                 self.con = sqlite3.connect(self.path)
@@ -60,7 +62,7 @@ class SQLiteDatabase(Database):
         Do some cleanup, once the platform is unloaded
         in the d4v1d core
         """
-        log.debug(f'Cleaning up Instagram database ... ')
+        log.debug('Cleaning up Instagram database ... ')
         self.con.close()
 
     def __health_check(self) -> bool:
@@ -73,7 +75,7 @@ class SQLiteDatabase(Database):
             bool: True if the database is valid, False otherwise
         """
         try:
-            for table, spec in SQLSchema.items():
+            for table in SQLSchema:
                 # check if the table exists
                 c: sqlite3.Cursor = self.con.cursor()
                 c.execute('SELECT name FROM sqlite_master WHERE type=? AND name=?', ('table', table))
@@ -97,14 +99,14 @@ class SQLiteDatabase(Database):
             def __burn_everything_to_the_ground(s: str) -> None:
                 msg: str = f'Invalid symbol in SQLite DB creation: {s} - refusing to continue'
                 log.critical(msg)
-                log.critical(f'Crashing everything, since this shouldn\'t happen unless someone messed with the schema ([bold][red]danger of SQLi !!![/red][/bold])')
-                log.critical(f'Compare your schema ("{os.path.join(os.path.dirname(__file__), "schema", "sql.py")}") with the original')
+                log.critical('Crashing everything, since this shouldn\'t happen unless someone messed with the schema ([bold][red]danger of SQLi !!![/red][/bold])')
+                log.critical('Compare your schema ("%s") with the original', os.path.join(os.path.dirname(__file__), "schema", "sql.py"))
                 raise ValueError(msg)
             if not re.match(__safe, table):
                 # crash everything - since this should DEFINITELY
                 # not happen unless someone messed with the schema
                 __burn_everything_to_the_ground(table)
-            if any(not (re.match(__safe, k) and (re.match(__safe, v) if type(v) == str else all(re.match(__safe, pk) for pk in v))) for k, v in spec.items()):
+            if any(not (re.match(__safe, k) and (re.match(__safe, v) if isinstance(v, str) else all(re.match(__safe, pk) for pk in v))) for k, v in spec.items()):
                 __burn_everything_to_the_ground('')
             # create the table
             c: sqlite3.Cursor = self.con.cursor()
@@ -112,7 +114,7 @@ class SQLiteDatabase(Database):
                 {", ".join([f"{k} {v}" for k, v in spec.items() if k[0] != "."])},
                 PRIMARY KEY ({", ".join(spec[".pk"])})
             )'''
-            log.debug(f'Creating table [bold]{table}[/bold] using ... ')
+            log.debug('Creating table [bold]%s[/bold] using ... ', table)
             log.debug(qry)
             c.execute(qry)
         self.con.commit()

@@ -2,16 +2,16 @@
 Some I/O related utility functions
 """
 
-from rich import print
-from typing import *
+from rich import print  # pylint: disable=redefined-builtin
+
 
 def e(msg: str) -> None:
     """
     Prints an error message
     """
-    print(_e(msg))
+    print(fe(msg))
 
-def _e(msg: str) -> None:
+def fe(msg: str) -> None:
     """
     Marks up an error message as if outputting it.
     """
@@ -21,9 +21,9 @@ def w(msg: str) -> None:
     """
     Prints a warning message
     """
-    print(_w(msg))
+    print(fw(msg))
 
-def _w(msg: str) -> None:
+def fw(msg: str) -> None:
     """
     Marks up a warning message as if outputting it.
     """
@@ -33,9 +33,9 @@ def i(msg: str) -> None:
     """
     Prints an info message
     """
-    print(_i(msg))
+    print(fi(msg))
 
-def _i(msg: str) -> None:
+def fi(msg: str) -> None:
     """
     Marks up an info message as if outputting it.
     """
@@ -45,21 +45,21 @@ def l(msg: str) -> None:
     """
     Outputs a single line to the user. 
     """
-    print(_l(msg))
+    print(fl(msg))
 
-def _l(msg: str) -> None:
+def fl(msg: str) -> None:
     """
     Marks up a single line as if outputting it.
     """
     return f'[bold grey53][*][/bold grey53] {msg}'
 
-def _(msg: str) -> None:
+def n(msg: str) -> None:
     """
     Output an *indented* line.
     """
-    print(__(msg))
+    print(fn(msg))
 
-def __(msg: str) -> None:
+def fn(msg: str) -> None:
     """
     Marks up an *indented* line as if outputting it.
     """
