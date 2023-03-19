@@ -49,5 +49,5 @@ class AddGroup(Command):
         if group_name in state.platform.groups:
             io.e(f'Group [bold]{group_name}[/bold] already exists.')
             return
-        state.platform.add_group(group_name)
+        state.platform.groups += state.platform.group(group_name)
         print(f'[green]Successfully created group [bold]{group_name}[/bold] for platform [bold]{state.platform.name}[/bold].[/green]')

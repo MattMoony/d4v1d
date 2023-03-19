@@ -53,25 +53,15 @@ class Instagram(Platform):
         del config.PCONFIG._instagram
         del self.db
 
-    def add_group(self, name: str) -> None:
+    def group(self, name: str) -> InstagramGroup:
         """
-        Adds a new group with the given name.
+        Create a new group with the given name.
 
-        Args:
-            name (str): The name of the group.
+        Returns:
+            InstagramGroup: The new group.
         """
-        log.debug('Adding group "%s" ... ', name)
-        self.groups[name] = InstagramGroup(name)
-
-    def rm_group(self, name: str) -> None:
-        """
-        Removes the group with the given name.
-
-        Args:
-            name (str): The name of the group.
-        """
-        log.debug('Removing group "%s" ... ', name)
-        del self.groups[name]
+        log.debug('Creating new group "%s" ... ', name)
+        return InstagramGroup(name)
 
     def get_user(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[User]:
         """

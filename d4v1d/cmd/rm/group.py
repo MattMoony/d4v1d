@@ -56,5 +56,5 @@ class RemoveGroup(Command):
         if group_name not in state.platform.groups:
             io.e(f'Group [bold]{group_name}[/bold] doesn\'t exist.')
             return
-        state.platform.rm_group(group_name)
+        state.platform.groups -= group_name
         print(f'[green]Successfully removed group [bold]{group_name}[/bold] from platform [bold]{state.platform.name}[/bold].[/green]')
