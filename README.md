@@ -30,14 +30,14 @@ At the moment, since `d4v1d` is still under active development, just clone the r
 pip install .
 ```
 
-... in the future, as soon as the first release is available, you will be able to simply install `d4v1d` from PyPI or from [releases](https://github.com/MattMoony/d4v1d/releases).
+... this will make `d4v1d` available as a command in your terminal, if you have `~/.local/bin` (at least on Linux) in your path, as this is where `pip` will put the script per default. In the future, as soon as the first release is available, you will be able to simply install `d4v1d` from PyPI or from [releases](https://github.com/MattMoony/d4v1d/releases).
 
 ## 🎮 Usage
 
 Simply run the main script (`d4v1d.py`) to enter `d4v1d`'s terminal-like environment:
 
 ```bash
-python3 ./d4v1d.py
+python3 -m d4v1d
 ```
 
 To learn more about the commands and features you can use from here, take a look at the [docs](docs/USAGE.md).
@@ -54,17 +54,17 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 
 <details>
 
-<summary>Completion <img src="https://progress-bar.dev/0/" height="13em" /></summary>
+<summary>Completion <img src="https://progress-bar.dev/15/" height="13em" /></summary>
 
 - [ ] Data Collection
-  - [ ] Profile Overview
+  - [x] Profile Overview
   - [ ] Posts
     - [ ] Media
     - [ ] Comments
   - [ ] Followers / Following
   - [ ] Stories
 - [ ] DB Controllers
-  - [ ] SQLite
+  - [x] SQLite
   - [ ] MySQL
   - [ ] Postgres
 
