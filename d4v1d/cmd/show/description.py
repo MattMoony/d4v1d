@@ -6,6 +6,7 @@ description of a specific user
 from typing import List, Optional
 
 from rich import print  # pylint: disable=redefined-builtin
+from rich.panel import Panel
 
 from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
 from d4v1d.platforms.platform.cmd.cmd import Command
@@ -52,7 +53,7 @@ class ShowDescription(Command):
             return
         try:
             d: Info[str] = state.platform.get_user_description(username)
-            print(f'[bold]Description of {username} @ {d.date.isoformat()}:[/bold]\n{d.value}')
+            print(Panel(d.value, title=f'Description of {username} @ {d.date.isoformat()}'))
         except PlatformError as e:
             io.e(f'[bold]{e.__class__.__name__}{":[/bold] "+str(e) if str(e) else "[/bold]"}')
             return

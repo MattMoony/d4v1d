@@ -3,21 +3,22 @@ Custom prompt session - to allow updating
 commands on the fly.
 """
 
-import sys
 import copy
+import sys
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion.nested import NestedDict
 from prompt_toolkit.formatted_text.html import HTML
-from rich import print  # pylint: disable=redefined-builtin
 
 from d4v1d import config
 from d4v1d.cmd._helper.completer import CmdCompleter
 from d4v1d.cmd._helper.validator import CmdValidator
+from d4v1d.log import log
 from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
 from d4v1d.platforms.platform.cmd.cmd import Command
+from d4v1d.utils import io
 
 
 class CmdSession(PromptSession):
@@ -107,10 +108,19 @@ class CmdSession(PromptSession):
         try:
             cmd, args = self[cmdline]
             cmd(args, state=self.state)
-        except KeyError as e:
+        except KeyError:
             # should never happen, since commands should
             # be validated before being executed
-            print(f'[bold red][-][/bold red] {e}')
+            io.e(f'Command not found: {cmdline}')
+        except BaseException as e:  # pylint: disable=broad-exception-caught
+            # if any of the commands errors, don't crash
+            # the whole program
+            if isinstance(e, SystemExit):
+                # if the program terminates, don't stop that
+                # since it was most likely intentional
+                raise e
+            io.e(f'Error while executing command: {e}')
+            log.exception('Command error\'d!')
 
     def refresh(self) -> None:
         """

@@ -8,6 +8,15 @@ class PlatformError(Exception):
     Generic exception for platforms
     """
 
+    def __str__(self) -> str:
+        """
+        Get string representation of the exception.
+
+        Returns:
+            str: The string representation of the exception
+        """
+        return f'{self.__class__.__name__}: {self.args[0]}'
+
 class EmptyGroupError(PlatformError):
     """
     Thrown, when no bots have been assigned

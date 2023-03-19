@@ -7,6 +7,7 @@ import re
 import sqlite3
 import uuid
 from typing import Optional, Tuple
+from datetime import datetime
 
 from d4v1d import config
 from d4v1d.log import log
@@ -132,8 +133,8 @@ class SQLiteDatabase(Database):
             following, profile_pic_local, private, number_posts,
             category_name, pronouns
         ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        )''', user.tuple())
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )''', user.dumpt())
         self.con.commit()
 
     def get_user(self, username: str) -> Optional[Info[User]]:
@@ -156,4 +157,4 @@ class SQLiteDatabase(Database):
         row: Optional[Tuple] = c.fetchone()
         if row is None:
             return None
-        return Info(User(*row[1:]), row[0])
+        return Info(User(*row[1:]), datetime.fromisoformat(row[0]))

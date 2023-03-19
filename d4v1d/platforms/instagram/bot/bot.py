@@ -73,7 +73,7 @@ class InstagramBot(Bot):
             raise BadAPIResponseError(f'Could not fetch profile picture for user {username}')
         stmp: datetime.datetime = datetime.datetime.now()
         os.makedirs(os.path.join(config.PCONFIG._instagram.ddir, 'users', username), exist_ok=True)  # pylint: disable=protected-access
-        ppath: str = os.path.join(config.PCONFIG._instagram.ddir, 'users', username, f'{stmp.timestamp().replace(".", "_")}.jpg')  # pylint: disable=protected-access
+        ppath: str = os.path.join(config.PCONFIG._instagram.ddir, 'users', username, f'{str(stmp.timestamp()).replace(".", "_")}.jpg')  # pylint: disable=protected-access
         with open(ppath, 'wb') as f:
             f.write(r.content)
         u: User = User.loadj(_u, api=True, profile_pic=ppath)
