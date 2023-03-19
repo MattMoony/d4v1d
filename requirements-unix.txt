@@ -1,7 +1,0 @@
-colorama==0.4.6
-commonmark==0.9.1
-prompt-toolkit==3.0.33
-pyfiglet==0.8.post1
-Pygments==2.13.0
-rich==12.6.0
-wcwidth==0.2.5

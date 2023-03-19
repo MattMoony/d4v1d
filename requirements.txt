@@ -1,0 +1,13 @@
+certifi==2022.12.7
+charset-normalizer==3.1.0
+colorama==0.4.6
+idna==3.4
+markdown-it-py==2.2.0
+mdurl==0.1.2
+prompt-toolkit==3.0.38
+pyfiglet==0.8.post1
+Pygments==2.14.0
+requests==2.28.2
+rich==13.3.2
+urllib3==1.26.15
+wcwidth==0.2.6
