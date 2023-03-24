@@ -68,6 +68,11 @@ SQLSchema: Dict[str, Dict[str, str]] = {
         '.pk': [
             'id',
             'timestamp',
+            'owner',
+        ],
+        '.fk': [
+            ( ('owner',), 'users', ('id',), ),
+            ( ('location',), 'locations', ('id',), ),
         ],
     },
     'images': {

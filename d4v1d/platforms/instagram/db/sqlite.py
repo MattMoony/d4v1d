@@ -6,13 +6,14 @@ import os
 import re
 import sqlite3
 import uuid
-from typing import List, Optional, Tuple
 from datetime import datetime
+from typing import List, Optional, Tuple
 
 from d4v1d import config
 from d4v1d.log import log
 from d4v1d.platforms.instagram.db.database import Database
 from d4v1d.platforms.instagram.db.models import InstagramUser
+from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.schema.sql import SQLSchema
 from d4v1d.platforms.platform.info import Info
 
@@ -173,6 +174,23 @@ class SQLiteDatabase(Database):
         )''', user.dumpt())
         self.con.commit()
 
+    def store_posts(self, posts: List[Info[InstagramPost]]) -> None:
+        """
+        Stores a list of posts in the database
+
+        Args:
+            posts (List[Info[Post]]): The posts to store
+        """
+        c: sqlite3.Cursor = self.con.cursor()
+        c.executemany('''INSERT INTO posts (
+            timestamp, id, shortcode, caption, width, height,
+            is_video, comments_disabled, taken_at_timestamp,
+            likes, owner, location
+        ) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )''', [(post.date.isoformat(), *post.value.dumpt(),) for post in posts])
+        self.con.commit()
+
     def get_user(self, username: str) -> Optional[Info[InstagramUser]]:
         """
         Gets a user from the database
@@ -216,3 +234,40 @@ class SQLiteDatabase(Database):
                      ORDER BY username;
                   ''')
         return [ Info(InstagramUser(*row[1:]), datetime.fromtimestamp(int(row[0]))) for row in c.fetchall() ]
+
+    def get_posts(self, user: InstagramUser, _from: datetime, _to: datetime) -> List[Info[InstagramPost]]:
+        """
+        Gets a list of posts from a user
+
+        Args:
+            user (User): The user to get the posts from
+            _from (datetime.datetime): The start of the time range
+            _to (datetime.datetime): The end of the time range
+
+        Returns:
+            List[Info[Post]]: The posts
+        """
+        c: sqlite3.Cursor = self.con.cursor()
+        c.execute(f'''SELECT
+                        timestamp, id, shortcode, caption, width, height,
+                        is_video, comments_disabled, taken_at_timestamp,
+                        likes, owner, location
+                     FROM posts p
+                     WHERE owner=?
+                           {f'AND timestamp >= ? AND ' if _from is not None else ''}
+                           {f'AND timestamp <= ?' if _to is not None else ''}
+                           AND timestamp = (SELECT MAX(timestamp)
+                                            FROM posts
+                                            WHERE id = p.id
+                                                  AND owner = p.owner)
+                     ORDER BY taken_at_timestamp DESC''', 
+                     (user.id,) + ((_from.isoformat(),) if _from else ()) + ((_to.isoformat(),) if _to else ()))
+        x = c.fetchall()
+        return [Info(InstagramPost(
+                    *row[1:4], 
+                    tuple(row[4:6]), 
+                    *row[6:8], 
+                    datetime.fromisoformat(row[8]), 
+                    *row[9:11], 
+                    location_id=row[11]
+               ), datetime.fromisoformat(row[0])) for row in x]

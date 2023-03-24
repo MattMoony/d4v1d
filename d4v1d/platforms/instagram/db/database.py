@@ -5,9 +5,11 @@ should look like. This base class is extended
 by all specific database implementations.
 """
 
+from datetime import datetime
 from typing import List, Optional
 
-from d4v1d.platforms.instagram.db.models import InstagramUser
+from d4v1d.platforms.instagram.db.models.post import InstagramPost
+from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.info import Info
 
 
@@ -22,6 +24,15 @@ class Database:
 
         Args:
             user (User): The user to store
+        """
+        raise NotImplementedError()
+    
+    def store_posts(self, posts: List[Info[InstagramPost]]) -> None:
+        """
+        Stores a list of posts in the database
+
+        Args:
+            posts (List[Info[Post]]): The posts to store
         """
         raise NotImplementedError()
 
@@ -43,5 +54,19 @@ class Database:
 
         Returns:
             List[Info[User]]: List of info about users.
+        """
+        raise NotImplementedError()
+
+    def get_posts(self, user: InstagramUser, _from: datetime, _to: datetime) -> List[Info[InstagramPost]]:
+        """
+        Gets a list of posts from a user
+
+        Args:
+            user (User): The user to get the posts from
+            _from (datetime.datetime): The start of the time range
+            _to (datetime.datetime): The end of the time range
+
+        Returns:
+            List[Info[Post]]: The posts
         """
         raise NotImplementedError()

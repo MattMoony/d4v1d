@@ -81,9 +81,10 @@ class InstagramPost:
             self.dimensions[1],
             self.is_video,
             self.comments_disabled,
-            int(self.taken_at.timestamp()),
+            self.taken_at.isoformat(),
             self.likes,
             self.owner_id,
+            self.location_id if self.location_id is not None else None,
         )
 
     @classmethod
