@@ -107,14 +107,50 @@ class SQLiteDatabase(Database):
                 # crash everything - since this should DEFINITELY
                 # not happen unless someone messed with the schema
                 __burn_everything_to_the_ground(table)
-            if any(not (re.match(__safe, k) and (re.match(__safe, v) if isinstance(v, str) else all(re.match(__safe, pk) for pk in v))) for k, v in spec.items()):
+            # TODO: clean this up a little bit?! I split up 
+            # the if into multiple lines to make it at least 
+            # a little more readable
+            if any(
+                not (
+                    # check if the key is safe
+                    re.match(__safe, k)
+                    # check if the value is safe
+                    and (
+                        # if the key's a column name, check
+                        # the definition for safety - regular string check
+                        re.match(__safe, v)
+                        if isinstance(v, str)
+                        else all(
+                            # if the key is '.pk' - i.e. the list of primary 
+                            # keys, check all key names
+                            re.match(__safe, _)
+                            if isinstance(_, str)
+                            else all(
+                                # check the names of the referenced tables
+                                # in case of the key being '.fk' - foreign keys
+                                re.match(__safe, __)
+                                if isinstance(__, str)
+                                else all(
+                                    # check the names of the referenced columns
+                                    # in case of the key being '.fk' - foreign keys
+                                    re.match(__safe, ___)
+                                    for ___ in __
+                                )
+                                for __ in _
+                            )
+                            for _ in v)
+                        )
+                    )
+                for k, v in spec.items()
+            ):
                 __burn_everything_to_the_ground('')
             # create the table
             c: sqlite3.Cursor = self.con.cursor()
             qry: str = f'''CREATE TABLE {table} (
                 {", ".join([f"{k} {v}" for k, v in spec.items() if k[0] != "."])},
-                PRIMARY KEY ({", ".join(spec[".pk"])})
-            )'''
+                PRIMARY KEY ({", ".join(spec[".pk"])}){f""",
+                {', '.join(f'FOREIGN KEY ({", ".join(cols)}) REFERENCES {tbl}({", ".join(fks)})' for cols, tbl, fks in spec['.fk'])}
+                """ if ".fk" in spec else ""})'''
             log.debug('Creating table [bold]%s[/bold] using ... ', table)
             log.debug(qry)
             c.execute(qry)

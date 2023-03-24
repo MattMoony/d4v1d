@@ -28,8 +28,13 @@ class InstagramConfig:
     """The user agents to use for requests"""
     dont_save: bool = False
     """Set, if the config shouldn't be saved - e.g. if it was corrupted"""
+    max_parallel_downloads: int
+    """The maximum number of parallel downloads"""
+    max_parallel_downloads_per_bot: int
+    """The maximum number of parallel downloads per bot"""
 
-    def __init__(self, ddir: str, cdir: str,  db_type: InstagramDBType, headers: Dict[str, str], user_agents: List[str]):
+    def __init__(self, ddir: str, cdir: str,  db_type: InstagramDBType, headers: Dict[str, str], user_agents: List[str],
+                 max_parallel_downloads: int = 5, max_parallel_downloads_per_bot: int = 2):
         """
         Creates a new InstagramConfig object
 
@@ -39,12 +44,16 @@ class InstagramConfig:
             db_type (InstagramDBType): The type of database to use
             headers (Dict[str, str]): The headers to use for requests
             user_agents (List[str]): The user agents to use for requests
+            max_parallel_downloads (int): The maximum number of parallel downloads
+            max_parallel_downloads_per_bot (int): The maximum number of parallel downloads per bot
         """
         self.ddir = ddir
         self.cdir = cdir
         self.db_type = db_type
         self.headers = headers
         self.user_agents = user_agents
+        self.max_parallel_downloads = max_parallel_downloads
+        self.max_parallel_downloads_per_bot = max_parallel_downloads_per_bot
 
     def __del__(self) -> None:
         """
@@ -66,7 +75,9 @@ class InstagramConfig:
         return {
             'db_type': self.db_type.name,
             'headers': self.headers,
-            'user_agents': self.user_agents
+            'user_agents': self.user_agents,
+            'max_parallel_downloads': self.max_parallel_downloads,
+            'max_parallel_downloads_per_bot': self.max_parallel_downloads_per_bot,
         }
 
     @classmethod
@@ -97,7 +108,9 @@ class InstagramConfig:
                 cdir,
                 db_type,
                 data['headers'],
-                data['user_agents']
+                data['user_agents'],
+                data['max_parallel_downloads'],
+                data['max_parallel_downloads_per_bot'],
             )
 
             # cleanup after *borked* db type
@@ -129,7 +142,7 @@ class InstagramConfig:
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:107.0) Gecko/20100101 Firefox/107.0',
-            ]
+            ],
         )
         c.dont_save = dont_save
         return c

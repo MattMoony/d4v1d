@@ -7,16 +7,18 @@ Instagram.
 import datetime
 import json
 import os
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import requests as req
 
 from d4v1d import config
+from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.bot.bot import Bot
 from d4v1d.platforms.platform.bot.group import Group
 from d4v1d.platforms.platform.errors import BadAPIResponseError
 from d4v1d.platforms.platform.info import Info
+from d4v1d.platforms.platform.mediatype import MediaType
 
 
 class InstagramBot(Bot):
@@ -54,7 +56,7 @@ class InstagramBot(Bot):
         self.session = req.Session()
         self.session.headers.update({ **headers, 'User-Agent': user_agent, })
 
-    def get_user(self, username: str) -> Optional[Info[InstagramUser]]:
+    def user(self, username: str) -> Optional[Info[InstagramUser]]:
         """
         Fetches info for the user with the given username
 
@@ -78,6 +80,55 @@ class InstagramBot(Bot):
             f.write(r.content)
         u: InstagramUser = InstagramUser.loadj(_u, api=True, profile_pic=ppath)
         return Info(u, stmp)
+    
+    def posts(self, user: InstagramUser, _from: Optional[datetime.datetime] = None, 
+              _to: Optional[datetime.datetime] = None) -> Optional[List[Info[InstagramPost]]]:
+        """
+        Returns a list of all posts this user has made; while caching
+        them locally - meaning also downloading & storing the actual images.
+
+        Args:
+            user (InstagramUser): The instagram user, whose posts to get.
+            _from (Optional[datetime.datetime]): The earliest date to fetch posts from.
+            _to (Optional[datetime.datetime]): The latest date to fetch posts from.
+
+        Returns:
+            List[Info[InstagramPost]]: The list of posts.
+        """
+        fetch: Callable[[int, Optional[str]], req.Response] = lambda _id, _after: self.session.get(f'https://www.instagram.com/graphql/query/?query_hash=e769aa130647d2354c40ea6a439bfc08&variables={json.dumps({"id": _id, "first": 10, "after": _after,})}')
+        r: req.Response = fetch(user.id, None)
+        if not r.ok:
+            return None
+        posts: List[Info[InstagramPost]] = []
+        while True:
+            _b: Dict[str, Any] = json.loads(r.text)['data']['user']['edge_owner_to_timeline_media']
+            for _p in _b['edges']:
+                p: InstagramPost = InstagramPost.loadj(_p['node'], api=True)
+                p.owner = user
+                if (not _from or _from <= p.taken_at) and (not _to or p.taken_at <= _to):
+                    posts.append(Info(p, datetime.datetime.now()))
+            if not _b['page_info']['has_next_page']:
+                break
+            r = fetch(user.id, _b["page_info"]["end_cursor"])
+            if not r.ok:
+                return None
+        return posts
+    
+    def download_post(self, post: Info[InstagramPost]) -> None:
+        """
+        Downloads the post and stores it locally.
+
+        Args:
+            post (Info[InstagramPost]): The post to download.
+        """
+        p: InstagramPost = post.value
+        os.makedirs(os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code), exist_ok=True)
+        for i, (t, u) in enumerate(p.media_urls):
+            r: req.Response = self.session.get(u)
+            if not r.ok:
+                raise BadAPIResponseError(f'Could not fetch post {p.id} from {u}')
+            with open(os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if t == MediaType.IMAGE else "mp4"}'), 'wb') as f:
+                f.write(r.content)
 
     def dumpj(self) -> Dict[str, Any]:
         """

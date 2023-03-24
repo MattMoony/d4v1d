@@ -6,7 +6,7 @@ from typing import Dict
 
 SQLSchema: Dict[str, Dict[str, str]] = {
     'users': {
-        'id': 'INTEGER',
+        'id': 'INTEGER NOT NULL',
         'timestamp': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
         'fbid': 'INTEGER',
         'username': 'VARCHAR(32) NOT NULL',
@@ -50,6 +50,50 @@ SQLSchema: Dict[str, Dict[str, str]] = {
             'referrer',
             'referring',
             'timestamp',
+        ],
+    },
+    'posts': {
+        'id': 'INTEGER NOT NULL',
+        'timestamp': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+        'shortcode': 'VARCHAR(16) NOT NULL',
+        'caption': 'VARCHAR(2304) NOT NULL',
+        'width': 'INTEGER NOT NULL',
+        'height': 'INTEGER NOT NULL',
+        'is_video': 'BOOLEAN NOT NULL',
+        'comments_disabled': 'BOOLEAN NOT NULL',
+        'taken_at_timestamp': 'TIMESTAMP',
+        'likes': 'INTEGER NOT NULL',
+        'owner': 'INTEGER NOT NULL',
+        'location': 'INTEGER',
+        '.pk': [
+            'id',
+            'timestamp',
+        ],
+    },
+    'images': {
+        'id': 'INTEGER NOT NULL',
+        'timestamp': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+        'post': 'INTEGER NOT NULL',
+        'path_local': 'VARCHAR(256) NOT NULL',
+        'width': 'INTEGER NOT NULL',
+        'height': 'INTEGER NOT NULL',
+        'is_video': 'BOOLEAN NOT NULL',
+        '.pk': [
+            'id',
+            'timestamp',
+            'post',
+        ],
+        '.fk': [
+            ( ('post',), 'posts', ('id',), ),
+        ],
+    },
+    'locations': {
+        'id': 'INTEGER NOT NULL',
+        'has_public_page': 'BOOLEAN',
+        'name': 'VARCHAR(128)',
+        'slug': 'VARCHAR(128)',
+        '.pk': [
+            'id',
         ],
     },
 }
