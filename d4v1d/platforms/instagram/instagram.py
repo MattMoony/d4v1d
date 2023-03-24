@@ -119,16 +119,18 @@ class Instagram(Platform):
             log.debug('Found %d posts in db', len(posts))
             if len(posts) == user.number_posts:
                 log.debug('Posts of user ("%s") can probably be found in the db', username)
-                return posts
-            log.debug('Posts of user ("%s") can not be found in the db ... yet', username)
-        log.debug('Fetching posts from instagram ... ')
-        if not group and not self.groups:
-            raise NoGroupsError('No groups available for fetching user\'s posts.')
-        posts: List[Info[InstagramPost]] = (group or list(self.groups.values())[0]).posts(user, _from=_from, _to=_to,)
-        log.debug('Storing posts in db ... ')
-        self.db.store_posts(posts)
+            else:
+                log.debug('Posts of user ("%s") can not be found in the db ... yet', username)
+        if not posts:
+            log.debug('Fetching posts from instagram ... ')
+            if not group and not self.groups:
+                raise NoGroupsError('No groups available for fetching user\'s posts.')
+            posts: List[Info[InstagramPost]] = (group or list(self.groups.values())[0]).posts(user, _from=_from, _to=_to,)
+            log.debug('Storing posts in db ... ')
+            self.db.store_posts(posts)
         if download:
             (group or list(self.groups.values())[0]).download_posts(posts)
+            self.db.update_posts(posts)
         return posts
 
     def users(self) -> List[Info[InstagramUser]]:

@@ -100,7 +100,7 @@ class InstagramPost:
             InstagramPost: The parsed instagram post.
         """
         if api:
-            return InstagramPost(
+            p: InstagramPost = InstagramPost(
                 obj['id'],
                 obj['shortcode'],
                 obj['edge_media_to_caption']['edges'][0]['node']['text'],
@@ -110,10 +110,13 @@ class InstagramPost:
                 datetime.fromtimestamp(obj['taken_at_timestamp']),
                 obj['edge_media_preview_like']['count'],
                 location = InstagramLocation.loadj(obj['location']) if obj['location'] is not None else None,
-                media = [ InstagramMedia.loadj(node['node']) for node in obj['edge_sidecar_to_children']['edges'] ]
+                media = [ InstagramMedia.loadj(node['node'], api=True) for node in obj['edge_sidecar_to_children']['edges'] ]
                         if 'edge_sidecar_to_children' in obj
-                        else [ InstagramMedia(obj) ],
+                        else [ InstagramMedia.loadj(obj, api=True) ],
             )
+            for m in p.media:
+                m.post = p
+            return p
         return InstagramPost(
             obj['id'],
             obj['short_code'],

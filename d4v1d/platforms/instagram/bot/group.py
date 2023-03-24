@@ -71,8 +71,12 @@ class InstagramGroup(Group):
         Returns:
             List[Info[InstagramPost]]: The list of posts.
         """
-        bot: InstagramBot = self.bot()
-        return bot.posts(user, _from, _to)
+        try:
+            bot: InstagramBot = self.bot()
+            return bot.posts(user, _from, _to)
+        except Exception as e:
+            import traceback
+            traceback.print_exception(e)
     
     def download_posts(self, posts: List[Info[InstagramPost]]) -> None:
         """

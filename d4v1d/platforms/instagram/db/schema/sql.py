@@ -81,7 +81,7 @@ SQLSchema: Dict[str, Dict[str, str]] = {
         'post': 'INTEGER NOT NULL',
         'type': 'INTEGER NOT NULL',
         'url': 'VARCHAR(2048) NOT NULL',
-        'path': 'VARCHAR(256) NOT NULL',
+        'path': 'VARCHAR(256)',
         'width': 'INTEGER NOT NULL',
         'height': 'INTEGER NOT NULL',
         '.pk': [

@@ -196,7 +196,59 @@ class SQLiteDatabase(Database):
         for p in posts:
             if p.value.location:
                 self.store_location(p.value.location)
-            self.store_media(p.value.media)
+            self.store_media(p.value.media, timestamp=p.date)
+
+    def update_posts(self, posts: List[Info[InstagramPost]]) -> None:
+        """
+        Updates a list of posts in the database
+
+        Args:
+            posts (List[Info[Post]]): The posts to update
+        """
+        c: sqlite3.Cursor = self.con.cursor()
+        c.executemany('''UPDATE posts SET
+            timestamp = ?, id = ?, shortcode = ?, caption = ?, width = ?, height = ?,
+            is_video = ?, comments_disabled = ?, taken_at_timestamp = ?,
+            likes = ?, owner = ?, location = ?
+        WHERE id = ?''', [(post.date.isoformat(), *post.value.dumpt(), post.value.id) for post in posts])
+        self.con.commit()
+        # update other, post-associated data ...
+        for p in posts:
+            self.update_media(p.value.media, timestamp=p.date)
+
+    def store_media(self, media: List[Info[InstagramMedia]], timestamp: Optional[datetime] = None) -> None:
+        """
+        Stores a list of media in the database.
+
+        Args:
+            media (List[Info[InstagramMedia]]): The media to store.
+            timestamp (Optional[datetime]): The timestamp of the post the media belongs to.
+        """
+        if any(not isinstance(m, Info) for m in media) and timestamp is None:
+            raise ValueError('If media is not a list of Info objects, timestamp must be specified')
+        c: sqlite3.Cursor = self.con.cursor()
+        c.executemany('''INSERT INTO media (
+                            timestamp, id, post, type, url, path, width, height
+                         ) VALUES (
+                            ?, ?, ?, ?, ?, ?, ?, ?
+                         )''', [(m.date.isoformat() if isinstance(m, Info) else timestamp, *(m.value.dumpt() if isinstance(m, Info) else m.dumpt()),) for m in media])
+        self.con.commit()
+
+    def update_media(self, media: List[Info[InstagramMedia]], timestamp: Optional[datetime] = None) -> None:
+        """
+        Updates a list of media in the database.
+
+        Args:
+            media (List[Info[InstagramMedia]]): The media to update.
+            timestamp (Optional[datetime]): The timestamp of the post the media belongs to.
+        """
+        if any(not isinstance(m, Info) for m in media) and timestamp is None:
+            raise ValueError('If media is not a list of Info objects, timestamp must be specified')
+        c: sqlite3.Cursor = self.con.cursor()
+        c.executemany('''UPDATE media SET
+                            timestamp = ?, id = ?, post = ?, type = ?, url = ?, path = ?, width = ?, height = ?
+                         WHERE id = ?''', [(m.date.isoformat() if isinstance(m, Info) else timestamp, *(m.value.dumpt() if isinstance(m, Info) else m.dumpt()), m.value.id if isinstance(m, Info) else m.id,) for m in media])
+        self.con.commit()
 
     def store_location(self, location: InstagramLocation) -> None:
         """
@@ -214,21 +266,6 @@ class SQLiteDatabase(Database):
         ) VALUES (
             ?, ?, ?, ?
         )''', location.dumpt())
-        self.con.commit()
-
-    def store_media(self, media: List[Info[InstagramMedia]]) -> None:
-        """
-        Stores a list of media in the database
-
-        Args:
-            media (List[Info[InstagramMedia]]): The media to store
-        """
-        c: sqlite3.Cursor = self.con.cursor()
-        c.executemany('''INSERT INTO media (
-                            timestamp, id, post, url, path, width, height, type
-                         ) VALUES (
-                            ?, ?, ?, ?, ?, ?, ?, ?
-                         )''', [(m.date.isoformat(), *m.value.dumpt(),) for m in media])
         self.con.commit()
 
     def get_user(self, username: Optional[str] = None, id: Optional[int] = None) -> Optional[Info[InstagramUser]]:

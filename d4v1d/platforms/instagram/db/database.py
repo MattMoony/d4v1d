@@ -37,13 +37,33 @@ class Database:
             posts (List[Info[Post]]): The posts to store
         """
         raise NotImplementedError()
-
-    def store_media(self, media: List[Info[InstagramMedia]]) -> None:
+    
+    def update_posts(self, posts: List[Info[InstagramPost]]) -> None:
         """
-        Stores a list of media in the database
+        Updates a list of posts in the database
 
         Args:
-            media (List[Info[InstagramMedia]]): The media to store
+            posts (List[Info[Post]]): The posts to update
+        """
+        raise NotImplementedError()
+
+    def store_media(self, media: List[Info[InstagramMedia]], timestamp: Optional[datetime] = None) -> None:
+        """
+        Stores a list of media in the database.
+
+        Args:
+            media (List[Info[InstagramMedia]]): The media to store.
+            timestamp (Optional[datetime]): The timestamp of the post the media belongs to.
+        """
+        raise NotImplementedError()
+    
+    def update_media(self, media: List[Info[InstagramMedia]], timestamp: Optional[datetime] = None) -> None:
+        """
+        Updates a list of media in the database.
+
+        Args:
+            media (List[Info[InstagramMedia]]): The media to update.
+            timestamp (Optional[datetime]): The timestamp of the post the media belongs to.
         """
         raise NotImplementedError()
     

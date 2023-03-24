@@ -48,16 +48,24 @@ class InstagramMedia:
         """
         Dump the media as a tuple.
         """
-        return (self.id, self.post.id if self.post is not None else None, self.type.value, self.url, self.path, *self.dimensions)
+        return (
+            self.id,
+            self.post.id if self.post is not None else None,
+            self.type.value,
+            self.url,
+            self.path,
+            *self.dimensions,
+        )
     
     @classmethod
-    def loadj(cls, data: dict, api: bool = False) -> 'InstagramMedia':
+    def loadj(cls, data: dict, api: bool = False, post: Optional["InstagramPost"] = None) -> 'InstagramMedia':
         """
         Load the media from a JSON object.
 
         Args:
             data (dict): The JSON object.
             api (bool): Whether the data is from the API or not.
+            post (Optional[InstagramPost]): The post this media belongs to.
 
         Returns:
             InstagramMedia: The parsed media.
@@ -68,6 +76,7 @@ class InstagramMedia:
                 MediaType.IMAGE if not data['is_video'] else MediaType.VIDEO,
                 data['display_url'] if not data['is_video'] else data['video_url'],
                 (data['dimensions']['width'], data['dimensions']['height']),
+                post = post,
             )
         return cls(
             data['id'],
@@ -75,4 +84,5 @@ class InstagramMedia:
             data['url'],
             (data['dimensions']['width'], data['dimensions']['height']),
             data['path'],
+            post = post,
         )
