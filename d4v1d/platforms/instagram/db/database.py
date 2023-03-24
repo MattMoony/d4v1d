@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from d4v1d.platforms.instagram.db.models.location import InstagramLocation
+from d4v1d.platforms.instagram.db.models.media import InstagramMedia
 from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.info import Info
@@ -34,6 +35,15 @@ class Database:
 
         Args:
             posts (List[Info[Post]]): The posts to store
+        """
+        raise NotImplementedError()
+
+    def store_media(self, media: List[Info[InstagramMedia]]) -> None:
+        """
+        Stores a list of media in the database
+
+        Args:
+            media (List[Info[InstagramMedia]]): The media to store
         """
         raise NotImplementedError()
     
@@ -82,6 +92,18 @@ class Database:
         """
         raise NotImplementedError()
     
+    def get_media(self, post: Info[InstagramPost]) -> List[Info[InstagramMedia]]:
+        """
+        Gets a list of media from a post
+
+        Args:
+            post (Info[InstagramPost]): The post to get the media from
+
+        Returns:
+            List[Info[InstagramMedia]]: The media
+        """
+        raise NotImplementedError()
+
     def get_location(self, id: int) -> Optional[InstagramLocation]:
         """
         Gets a location from the database

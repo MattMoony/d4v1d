@@ -31,7 +31,7 @@ LOG_NAME: str = 'd4v1d'
 LOG_FORMAT: str = '%(message)s'
 """The format for error/warning log messages"""
 
-LOG_LEVEL: str = 'WARNING'
+LOG_LEVEL: str = 'DEBUG'
 """The default log level for the logger"""
 
 LOG_DATEFMT: str = '[%X]'

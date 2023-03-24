@@ -14,6 +14,7 @@ from d4v1d.log import log
 from d4v1d.platforms.instagram.db.database import Database
 from d4v1d.platforms.instagram.db.models import InstagramUser
 from d4v1d.platforms.instagram.db.models.location import InstagramLocation
+from d4v1d.platforms.instagram.db.models.media import InstagramMedia
 from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.schema.sql import SQLSchema
 from d4v1d.platforms.platform.info import Info
@@ -195,6 +196,7 @@ class SQLiteDatabase(Database):
         for p in posts:
             if p.value.location:
                 self.store_location(p.value.location)
+            self.store_media(p.value.media)
 
     def store_location(self, location: InstagramLocation) -> None:
         """
@@ -212,6 +214,21 @@ class SQLiteDatabase(Database):
         ) VALUES (
             ?, ?, ?, ?
         )''', location.dumpt())
+        self.con.commit()
+
+    def store_media(self, media: List[Info[InstagramMedia]]) -> None:
+        """
+        Stores a list of media in the database
+
+        Args:
+            media (List[Info[InstagramMedia]]): The media to store
+        """
+        c: sqlite3.Cursor = self.con.cursor()
+        c.executemany('''INSERT INTO media (
+                            timestamp, id, post, url, path, width, height, type
+                         ) VALUES (
+                            ?, ?, ?, ?, ?, ?, ?, ?
+                         )''', [(m.date.isoformat(), *m.value.dumpt(),) for m in media])
         self.con.commit()
 
     def get_user(self, username: Optional[str] = None, id: Optional[int] = None) -> Optional[Info[InstagramUser]]:
@@ -298,6 +315,24 @@ class SQLiteDatabase(Database):
                     owner = self.get_user(id=row[10]).value,
                     location = self.get_location(row[11]) if row[11] is not None else None
                ), datetime.fromisoformat(row[0])) for row in x]
+    
+    def get_media(self, post: Info[InstagramPost]) -> List[Info[InstagramMedia]]:
+        """
+        Gets a list of media from a post
+
+        Args:
+            post (Info[InstagramPost]): The post to get the media from
+
+        Returns:
+            List[Info[InstagramMedia]]: The media
+        """
+        c: sqlite3.Cursor = self.con.cursor()
+        c.execute('''SELECT
+                        timestamp, type, id, post, url, path, width, height
+                     FROM media
+                     WHERE post = ?
+                     ORDER BY timestamp DESC''', (post.value.id,))
+        return [Info(InstagramMedia(*row[1:]), datetime.fromisoformat(row[0])) for row in c.fetchall()]
 
     def get_location(self, id: int) -> Optional[InstagramLocation]:
         """

@@ -16,7 +16,9 @@ from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.bot.bot import Bot
 from d4v1d.platforms.platform.bot.group import Group
-from d4v1d.platforms.platform.errors import BadAPIResponseError
+from d4v1d.platforms.platform.errors import (BadAPIResponseError,
+                                             RateLimitError,
+                                             RequiresAuthenticationError)
 from d4v1d.platforms.platform.info import Info
 from d4v1d.platforms.platform.mediatype import MediaType
 
@@ -56,6 +58,24 @@ class InstagramBot(Bot):
         self.session = req.Session()
         self.session.headers.update({ **headers, 'User-Agent': user_agent, })
 
+    def handle_error(self, r: req.Response) -> None:
+        """
+        Handles an error response from the Instagram
+        API - to raise a more fitting exception, should
+        one exist.
+
+        Args:
+            r (req.Response): The error response to handle.
+        """
+        try:
+            parsed: Dict[str, Any] = json.loads(r.text)
+        except Exception:
+            return
+        if 'message' in parsed and 'wait' in parsed['message']:
+            raise RateLimitError(parsed['message'])
+        if 'require_login' in parsed and parsed['require_login']:
+            raise RequiresAuthenticationError('Instagram is asking the bot to authenticate.')
+
     def user(self, username: str) -> Optional[Info[InstagramUser]]:
         """
         Fetches info for the user with the given username
@@ -68,7 +88,7 @@ class InstagramBot(Bot):
         """
         r: req.Response = self.session.get(f'https://www.instagram.com/{username}/?__a=1&__d=1')
         if not r.ok:
-            return None
+            return self.handle_error(r)
         _u: Dict[str, Any] = json.loads(r.text)['graphql']['user']
         r = self.session.get(_u['profile_pic_url_hd'])
         if not r.ok:
@@ -98,7 +118,7 @@ class InstagramBot(Bot):
         fetch: Callable[[int, Optional[str]], req.Response] = lambda _id, _after: self.session.get(f'https://www.instagram.com/graphql/query/?query_hash=e769aa130647d2354c40ea6a439bfc08&variables={json.dumps({"id": _id, "first": 10, "after": _after,})}')
         r: req.Response = fetch(user.id, None)
         if not r.ok:
-            return None
+            return self.handle_error(r)
         posts: List[Info[InstagramPost]] = []
         while True:
             _b: Dict[str, Any] = json.loads(r.text)['data']['user']['edge_owner_to_timeline_media']
@@ -111,9 +131,9 @@ class InstagramBot(Bot):
                 break
             r = fetch(user.id, _b["page_info"]["end_cursor"])
             if not r.ok:
-                return None
+                return self.handle_error(r)
         return posts
-    
+
     def download_post(self, post: Info[InstagramPost]) -> None:
         """
         Downloads the post and stores it locally.
@@ -123,11 +143,17 @@ class InstagramBot(Bot):
         """
         p: InstagramPost = post.value
         os.makedirs(os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code), exist_ok=True)
-        for i, (t, u) in enumerate(p.media_urls):
-            r: req.Response = self.session.get(u)
+        for i, m in enumerate(p.media):
+            m.path = os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if m.type == MediaType.IMAGE else "mp4"}')
+            # don't overwrite already downloaded files, as this is
+            # probably unwanted behaviour, but could happen, if the user
+            # tells d4v1d to download locally cached posts - yk
+            if os.path.exists(m.path):
+                continue
+            r: req.Response = self.session.get(m.url)
             if not r.ok:
-                raise BadAPIResponseError(f'Could not fetch post {p.id} from {u}')
-            with open(os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if t == MediaType.IMAGE else "mp4"}'), 'wb') as f:
+                raise BadAPIResponseError(f'Could not fetch post {p.id} from {m.url}')
+            with open(m.path, 'wb') as f:
                 f.write(r.content)
 
     def dumpj(self) -> Dict[str, Any]:

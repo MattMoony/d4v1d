@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 from d4v1d.platforms.instagram.db.models.location import InstagramLocation
+from d4v1d.platforms.instagram.db.models.media import InstagramMedia
 from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.mediatype import MediaType
 
@@ -41,6 +42,8 @@ class InstagramPost:
 
     media_urls: List[Tuple[MediaType, str]] = field(default_factory=list)
     """The media urls of this post."""
+    media: List[InstagramMedia] = field(default_factory=list)
+    """The media of this post."""
 
     def dumpj(self) -> Dict[str, Any]:
         """
@@ -107,16 +110,9 @@ class InstagramPost:
                 datetime.fromtimestamp(obj['taken_at_timestamp']),
                 obj['edge_media_preview_like']['count'],
                 location = InstagramLocation.loadj(obj['location']) if obj['location'] is not None else None,
-                media_urls = [
-                                ( MediaType.IMAGE, node['node']['display_url'], )
-                                if not node['node']['is_video']
-                                else ( MediaType.VIDEO, node['node']['video_url'], )
-                                for node in obj['edge_sidecar_to_children']['edges']
-                            ]
-                            if 'edge_sidecar_to_children' in obj
-                            else [ ( MediaType.IMAGE, obj['display_url'], ), ]
-                                if not obj['is_video']
-                                else [ ( MediaType.VIDEO, obj['video_url'], ), ]
+                media = [ InstagramMedia.loadj(node['node']) for node in obj['edge_sidecar_to_children']['edges'] ]
+                        if 'edge_sidecar_to_children' in obj
+                        else [ InstagramMedia(obj) ],
             )
         return InstagramPost(
             obj['id'],

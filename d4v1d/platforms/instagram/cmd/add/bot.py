@@ -4,11 +4,13 @@ social-media platform + add it to a group
 already.
 """
 
+import random
 from argparse import _ArgumentGroup as ArgumentGroup
 from typing import List, Optional, Tuple
 
 from prompt_toolkit.completion.nested import NestedDict
 
+from d4v1d import config
 from d4v1d.platforms.instagram.bot.bot import InstagramBot
 from d4v1d.platforms.instagram.bot.group import InstagramGroup
 from d4v1d.platforms.platform.cmd import CLISessionState, Command
@@ -30,7 +32,7 @@ class AddBot(Command):
         creds: ArgumentGroup = self._parser.add_argument_group('creds')
         creds.add_argument('-u', '--username', type=str, help='The username of the bot.')
         creds.add_argument('-p', '--password', type=str, help='The password of the bot.')
-        self.add_argument('--user-agent', type=str, help='The "User-Agent" the bot should use.', default='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36')
+        self.add_argument('--user-agent', type=str, help='The "User-Agent" the bot should use.')
         self.add_argument('-h', '--header', type=str, dest='headers', nargs=2, action='append', help='A header to add to the bot\'s requests. Can be used multiple times.')
 
     def available(self, state: CLISessionState) -> bool:
@@ -76,9 +78,7 @@ class AddBot(Command):
             io.e('You must provide a group name!')
             return
         if not user_agent:
-            # shouldn't happen
-            io.e('There must be a user-agent!')
-            return
+            user_agent = random.choice(config.PCONFIG._instagram.user_agents)
         if not anonymous and not (username and password):
             io.e('You must either set the --anonymous flag or provide username & password!')
             return

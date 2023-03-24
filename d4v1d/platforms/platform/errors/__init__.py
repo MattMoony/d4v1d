@@ -41,3 +41,15 @@ class BadAPIResponseError(PlatformError):
     Thrown, when the API responds in an
     unexpected way or doesn't respond at all
     """
+
+class RateLimitError(BadAPIResponseError):
+    """
+    Thrown, when the API responds with a
+    rate limit error
+    """
+
+class RequiresAuthenticationError(BadAPIResponseError):
+    """
+    Thrown, when an action requires
+    authentication, but the bot is anonymous
+    """

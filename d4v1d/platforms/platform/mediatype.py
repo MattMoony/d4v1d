@@ -9,5 +9,5 @@ class MediaType(Enum):
     A helper enum for common media types.
     """
 
-    IMAGE = 'image'
-    VIDEO = 'video'
+    IMAGE = 0
+    VIDEO = 1

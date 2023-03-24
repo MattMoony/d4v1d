@@ -75,21 +75,22 @@ SQLSchema: Dict[str, Dict[str, str]] = {
             ( ('location',), 'locations', ('id',), ),
         ],
     },
-    'images': {
+    'media': {
         'id': 'INTEGER NOT NULL',
         'timestamp': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
         'post': 'INTEGER NOT NULL',
-        'path_local': 'VARCHAR(256) NOT NULL',
+        'type': 'INTEGER NOT NULL',
+        'url': 'VARCHAR(2048) NOT NULL',
+        'path': 'VARCHAR(256) NOT NULL',
         'width': 'INTEGER NOT NULL',
         'height': 'INTEGER NOT NULL',
-        'is_video': 'BOOLEAN NOT NULL',
         '.pk': [
             'id',
             'timestamp',
             'post',
         ],
         '.fk': [
-            ( ('post',), 'posts', ('id',), ),
+            ( ('post', 'timestamp',), 'posts', ('id', 'timestamp',), ),
         ],
     },
     'locations': {
