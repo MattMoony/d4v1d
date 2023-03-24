@@ -94,9 +94,9 @@ SQLSchema: Dict[str, Dict[str, str]] = {
     },
     'locations': {
         'id': 'INTEGER NOT NULL',
-        'has_public_page': 'BOOLEAN',
-        'name': 'VARCHAR(128)',
-        'slug': 'VARCHAR(128)',
+        'has_public_page': 'BOOLEAN NOT NULL',
+        'name': 'VARCHAR(128) NOT NULL',
+        'slug': 'VARCHAR(128) NOT NULL',
         '.pk': [
             'id',
         ],

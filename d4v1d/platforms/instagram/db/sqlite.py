@@ -13,6 +13,7 @@ from d4v1d import config
 from d4v1d.log import log
 from d4v1d.platforms.instagram.db.database import Database
 from d4v1d.platforms.instagram.db.models import InstagramUser
+from d4v1d.platforms.instagram.db.models.location import InstagramLocation
 from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.schema.sql import SQLSchema
 from d4v1d.platforms.platform.info import Info
@@ -190,26 +191,51 @@ class SQLiteDatabase(Database):
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )''', [(post.date.isoformat(), *post.value.dumpt(),) for post in posts])
         self.con.commit()
+        # store other, post-associated data ...
+        for p in posts:
+            if p.value.location:
+                self.store_location(p.value.location)
 
-    def get_user(self, username: str) -> Optional[Info[InstagramUser]]:
+    def store_location(self, location: InstagramLocation) -> None:
         """
-        Gets a user from the database
+        Stores a location in the database
 
         Args:
-            username (str): The username of the user
+            location (Location): The location to store
+        """
+        if self.get_location(location.id):
+            # already exists, ignore ...
+            return
+        c: sqlite3.Cursor = self.con.cursor()
+        c.execute('''INSERT INTO locations (
+            id, has_public_page, name, slug
+        ) VALUES (
+            ?, ?, ?, ?
+        )''', location.dumpt())
+        self.con.commit()
+
+    def get_user(self, username: Optional[str] = None, id: Optional[int] = None) -> Optional[Info[InstagramUser]]:
+        """
+        Gets a user from the database.
+
+        Args:
+            username (Optional[str]): The username of the user.
+            id (Optional[int]): The id of the user.
 
         Returns:
-            Optional[Info[User]]: The user if it exists, None otherwise
+            Optional[Info[User]]: The user if it exists, None otherwise.
         """
+        if username is None and id is None:
+            raise ValueError('Either username or id must be specified')
         c: sqlite3.Cursor = self.con.cursor()
-        c.execute('''SELECT
+        c.execute(f'''SELECT
                         STRFTIME('%s', timestamp), id, fbid, username, full_name, bio, followers,
                         following, profile_pic_local, private, number_posts,
                         category_name, pronouns
                      FROM users 
-                     WHERE username=?
+                     WHERE {f'username = ?' if username is not None else 'id = ?'}
                      ORDER BY timestamp DESC
-                     LIMIT 1''', (username,))
+                     LIMIT 1''', (username if username is not None else id,))
         row: Optional[Tuple] = c.fetchone()
         if row is None:
             return None
@@ -268,6 +294,27 @@ class SQLiteDatabase(Database):
                     tuple(row[4:6]), 
                     *row[6:8], 
                     datetime.fromisoformat(row[8]), 
-                    *row[9:11], 
-                    location_id=row[11]
+                    *row[9:10],
+                    owner = self.get_user(id=row[10]).value,
+                    location = self.get_location(row[11]) if row[11] is not None else None
                ), datetime.fromisoformat(row[0])) for row in x]
+
+    def get_location(self, id: int) -> Optional[InstagramLocation]:
+        """
+        Gets a location from the database
+
+        Args:
+            id (int): The id of the location
+
+        Returns:
+            Optional[InstagramLocation]: The location if it exists, None otherwise.
+        """
+        c: sqlite3.Cursor = self.con.cursor()
+        c.execute('''SELECT
+                        id, has_public_page, name, slug
+                     FROM locations
+                     WHERE id = ?''', (id,))
+        row: Optional[Tuple] = c.fetchone()
+        if row is None:
+            return None
+        return InstagramLocation(*row)

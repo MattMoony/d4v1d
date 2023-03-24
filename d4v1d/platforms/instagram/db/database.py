@@ -8,6 +8,7 @@ by all specific database implementations.
 from datetime import datetime
 from typing import List, Optional
 
+from d4v1d.platforms.instagram.db.models.location import InstagramLocation
 from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.info import Info
@@ -35,16 +36,26 @@ class Database:
             posts (List[Info[Post]]): The posts to store
         """
         raise NotImplementedError()
-
-    def get_user(self, username: str) -> Optional[Info[InstagramUser]]:
+    
+    def store_location(self, location: InstagramLocation) -> None:
         """
-        Gets a user from the database
+        Stores a location in the database
 
         Args:
-            username (str): The username of the user
+            location (Location): The location to store
+        """
+        raise NotImplementedError()
+
+    def get_user(self, username: Optional[str] = None, id: Optional[int] = None) -> Optional[Info[InstagramUser]]:
+        """
+        Gets a user from the database.
+
+        Args:
+            username (Optional[str]): The username of the user.
+            id (Optional[int]): The id of the user.
 
         Returns:
-            Optional[Info[User]]: The user if it exists, None otherwise
+            Optional[Info[User]]: The user if it exists, None otherwise.
         """
         raise NotImplementedError()
     
@@ -68,5 +79,17 @@ class Database:
 
         Returns:
             List[Info[Post]]: The posts
+        """
+        raise NotImplementedError()
+    
+    def get_location(self, id: int) -> Optional[InstagramLocation]:
+        """
+        Gets a location from the database
+
+        Args:
+            id (int): The id of the location
+
+        Returns:
+            Optional[InstagramLocation]: The location if it exists, None otherwise.
         """
         raise NotImplementedError()

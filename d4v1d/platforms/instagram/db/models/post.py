@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+from d4v1d.platforms.instagram.db.models.location import InstagramLocation
+from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.mediatype import MediaType
 
 
@@ -32,15 +34,10 @@ class InstagramPost:
     likes: int
     """The number of likes."""
 
-    owner_id: int
-    """The instagram user id of the owner of the post."""
-    owner: Optional["InstagramUser"] = None
-    """The owner of this post; not necessarily set, since loaded separately."""
-
-    location_id: Optional[int] = None
-    """The instagram location id of the post."""
-    location: Optional["InstagramLocation"] = None
-    """The location of this post; not necessarily set, since loaded separately."""
+    owner: Optional[InstagramUser] = None
+    """The owner of this post; not necessarily set, since loaded & set separately."""
+    location: Optional[InstagramLocation] = None
+    """The location of this post; not necessarily set, since not always present separately."""
 
     media_urls: List[Tuple[MediaType, str]] = field(default_factory=list)
     """The media urls of this post."""
@@ -83,8 +80,8 @@ class InstagramPost:
             self.comments_disabled,
             self.taken_at.isoformat(),
             self.likes,
-            self.owner_id,
-            self.location_id if self.location_id is not None else None,
+            self.owner.id if self.owner is not None else None,
+            self.location.id if self.location is not None else None,
         )
 
     @classmethod
@@ -109,8 +106,7 @@ class InstagramPost:
                 obj['comments_disabled'],
                 datetime.fromtimestamp(obj['taken_at_timestamp']),
                 obj['edge_media_preview_like']['count'],
-                obj['owner']['id'],
-                location_id = obj['location']['id'] if obj['location'] is not None else None,
+                location = InstagramLocation.loadj(obj['location']) if obj['location'] is not None else None,
                 media_urls = [
                                 ( MediaType.IMAGE, node['node']['display_url'], )
                                 if not node['node']['is_video']
