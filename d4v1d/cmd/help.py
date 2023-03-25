@@ -34,6 +34,8 @@ class Help(Command):
         """
         done: List[Command] = []
         for k, v in cmds.items():
+            if k.startswith('.'):
+                continue
             if isinstance(v, Command) and v.available(state) and v not in done:
                 tree.add(f'[bold]{v.name}[/bold]: {v.description}')
                 done.append(v)

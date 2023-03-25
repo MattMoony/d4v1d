@@ -257,6 +257,7 @@ class CmdSession(PromptSession):
         d, args = self.parse(cmd.strip().split())
         if isinstance(d, dict):
             raise TypeError(f'"{cmd}" has several sub-commands!')
+        # TODO: confirm, if this is working as intended
         if not d.available(self.state):
             raise ValueError(f'"{cmd}" is not usable in the current context!')
         return d, args
