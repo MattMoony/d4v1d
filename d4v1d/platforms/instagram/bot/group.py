@@ -7,7 +7,7 @@ browsers.
 
 import datetime
 from multiprocessing import Lock, Manager, Pool
-from multiprocessing.managers import ListProxy
+from multiprocessing.managers import DictProxy
 from typing import Any, Dict, List, Optional
 
 from d4v1d import config
@@ -37,8 +37,8 @@ class InstagramGroup(Group):
         
         if _safety_lock is not None:
             _safety_lock.acquire()
-        _minr: int = min(b.requests for b in self.bots)
-        minb: InstagramBot = [ b for b in self.bots if b.requests == _minr ][0]
+        _minr: int = min(b.requests for b in self.bots.values())
+        minb: InstagramBot = [ b for b in self.bots.values() if b.requests == _minr ][0]
         if _safety_lock is not None:
             _safety_lock.release()
         return minb
@@ -87,9 +87,9 @@ class InstagramGroup(Group):
         """
         with Manager() as manager:
             bots_lock: Lock = manager.Lock()
-            constraints: ListProxy = manager.list([
-                manager.Semaphore(config.PCONFIG._instagram.max_parallel_downloads_per_bot) for _ in self.bots 
-            ])
+            constraints: DictProxy = manager.dict({
+                _: manager.Semaphore(config.PCONFIG._instagram.max_parallel_downloads_per_bot) for _ in self.bots
+            })
             with Pool(processes=config.PCONFIG._instagram.max_parallel_downloads) as pool:
                 pool.starmap(self._download_post, [ (p, constraints, bots_lock,) for p in posts ])
 
@@ -102,27 +102,20 @@ class InstagramGroup(Group):
         """
         return {
             'name': self.name,
-            'bots': [ b.dumpj() for b in self.bots ],
+            'bots': [ b.dumpj() for b in self.bots.values() ],
         }
     
-    def _download_post(self, post: Info[InstagramPost], constraints: ListProxy, bots_lock: Lock) -> None:
+    def _download_post(self, post: Info[InstagramPost], constraints: DictProxy, bots_lock: Lock) -> None:
         """
         Downloads the given post (threaded).
 
         Args:
             post (Info[InstagramPost]): The post to download.
-            constraints (ListProxy): The constraints for each bot.
+            constraints (DictProxy): The constraints for each bot.
             bots_lock (Lock): The lock to use for thread safety.
         """
         bot: InstagramBot = self.bot(_safety_lock=bots_lock)
-        bots_lock.acquire()
-        boti: int = self.bots.index(bot)
-        bots_lock.release()
-        # TODO: could probably improve this whole constraints
-        # situation, as it looks a little messy right now; but
-        # yes... perhaps need to introduce some sort of unique
-        # bot id (perhaps nickname) for this? :thinking:
-        with constraints[boti]:
+        with constraints[bot.nickname]:
             bot.download_post(post)
 
     @classmethod
@@ -140,5 +133,6 @@ class InstagramGroup(Group):
         g: InstagramGroup = cls(
             name=data['name'],
         )
-        g.bots = [ InstagramBot.loadj(b, g) for b in data['bots'] ]
+        _bots: List[InstagramBot] = [ InstagramBot.loadj(b, g) for b in data['bots'] ]
+        g.bots = { b.nickname: b for b in _bots }
         return g

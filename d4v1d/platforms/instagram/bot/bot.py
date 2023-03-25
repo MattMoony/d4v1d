@@ -35,19 +35,20 @@ class InstagramBot(Bot):
     session: req.Session
     """The session of the bot"""
 
-    def __init__(self, group: Group, anonymous: bool, user_agent: str, headers: Dict[str, str] = {},  # pylint: disable=dangerous-default-value
+    def __init__(self, nickname: str, group: Group, anonymous: bool, user_agent: str, headers: Dict[str, str] = {},  # pylint: disable=dangerous-default-value
                  creds: Optional[Tuple[str, str]] = None):
         """
         Creates a new InstagramBot object
 
         Args:
+            nickname (str): The nickname of the bot (e.g. 'bot1')
             group (Group): The group the bot belongs to
             anonymous (bool): Whether the bot should be anonymous
             user_agent (str): The user agent of the bot
             headers (Dict[str, str]): The headers of the bot
             creds (Optional[Tuple[str, str]]): The credentials of the bot
         """
-        super().__init__(group, anonymous)
+        super().__init__(nickname, group, anonymous)
         if not anonymous:
             if not isinstance(creds, tuple):
                 raise TypeError('`creds` must be tuple of (<username>, <password>)!')
@@ -57,6 +58,14 @@ class InstagramBot(Bot):
 
         self.session = req.Session()
         self.session.headers.update({ **headers, 'User-Agent': user_agent, })
+
+    def debug(self) -> None:
+        """
+        Debugs the bot - drops into interactive IPython
+        session with the bot.
+        """
+        bot: InstagramBot = self
+        __import__('IPython').embed()
 
     def handle_error(self, r: req.Response) -> None:
         """
@@ -164,11 +173,18 @@ class InstagramBot(Bot):
             Dict[str, Any]: The bot in saveable dictionary format
         """
         return {
+            'nickname': self.nickname,
             'anonymous': self.anonymous,
             'user_agent': self.session.headers['User-Agent'],
             'headers': dict(self.session.headers),
             'creds': (self.username, self.password) if not self.anonymous else None,
         }
+    
+    def __str__(self) -> str:
+        return f'"{self.nickname}"@Instagram ({"anonymous" if self.anonymous else "authenticated"}))'
+
+    def __repr__(self) -> str:
+        return f'<{self}>'
 
     @classmethod
     def loadj(cls, data: Dict[str, Any], group: "Group") -> "InstagramBot":
@@ -184,6 +200,7 @@ class InstagramBot(Bot):
             Platform: The re-constructed bot
         """
         return InstagramBot(
+            data['nickname'],
             group,
             not data['creds'],
             data['user_agent'],

@@ -11,6 +11,8 @@ class Bot:
     Template bot class - template automated user.
     """
 
+    nickname: str
+    """The nickname of the bot"""
     group: "Group"
     """The group the bot belongs to"""
     anonymous: bool
@@ -18,7 +20,7 @@ class Bot:
     requests: int
     """The number of requests the bot has made"""
 
-    def __init__(self, group: "Group", anonymous: bool):
+    def __init__(self, nickname: str, group: "Group", anonymous: bool):
         """
         Creates a new Bot object
 
@@ -26,6 +28,7 @@ class Bot:
             group (Group): The group the bot belongs to
             anonymous (bool): Whether the bot should be anonymous
         """
+        self.nickname = nickname
         self.group = group
         self.anonymous = anonymous
         self.requests = 0
@@ -38,6 +41,12 @@ class Bot:
             Dict[str, Any]: The bot in saveable dictionary format
         """
         raise NotImplementedError()
+
+    def __str__(self) -> str:
+        return f'"{self.nickname}"@No Platform ()'
+    
+    def __repr__(self) -> str:
+        return f'<{self}>'
 
     @classmethod
     def loadj(cls, data: Dict[str, Any], group: "Group") -> "Bot":

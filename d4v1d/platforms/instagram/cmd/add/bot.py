@@ -28,6 +28,7 @@ class AddBot(Command):
         """
         super().__init__('add bot', description='Create a new bot for the `instagram` platform.')
         self.add_argument('group_name', type=str, help='The name of the group to add the bot to.')
+        self.add_argument('nickname', type=str, help='The nickname of the bot.')
         self.add_argument('--anonymous', action='store_true', help='Whether or not the bot should use the "anonymous" user; i.e. not login.')
         creds: ArgumentGroup = self._parser.add_argument_group('creds')
         creds.add_argument('-u', '--username', type=str, help='The username of the bot.')
@@ -55,7 +56,7 @@ class AddBot(Command):
         return { g: None for g in state.platform.groups }
 
     def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
-                group_name: Optional[str] = None, user_agent: Optional[str] = None,
+                nickname: Optional[str] = None, group_name: Optional[str] = None, user_agent: Optional[str] = None,
                 anonymous: bool = False, username: Optional[str] = None, password: Optional[str] = None,
                 headers: Optional[List[Tuple[str, str]]] = None, **kwargs) -> None:
         """
@@ -65,6 +66,7 @@ class AddBot(Command):
             raw_args (List[str]): The raw arguments passed to the command.
             argv (List[str]): The extra arguments that weren't parsed.
             state (CLISessionState): The current session state.
+            nickname (str): The nickname of the bot.
             group_name (Optional[str]): The name of the group to add the bot to.
             user_agent (Optional[str]): The "User-Agent" the bot should use.
             anonymous (bool, optional): Whether or not the bot should use the "anonymous" user; i.e. not login. Defaults to False.
@@ -73,6 +75,10 @@ class AddBot(Command):
             password (Optional[str], optional): The password of the bot. Defaults to None.
             headers (Optional[List[Tuple[str, str]]], optional): The headers to add to the bot's requests. Defaults to None.
         """
+        if not nickname:
+            # shouldn't happen
+            io.e('You must provide a nickname!')
+            return
         if not group_name:
             # shouldn't happen
             io.e('You must provide a group name!')
@@ -89,6 +95,6 @@ class AddBot(Command):
             io.e(f'Group "{group_name}" does not exist!')
             return
         group: InstagramGroup = state.platform.groups[group_name]
-        bot: InstagramBot = InstagramBot(group, anonymous=anonymous, user_agent=user_agent,
+        bot: InstagramBot = InstagramBot(nickname, group, anonymous=anonymous, user_agent=user_agent,
                                          headers=dict(headers or []), creds=(username, password,))
         group.add(bot)
