@@ -53,6 +53,8 @@ class CmdCompleter(NestedCompleter):
         # check if current "end" is a command that offers
         # completion
         try:
+            # TODO: confirm that this is working as intended
+            # especially, with regards to multi-level completion
             c, args = self.session[document.text]
             compl: Optional[NestedDict] = c.completer(self.session.state)
             if not compl:

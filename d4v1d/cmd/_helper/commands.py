@@ -5,6 +5,8 @@ Collects all available commands
 from typing import Any, Dict
 
 from d4v1d.cmd.add.group import AddGroup
+from d4v1d.cmd.debug.bot import DebugBot
+from d4v1d.cmd.debug.log import DebugLog
 from d4v1d.cmd.exit import Exit
 from d4v1d.cmd.help import Help
 from d4v1d.cmd.rm.group import RemoveGroup
@@ -18,6 +20,10 @@ from d4v1d.cmd.show.users import ShowUsers
 from d4v1d.cmd.use import Use
 
 CMDS: Dict[str, Any] = {
+    '.debug': {
+        'bot': DebugBot(),
+        'log': DebugLog(),
+    },
     'add': {
         'group': AddGroup(),
     },
