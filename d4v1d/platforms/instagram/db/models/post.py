@@ -40,8 +40,6 @@ class InstagramPost:
     location: Optional[InstagramLocation] = None
     """The location of this post; not necessarily set, since not always present separately."""
 
-    media_urls: List[Tuple[MediaType, str]] = field(default_factory=list)
-    """The media urls of this post."""
     media: List[InstagramMedia] = field(default_factory=list)
     """The media of this post."""
 

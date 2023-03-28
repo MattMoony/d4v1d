@@ -11,6 +11,7 @@ from multiprocessing.managers import DictProxy
 from typing import Any, Dict, List, Optional
 
 from d4v1d import config
+from d4v1d.log import log
 from d4v1d.platforms.instagram.bot.bot import InstagramBot
 from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.models.user import InstagramUser
@@ -71,12 +72,8 @@ class InstagramGroup(Group):
         Returns:
             List[Info[InstagramPost]]: The list of posts.
         """
-        try:
-            bot: InstagramBot = self.bot()
-            return bot.posts(user, _from, _to)
-        except Exception as e:
-            import traceback
-            traceback.print_exception(e)
+        bot: InstagramBot = self.bot()
+        return bot.posts(user, _from, _to)
     
     def download_posts(self, posts: List[Info[InstagramPost]]) -> None:
         """
@@ -85,6 +82,7 @@ class InstagramGroup(Group):
         Args:
             posts (List[Info[InstagramPost]]): The list of posts to download.
         """
+        log.info('Downloading %d posts using a max of %d bots in parallel ...', len(posts), config.PCONFIG._instagram.max_parallel_downloads)
         with Manager() as manager:
             bots_lock: Lock = manager.Lock()
             constraints: DictProxy = manager.dict({

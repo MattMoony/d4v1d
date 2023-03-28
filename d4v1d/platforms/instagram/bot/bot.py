@@ -12,6 +12,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 import requests as req
 
 from d4v1d import config
+from d4v1d.log import log
 from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.models.user import InstagramUser
 from d4v1d.platforms.platform.bot.bot import Bot
@@ -125,7 +126,10 @@ class InstagramBot(Bot):
         Returns:
             List[Info[InstagramPost]]: The list of posts.
         """
-        fetch: Callable[[int, Optional[str]], req.Response] = lambda _id, _after: self.session.get(f'https://www.instagram.com/graphql/query/?query_hash=e769aa130647d2354c40ea6a439bfc08&variables={json.dumps({"id": _id, "first": 10, "after": _after,})}')
+        fetch: Callable[[int, Optional[str]], req.Response] = lambda _id, _after: self.session.get(f'https://www.instagram.com/graphql/query/', params={
+            'query_hash': 'e769aa130647d2354c40ea6a439bfc08',
+            'variables': json.dumps({"id": _id, "first": 10, "after": _after,}),
+        })
         r: req.Response = fetch(user.id, None)
         if not r.ok:
             return self.handle_error(r)
@@ -151,9 +155,11 @@ class InstagramBot(Bot):
         Args:
             post (Info[InstagramPost]): The post to download.
         """
+        log.info('Downloading post %s', post.value.short_code)
         p: InstagramPost = post.value
         os.makedirs(os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code), exist_ok=True)
         for i, m in enumerate(p.media):
+            log.debug('Downloading media %s with %s', m.url, str(self))
             m.path = os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if m.type == MediaType.IMAGE else "mp4"}')
             # don't overwrite already downloaded files, as this is
             # probably unwanted behaviour, but could happen, if the user

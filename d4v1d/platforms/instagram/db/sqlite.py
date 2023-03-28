@@ -18,6 +18,7 @@ from d4v1d.platforms.instagram.db.models.media import InstagramMedia
 from d4v1d.platforms.instagram.db.models.post import InstagramPost
 from d4v1d.platforms.instagram.db.schema.sql import SQLSchema
 from d4v1d.platforms.platform.info import Info
+from d4v1d.platforms.platform.mediatype import MediaType
 
 
 class SQLiteDatabase(Database):
@@ -207,10 +208,24 @@ class SQLiteDatabase(Database):
         """
         c: sqlite3.Cursor = self.con.cursor()
         c.executemany('''UPDATE posts SET
-            timestamp = ?, id = ?, shortcode = ?, caption = ?, width = ?, height = ?,
+            shortcode = ?, caption = ?, width = ?, height = ?,
             is_video = ?, comments_disabled = ?, taken_at_timestamp = ?,
-            likes = ?, owner = ?, location = ?
-        WHERE id = ?''', [(post.date.isoformat(), *post.value.dumpt(), post.value.id) for post in posts])
+            likes = ?, location = ?
+        WHERE id = ?
+              AND timestamp = ?
+              AND owner = ?''', [(
+                    post.value.short_code,
+                    post.value.caption,
+                    *post.value.dimensions,
+                    post.value.is_video,
+                    post.value.comments_disabled,
+                    post.value.taken_at.isoformat(),
+                    post.value.likes,
+                    post.value.location.id if post.value.location else None,
+                    post.value.id,
+                    post.date.isoformat(),
+                    post.value.owner.id,
+                    ) for post in posts])
         self.con.commit()
         # update other, post-associated data ...
         for p in posts:
@@ -231,7 +246,7 @@ class SQLiteDatabase(Database):
                             timestamp, id, post, type, url, path, width, height
                          ) VALUES (
                             ?, ?, ?, ?, ?, ?, ?, ?
-                         )''', [(m.date.isoformat() if isinstance(m, Info) else timestamp, *(m.value.dumpt() if isinstance(m, Info) else m.dumpt()),) for m in media])
+                         )''', [(m.date.isoformat() if isinstance(m, Info) else timestamp.isoformat(), *(m.value.dumpt() if isinstance(m, Info) else m.dumpt()),) for m in media])
         self.con.commit()
 
     def update_media(self, media: List[Info[InstagramMedia]], timestamp: Optional[datetime] = None) -> None:
@@ -246,8 +261,26 @@ class SQLiteDatabase(Database):
             raise ValueError('If media is not a list of Info objects, timestamp must be specified')
         c: sqlite3.Cursor = self.con.cursor()
         c.executemany('''UPDATE media SET
-                            timestamp = ?, id = ?, post = ?, type = ?, url = ?, path = ?, width = ?, height = ?
-                         WHERE id = ?''', [(m.date.isoformat() if isinstance(m, Info) else timestamp, *(m.value.dumpt() if isinstance(m, Info) else m.dumpt()), m.value.id if isinstance(m, Info) else m.id,) for m in media])
+                            type = ?, url = ?, path = ?, width = ?, height = ?
+                         WHERE id = ?
+                               AND timestamp = ?
+                               AND post = ?''', [(
+                                m.value.type.value,
+                                m.value.url,
+                                m.value.path,
+                                *m.value.dimensions,
+                                m.value.id,
+                                m.date.isoformat(),
+                                m.value.post.id,
+                         ) if isinstance(m, Info) else (
+                                m.type.value,
+                                m.url,
+                                m.path,
+                                *m.dimensions,
+                                m.id,
+                                timestamp.isoformat(),
+                                m.post.id,
+                         ) for m in media])
         self.con.commit()
 
     def store_location(self, location: InstagramLocation) -> None:
@@ -342,16 +375,18 @@ class SQLiteDatabase(Database):
                                                   AND owner = p.owner)
                      ORDER BY taken_at_timestamp DESC''', 
                      (user.id,) + ((_from.isoformat(),) if _from else ()) + ((_to.isoformat(),) if _to else ()))
-        x = c.fetchall()
-        return [Info(InstagramPost(
-                    *row[1:4], 
-                    tuple(row[4:6]), 
-                    *row[6:8], 
-                    datetime.fromisoformat(row[8]), 
-                    *row[9:10],
-                    owner = self.get_user(id=row[10]).value,
-                    location = self.get_location(row[11]) if row[11] is not None else None
-               ), datetime.fromisoformat(row[0])) for row in x]
+        posts: List[Info[InstagramPost]] = [Info(InstagramPost(
+                                                    *row[1:4], 
+                                                    tuple(row[4:6]), 
+                                                    *row[6:8], 
+                                                    datetime.fromisoformat(row[8]), 
+                                                    *row[9:10],
+                                                    owner = self.get_user(id=row[10]).value,
+                                                    location = self.get_location(row[11]) if row[11] is not None else None
+                                            ), datetime.fromisoformat(row[0])) for row in c.fetchall()]
+        for p in posts:
+            p.value.media = [ _.value for _ in self.get_media(p) ]
+        return posts
     
     def get_media(self, post: Info[InstagramPost]) -> List[Info[InstagramMedia]]:
         """
@@ -365,11 +400,15 @@ class SQLiteDatabase(Database):
         """
         c: sqlite3.Cursor = self.con.cursor()
         c.execute('''SELECT
-                        timestamp, type, id, post, url, path, width, height
+                        timestamp, id, type, url, width, height, path
                      FROM media
                      WHERE post = ?
-                     ORDER BY timestamp DESC''', (post.value.id,))
-        return [Info(InstagramMedia(*row[1:]), datetime.fromisoformat(row[0])) for row in c.fetchall()]
+                           AND timestamp = ?
+                     ORDER BY timestamp DESC''', (post.value.id, post.date.isoformat()))
+        media: List[Info[InstagramMedia]] = [Info(InstagramMedia(row[1], MediaType(row[2]), row[3], tuple(row[4:6]), *row[6:]), datetime.fromisoformat(row[0])) for row in c.fetchall()]
+        for m in media:
+            m.value.post = post.value
+        return media
 
     def get_location(self, id: int) -> Optional[InstagramLocation]:
         """
