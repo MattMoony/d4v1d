@@ -21,6 +21,7 @@ from d4v1d.platforms.platform.errors import (BadAPIResponseError,
                                              RequiresAuthenticationError)
 from d4v1d.platforms.platform.info import Info
 from d4v1d.platforms.platform.mediatype import MediaType
+from d4v1d.utils.anonsession import AnonSession
 
 
 class InstagramBot(Bot):
@@ -32,7 +33,7 @@ class InstagramBot(Bot):
     """The username of the bot"""
     password: str
     """The password of the bot"""
-    session: req.Session
+    session: AnonSession
     """The session of the bot"""
 
     def __init__(self, nickname: str, group: Group, anonymous: bool, user_agent: str, headers: Dict[str, str] = {},  # pylint: disable=dangerous-default-value
@@ -44,7 +45,7 @@ class InstagramBot(Bot):
             nickname (str): The nickname of the bot (e.g. 'bot1')
             group (Group): The group the bot belongs to
             anonymous (bool): Whether the bot should be anonymous
-            user_agent (str): The user agent of the bot
+            user_agent (str): The user agent of the bot (deprecated).
             headers (Dict[str, str]): The headers of the bot
             creds (Optional[Tuple[str, str]]): The credentials of the bot
         """
@@ -56,8 +57,8 @@ class InstagramBot(Bot):
                 raise ValueError('`creds` must consist of <username> and <password>!')
             self.username, self.password = creds
 
-        self.session = req.Session()
-        self.session.headers.update({ **headers, 'User-Agent': user_agent, })
+        self.session = AnonSession(shapeshift=anonymous)
+        self.session.headers.update({ **headers })
 
     def debug(self) -> None:
         """
