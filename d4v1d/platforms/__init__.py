@@ -10,6 +10,7 @@ from typing import Dict
 
 PLATFORMS: Dict[str, ModuleType] = {
     'instagram': importlib.import_module('d4v1d.platforms.instagram'),
+    'tellonym': importlib.import_module('d4v1d.platforms.tellonym'),
     # 'twitter': importlib.import_module('d4v1d.platforms.twitter'),
     **{
         name[len('d4v1d_p_'):]: importlib.import_module(name)
