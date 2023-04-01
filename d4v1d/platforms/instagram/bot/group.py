@@ -92,10 +92,10 @@ class InstagramGroup(Group):
             # after the media has been stored there - all while
             # using a threaded approach -> use this helper proxy
             media_paths: DictProxy = manager.dict({
-                p.value.short_code: {
+                p.value.short_code: manager.dict({
                     m.id: None
                     for m in p.value.media
-                }
+                })
                 for p in posts
             })
             with Pool(processes=config.PCONFIG._instagram.max_parallel_downloads) as pool:

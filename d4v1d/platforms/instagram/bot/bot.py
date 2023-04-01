@@ -171,12 +171,12 @@ class InstagramBot(Bot):
             # tells d4v1d to download locally cached posts - yk
             if os.path.exists(_path):
                 log.debug('Media %s already exists, skipping', _path)
-                continue
-            r: req.Response = self.session.get(m.url)
-            if not r.ok:
-                raise BadAPIResponseError(f'Could not fetch post {p.id} from {m.url}')
-            with open(_path, 'wb') as f:
-                f.write(r.content)
+            else:
+                r: req.Response = self.session.get(m.url)
+                if not r.ok:
+                    raise BadAPIResponseError(f'Could not fetch post {p.id} from {m.url}')
+                with open(_path, 'wb') as f:
+                    f.write(r.content)
             # in case downloading the media was a success, update the local
             # path of the media object ...
             m.path = _path
