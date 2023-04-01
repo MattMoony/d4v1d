@@ -77,7 +77,7 @@ class AnonSession(req.Session):
                     log.debug('Number of cookies after making request: %d', len(self.cookies))
                     return res
             except CurlError as e:
-                log.warning('HTTP request (%s "%s" as %s) failed: %s; %d retries remaining ...', 
+                log.warning('HTTP request (%s "%s" as "%s") failed: %s; %d retries remaining ...', 
                             args[0] if args else kwargs['method'],
                             args[1] if args else kwargs['url'],
                             self.identity.name if self.identity else 'no-profile',

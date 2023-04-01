@@ -88,8 +88,23 @@ class InstagramGroup(Group):
             constraints: DictProxy = manager.dict({
                 _: manager.Semaphore(config.PCONFIG._instagram.max_parallel_downloads_per_bot) for _ in self.bots
             })
+            # in order to allow local media paths to be updated
+            # after the media has been stored there - all while
+            # using a threaded approach -> use this helper proxy
+            media_paths: DictProxy = manager.dict({
+                p.value.short_code: {
+                    m.id: None
+                    for m in p.value.media
+                }
+                for p in posts
+            })
             with Pool(processes=config.PCONFIG._instagram.max_parallel_downloads) as pool:
-                pool.starmap(self._download_post, [ (p, constraints, bots_lock,) for p in posts ])
+                pool.starmap(self._download_post, [ (p, constraints, bots_lock, media_paths[p.value.short_code],) for p in posts ])
+            log.info('Done downloading %d posts.', len(posts))
+            # actually update the local media paths for the posts;
+            # since pass by reference wasn't possible due to multiprocessing ...
+            for m in [ m for p in posts for m in p.value.media ]:
+                m.path = media_paths[m.post.short_code][m.id]
 
     def dumpj(self) -> Dict[str, Any]:
         """
@@ -103,7 +118,7 @@ class InstagramGroup(Group):
             'bots': [ b.dumpj() for b in self.bots.values() ],
         }
     
-    def _download_post(self, post: Info[InstagramPost], constraints: DictProxy, bots_lock: Lock) -> None:
+    def _download_post(self, post: Info[InstagramPost], constraints: DictProxy, bots_lock: Lock, media_paths: DictProxy) -> None:
         """
         Downloads the given post (threaded).
 
@@ -111,10 +126,11 @@ class InstagramGroup(Group):
             post (Info[InstagramPost]): The post to download.
             constraints (DictProxy): The constraints for each bot.
             bots_lock (Lock): The lock to use for thread safety.
+            media_paths (DictProxy): The media paths for the post (for parallelism; yk, cause only pass by value, etc.).
         """
         bot: InstagramBot = self.bot(_safety_lock=bots_lock)
         with constraints[bot.nickname]:
-            bot.download_post(post)
+            bot.download_post(post, media_paths=media_paths)
 
     @classmethod
     def loadj(cls, data: Dict[str, Any]) -> "InstagramGroup":

@@ -7,6 +7,7 @@ Instagram.
 import datetime
 import json
 import os
+from multiprocessing.managers import DictProxy
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import requests as req
@@ -148,29 +149,41 @@ class InstagramBot(Bot):
                 return self.handle_error(r)
         return posts
 
-    def download_post(self, post: Info[InstagramPost]) -> None:
+    def download_post(self, post: Info[InstagramPost], media_paths: Optional[DictProxy]) -> None:
         """
         Downloads the post and stores it locally.
 
         Args:
             post (Info[InstagramPost]): The post to download.
+            media_paths (Optional[DictProxy]): The downloaded media's storage location;
+                in case this method is called in a threaded context, this is required, as
+                due to the pass by value nature of multiprocessing, the paths wouldn't be
+                updated properly otherwise.
         """
         log.info('Downloading post %s', post.value.short_code)
         p: InstagramPost = post.value
         os.makedirs(os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code), exist_ok=True)
         for i, m in enumerate(p.media):
             log.debug('Downloading media %s with %s', m.url, str(self))
-            m.path = os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if m.type == MediaType.IMAGE else "mp4"}')
+            _path = os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if m.type == MediaType.IMAGE else "mp4"}')
             # don't overwrite already downloaded files, as this is
             # probably unwanted behaviour, but could happen, if the user
             # tells d4v1d to download locally cached posts - yk
-            if os.path.exists(m.path):
+            if os.path.exists(_path):
+                log.debug('Media %s already exists, skipping', _path)
                 continue
             r: req.Response = self.session.get(m.url)
             if not r.ok:
                 raise BadAPIResponseError(f'Could not fetch post {p.id} from {m.url}')
-            with open(m.path, 'wb') as f:
+            with open(_path, 'wb') as f:
                 f.write(r.content)
+            # in case downloading the media was a success, update the local
+            # path of the media object ...
+            m.path = _path
+            # and in case of parllelism via multiprocessing, notify the parent
+            # of the new path by storing it in the synchronized dict ...
+            if media_paths:
+                media_paths[m.id] = m.path
 
     def dumpj(self) -> Dict[str, Any]:
         """
