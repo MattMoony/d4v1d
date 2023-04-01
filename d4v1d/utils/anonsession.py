@@ -64,6 +64,7 @@ class AnonSession(req.Session):
             _res: Cookies._CookieCompatResponse = Cookies._CookieCompatResponse(res)
             _req: Cookies._CookieCompatRequest = Cookies._CookieCompatRequest(res.request)
             self.cookies.extract_cookies(_res, _req)
+            log.debug('Number of cookies after making request: %d', len(self.cookies))
             return res
     
     head: Callable = partialmethod(request, "HEAD")

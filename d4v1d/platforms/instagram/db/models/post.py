@@ -101,7 +101,7 @@ class InstagramPost:
             p: InstagramPost = InstagramPost(
                 obj['id'],
                 obj['shortcode'],
-                obj['edge_media_to_caption']['edges'][0]['node']['text'],
+                obj['edge_media_to_caption']['edges'][0]['node']['text'] if obj['edge_media_to_caption']['edges'] else '',
                 (obj['dimensions']['width'], obj['dimensions']['height']),
                 obj['is_video'],
                 obj['comments_disabled'],

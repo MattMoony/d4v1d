@@ -113,6 +113,7 @@ class Instagram(Platform):
             group (Optional[InstagramGroup]): The group to use for fetching the posts.
         """
         user: InstagramUser = self.user(username, group=group).value
+        posts: List[Info[InstagramPost]] = []
         if not refresh:
             log.debug('Check if posts of user ("%s") can be found in the db', username)
             posts: List[Info[InstagramPost]] = self.db.get_posts(user, _from=_from, _to=_to)
