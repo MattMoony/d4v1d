@@ -86,6 +86,7 @@ class AnonSession(req.Session):
                 if i < self.max_retries - 1:
                     log.debug('Pausing for %d seconds before retrying ...', self.retry_pause)
                     time.sleep(self.retry_pause)
+                    continue
                 raise e
     
     head: Callable = partialmethod(request, "HEAD")
