@@ -59,7 +59,7 @@ Below is a list of things that I'm planning on incorporating / hoping to incorpo
 - [ ] Data Collection
   - [x] Profile Overview
   - [ ] Posts
-    - [ ] Media
+    - [x] Media
     - [ ] Comments
   - [ ] Followers / Following
   - [ ] Stories

@@ -9,6 +9,7 @@ from d4v1d.cmd.debug.bot import DebugBot
 from d4v1d.cmd.debug.log import DebugLog
 from d4v1d.cmd.exit import Exit
 from d4v1d.cmd.help import Help
+from d4v1d.cmd.rm.bot import RemoveBot
 from d4v1d.cmd.rm.group import RemoveGroup
 from d4v1d.cmd.show.bots import ShowBots
 from d4v1d.cmd.show.description import ShowDescription
@@ -39,6 +40,7 @@ CMDS: Dict[str, Any] = {
         'users': ShowUsers(),
     },
     'rm': {
+        'bot': RemoveBot(),
         'group': RemoveGroup(),
     },
     'use': Use(),
