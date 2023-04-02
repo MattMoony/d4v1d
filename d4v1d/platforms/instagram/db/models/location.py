@@ -29,7 +29,7 @@ class InstagramLocation:
             'name': self.name,
             'slug': self.slug,
         }
-    
+
     def dumpt(self) -> tuple:
         """
         Dump the location as a tuple.
@@ -40,7 +40,7 @@ class InstagramLocation:
             self.name,
             self.slug,
         )
-    
+
     @classmethod
     def loadj(cls, obj: dict) -> "InstagramLocation":
         """

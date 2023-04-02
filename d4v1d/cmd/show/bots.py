@@ -31,7 +31,7 @@ class ShowBots(Command):
         """
         return bool(state.platform) and bool(state.platform.groups)
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, 
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
                 group_name: Optional[str] = None, **kwargs) -> None:
         """
         Executes the command.

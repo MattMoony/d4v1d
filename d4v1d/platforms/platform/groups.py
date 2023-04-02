@@ -45,7 +45,7 @@ class Groups(MutableMapping):
             return self.groups[key]
         except KeyError as e:
             raise KeyError(f'No group with the name "{key}".') from e
-        
+
     def __setitem__(self, key: str, value: Group) -> None:
         """
         Add a group to the dictionary of
@@ -98,7 +98,7 @@ class Groups(MutableMapping):
             raise ValueError('Can only remove a group or a group by its name!')
         del self[value if isinstance(value, str) else value.name]
         return self
-    
+
     def __contains__(self, needle: Any) -> bool:
         """
         See, if the given group or a group with the
@@ -138,7 +138,7 @@ class Groups(MutableMapping):
             Iterator[str]: Iterator over group names in this collection.
         """
         return iter(self.groups)
-    
+
     def __len__(self) -> int:
         """
         Return the number of groups in this collection.

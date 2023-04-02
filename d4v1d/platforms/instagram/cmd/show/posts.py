@@ -12,6 +12,7 @@ from d4v1d.platforms.platform.cmd.clisessionstate import CLISessionState
 from d4v1d.platforms.platform.cmd.cmd import Command
 from d4v1d.platforms.platform.errors import PlatformError
 from d4v1d.platforms.platform.info import Info
+from d4v1d.platforms.platform.ptaskopts import PTaskOpts
 from d4v1d.utils import io
 
 
@@ -36,13 +37,13 @@ class ShowPosts(Command):
         Can it be used rn?
         """
         return bool(state.platform)
-    
+
     def completer(self, state: CLISessionState) -> Optional[NestedDict]:
         """
         Custom command auto-completion.
         """
         return { i.value.username: None for i in state.platform.users() }
-    
+
     def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
                 username: Optional[str] = None, download: bool = False, refresh: bool = False,
                 group_name: Optional[str] = None, **kwargs) -> None:
@@ -72,7 +73,7 @@ class ShowPosts(Command):
                 return
             group = state.platform.groups[group_name]
         try:
-            posts: List[Info[InstagramPost]] = state.platform.posts(username, download=download, refresh=refresh, group=group)
+            posts: List[Info[InstagramPost]] = state.platform.posts(username, download=download, opts=PTaskOpts(refresh=refresh, group=group))
             if not posts:
                 io.w(f'No posts found for [bold]{username}[/bold] on Instagram. Perhaps the account is private?')
                 return

@@ -84,7 +84,7 @@ class AddBot(Command):
             io.e('You must provide a group name!')
             return
         if not user_agent:
-            user_agent = random.choice(config.PCONFIG._instagram.user_agents)
+            user_agent = random.choice(config.PCONFIG._instagram.user_agents)  # pylint: disable=protected-access
         if not anonymous and not (username and password):
             io.e('You must either set the --anonymous flag or provide username & password!')
             return

@@ -13,7 +13,7 @@ class InstagramMedia:
     """
     Represents some sort of media on Instagram.
     """
-    
+
     id: int
     """The media's id."""
     type: MediaType
@@ -43,7 +43,7 @@ class InstagramMedia:
                 'height': self.dimensions[1],
             },
         }
-    
+
     def dumpt(self) -> tuple:
         """
         Dump the media as a tuple.
@@ -56,7 +56,7 @@ class InstagramMedia:
             self.path,
             *self.dimensions,
         )
-    
+
     @classmethod
     def loadj(cls, data: dict, api: bool = False, post: Optional["InstagramPost"] = None) -> 'InstagramMedia':
         """

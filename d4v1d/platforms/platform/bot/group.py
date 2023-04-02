@@ -5,7 +5,7 @@ a collection of automated users / anonymous
 browsers.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from d4v1d.platforms.platform.bot.bot import Bot
 
@@ -64,7 +64,7 @@ class Group:
             Dict[str, Any]: The group in saveable dictionary format
         """
         raise NotImplementedError()
-    
+
     def __iadd__(self, bot: Bot) -> "Group":
         """
         Adds a bot to the group.
@@ -81,7 +81,7 @@ class Group:
             raise TypeError(f'Can\'t add {type(bot)} to group!')
         self.add(bot)
         return self
-    
+
     def __isub__(self, bot: Bot) -> "Group":
         """
         Removes a bot from the group

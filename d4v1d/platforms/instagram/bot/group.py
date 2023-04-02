@@ -35,7 +35,7 @@ class InstagramGroup(Group):
         """
         if not self.bots:
             raise EmptyGroupError()
-        
+
         if _safety_lock is not None:
             _safety_lock.acquire()
         _minr: int = min(b.requests for b in self.bots.values())
@@ -58,7 +58,7 @@ class InstagramGroup(Group):
             EmptyGroupException: If the group is empty
         """
         return self.bot().user(username)
-    
+
     def posts(self, user: InstagramUser, _from: Optional[datetime.datetime] = None,
               _to: Optional[datetime.datetime] = None) -> List[Info[InstagramPost]]:
         """
@@ -74,7 +74,7 @@ class InstagramGroup(Group):
         """
         bot: InstagramBot = self.bot()
         return bot.posts(user, _from, _to)
-    
+
     def download_posts(self, posts: List[Info[InstagramPost]]) -> None:
         """
         Downloads all the posts in the given list.
@@ -82,11 +82,12 @@ class InstagramGroup(Group):
         Args:
             posts (List[Info[InstagramPost]]): The list of posts to download.
         """
-        log.info('Downloading %d posts using a max of %d bots in parallel ...', len(posts), config.PCONFIG._instagram.max_parallel_downloads)
+        log.info('Downloading %d posts using a max of %d bots in parallel ...', len(posts), config.PCONFIG._instagram.max_parallel_downloads)  # pylint: disable=protected-access
         with Manager() as manager:
             bots_lock: Lock = manager.Lock()
             constraints: DictProxy = manager.dict({
-                _: manager.Semaphore(config.PCONFIG._instagram.max_parallel_downloads_per_bot) for _ in self.bots
+                _: manager.Semaphore(config.PCONFIG._instagram.max_parallel_downloads_per_bot)  # pylint: disable=no-member, protected-access
+                for _ in self.bots
             })
             # in order to allow local media paths to be updated
             # after the media has been stored there - all while
@@ -98,7 +99,7 @@ class InstagramGroup(Group):
                 })
                 for p in posts
             })
-            with Pool(processes=config.PCONFIG._instagram.max_parallel_downloads) as pool:
+            with Pool(processes=config.PCONFIG._instagram.max_parallel_downloads) as pool:  # pylint: disable=protected-access
                 pool.starmap(self._download_post, [ (p, constraints, bots_lock, media_paths[p.value.short_code],) for p in posts ])
             log.info('Done downloading %d posts.', len(posts))
             # actually update the local media paths for the posts;
@@ -117,7 +118,7 @@ class InstagramGroup(Group):
             'name': self.name,
             'bots': [ b.dumpj() for b in self.bots.values() ],
         }
-    
+
     def _download_post(self, post: Info[InstagramPost], constraints: DictProxy, bots_lock: Lock, media_paths: DictProxy) -> None:
         """
         Downloads the given post (threaded).

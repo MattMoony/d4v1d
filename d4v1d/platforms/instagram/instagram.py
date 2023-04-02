@@ -20,6 +20,8 @@ from d4v1d.platforms.platform import Platform
 from d4v1d.platforms.platform.cmd.cmd import Command
 from d4v1d.platforms.platform.errors import NoGroupsError, UnknownUserError
 from d4v1d.platforms.platform.info import Info
+from d4v1d.platforms.platform.ptaskopts import PTaskOpts
+from d4v1d.platforms.platform.user import User
 
 
 class Instagram(Platform):
@@ -69,7 +71,7 @@ class Instagram(Platform):
         log.debug('Creating new group "%s" ... ', name)
         return InstagramGroup(name)
 
-    def user(self, username: str, refresh: bool = False, group: Optional[InstagramGroup] = None) -> Info[InstagramUser]:
+    def user(self, username: str, opts: PTaskOpts = PTaskOpts()) -> Info[InstagramUser]:
         """
         Returns the user with the given username.
 
@@ -81,7 +83,7 @@ class Instagram(Platform):
         Returns:
             Info[User]: The user info.
         """
-        if not refresh:
+        if not opts.refresh:
             log.debug('Check if user ("%s") is already part of the db', username)
             user: Optional[Info[InstagramUser]] = self.db.get_user(username)
             if user:
@@ -89,18 +91,18 @@ class Instagram(Platform):
                 return Info(user.value, user.date, self)
             log.debug('"%s" is not part of the db ... yet', username)
         log.debug('Fetching user info from instagram ... ')
-        if not group and not self.groups:
+        if not opts.group and not self.groups:
             raise NoGroupsError('No groups available for fetching user info.')
-        user = (group or list(self.groups.values())[0]).user(username)
+        user = (opts.group or list(self.groups.values())[0]).user(username)
         if not user:
             log.debug('"%s" is not known to instagram', username)
             raise UnknownUserError(f'"{username}" is not known to instagram')
         log.debug('Adding user to db ... ')
         self.db.store_user(user.value)
         return Info(user.value, user.date, self)
-    
+
     def posts(self, username: str, download: bool = False, _from: Optional[datetime.datetime] = None,
-              _to: Optional[datetime.datetime] = None, refresh: bool = False, group: Optional[InstagramGroup] = None) -> List[Info[InstagramPost]]:
+              _to: Optional[datetime.datetime] = None, opts: PTaskOpts = PTaskOpts()) -> List[Info[InstagramPost]]:
         """
         Returns a list of all posts for the given usernames.
 
@@ -109,12 +111,11 @@ class Instagram(Platform):
             download (bool): Whether to download the posts (the media).
             _from (Optional[datetime.datetime]): The start date.
             _to (Optional[datetime.datetime]): The end date.
-            refresh (bool): Whether to force refresh the posts.
-            group (Optional[InstagramGroup]): The group to use for fetching the posts.
+            opts (PTaskOpts): The options for the task.
         """
-        user: InstagramUser = self.user(username, group=group).value
+        user: InstagramUser = self.user(username, opts=PTaskOpts(group=opts.group)).value
         posts: List[Info[InstagramPost]] = []
-        if not refresh:
+        if not opts.refresh:
             log.debug('Check if posts of user ("%s") can be found in the db', username)
             posts: List[Info[InstagramPost]] = self.db.get_posts(user, _from=_from, _to=_to)
             log.debug('Found %d posts in db', len(posts))
@@ -124,13 +125,13 @@ class Instagram(Platform):
                 log.debug('Posts of user ("%s") can not be found in the db ... yet', username)
         if not posts:
             log.debug('Fetching posts from instagram ... ')
-            if not group and not self.groups:
+            if not opts.group and not self.groups:
                 raise NoGroupsError('No groups available for fetching user\'s posts.')
-            posts: List[Info[InstagramPost]] = (group or list(self.groups.values())[0]).posts(user, _from=_from, _to=_to,)
+            posts: List[Info[InstagramPost]] = (opts.group or list(self.groups.values())[0]).posts(user, _from=_from, _to=_to,)
             log.debug('Storing posts in db ... ')
             self.db.store_posts(posts)
         if download:
-            (group or list(self.groups.values())[0]).download_posts(posts)
+            (opts.group or list(self.groups.values())[0]).download_posts(posts)
             self.db.update_posts(posts)
         return posts
 
@@ -142,7 +143,7 @@ class Instagram(Platform):
             List[str]: The list of local userrs.
         """
         return self.db.get_users()
-    
+
     def dumpj(self) -> Dict[str, Any]:
         """
         To save-able format.
@@ -164,3 +165,25 @@ class Instagram(Platform):
         except Exception:  # pylint: disable=broad-exception-caught
             log.error('Instagram plaform file seems to be corrupted - continuing without saved groups, etc.')
         return i
+
+    def __getitem__(self, username: str) -> User:
+        """
+        Get information about the user with the given 
+        username; will **always** try to get the user 
+        information from the local cache before scraping it.
+
+        To get new, refreshed user information use
+        the ``.user()`` method directly as it works
+        for such requirements.
+
+        Args:
+            username (str): The user's username.
+
+        Returns:
+            User: The info about the user matching the username.
+
+        Raises:
+            KeyError: In case no user with the given
+                username exists.
+        """
+        return self.user(username)

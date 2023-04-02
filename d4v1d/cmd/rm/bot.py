@@ -42,8 +42,8 @@ class RemoveBot(Command):
             }
             for g, _ in state.platform.groups.items()
         }
-    
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, 
+
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
                 group_name: Optional[str] = None, bot_name: Optional[str] = None, **kwargs) -> None:
         """
         Executes the command.

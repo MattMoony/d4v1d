@@ -9,7 +9,6 @@ from typing import Any, Dict, List, Optional, Tuple
 from d4v1d.platforms.instagram.db.models.location import InstagramLocation
 from d4v1d.platforms.instagram.db.models.media import InstagramMedia
 from d4v1d.platforms.instagram.db.models.user import InstagramUser
-from d4v1d.platforms.platform.mediatype import MediaType
 
 
 @dataclass
@@ -60,11 +59,11 @@ class InstagramPost:
             'taken_at_timestamp': int(self.taken_at.timestamp()),
             'likes': self.likes,
             'owner': {
-                'id': self.owner_id,
-            },
+                'id': self.owner.id,
+            } if self.owner else None,
             'location': {
-                'id': self.location_id,
-            },
+                'id': self.location.id,
+            } if self.location else None,
         }
 
     def dumpt(self) -> Tuple[Any, ...]:
@@ -124,5 +123,4 @@ class InstagramPost:
             obj['comments_disabled'],
             datetime.fromtimestamp(obj['taken_at_timestamp']),
             obj['likes'],
-            obj['owner']['id'],
         )

@@ -28,7 +28,7 @@ class Database:
             user (User): The user to store
         """
         raise NotImplementedError()
-    
+
     def store_posts(self, posts: List[Info[InstagramPost]]) -> None:
         """
         Stores a list of posts in the database
@@ -37,7 +37,7 @@ class Database:
             posts (List[Info[Post]]): The posts to store
         """
         raise NotImplementedError()
-    
+
     def update_posts(self, posts: List[Info[InstagramPost]]) -> None:
         """
         Updates a list of posts in the database
@@ -56,7 +56,7 @@ class Database:
             timestamp (Optional[datetime]): The timestamp of the post the media belongs to.
         """
         raise NotImplementedError()
-    
+
     def update_media(self, media: List[Info[InstagramMedia]], timestamp: Optional[datetime] = None) -> None:
         """
         Updates a list of media in the database.
@@ -66,7 +66,7 @@ class Database:
             timestamp (Optional[datetime]): The timestamp of the post the media belongs to.
         """
         raise NotImplementedError()
-    
+
     def store_location(self, location: InstagramLocation) -> None:
         """
         Stores a location in the database
@@ -76,7 +76,7 @@ class Database:
         """
         raise NotImplementedError()
 
-    def get_user(self, username: Optional[str] = None, id: Optional[int] = None) -> Optional[Info[InstagramUser]]:
+    def get_user(self, username: Optional[str] = None, id: Optional[int] = None) -> Optional[Info[InstagramUser]]:  # pylint: disable=redefined-builtin
         """
         Gets a user from the database.
 
@@ -88,7 +88,7 @@ class Database:
             Optional[Info[User]]: The user if it exists, None otherwise.
         """
         raise NotImplementedError()
-    
+
     def get_users(self) -> List[Info[InstagramUser]]:
         """
         Get a list of users stored in the DB.
@@ -111,7 +111,7 @@ class Database:
             List[Info[Post]]: The posts
         """
         raise NotImplementedError()
-    
+
     def get_media(self, post: Info[InstagramPost]) -> List[Info[InstagramMedia]]:
         """
         Gets a list of media from a post
@@ -124,7 +124,7 @@ class Database:
         """
         raise NotImplementedError()
 
-    def get_location(self, id: int) -> Optional[InstagramLocation]:
+    def get_location(self, id: int) -> Optional[InstagramLocation]:  # pylint: disable=redefined-builtin
         """
         Gets a location from the database
 

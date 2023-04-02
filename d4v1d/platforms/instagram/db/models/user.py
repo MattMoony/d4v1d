@@ -36,6 +36,7 @@ class InstagramUser(User):
         """
         Create a new user with the given info
         """
+        super().__init__(username, bio, no_followers, no_following, number_posts, profile_pic)
         # TODO: auto-generate init with dataclass - needs
         # some extra config tho, because of alphabetical ordering
         # of arguments, etc.
@@ -43,14 +44,8 @@ class InstagramUser(User):
         # fit to the parent class it's inheriting from ...
         self.id = id
         self.fbid = fbid
-        self.username = username
         self.full_name = full_name
-        self.description = bio
-        self.number_followers = no_followers
-        self.number_following = no_following
-        self.profile_pic = profile_pic
         self.private = private
-        self.number_posts = number_posts
         self.category_name = category_name
         self.pronouns = pronouns
 

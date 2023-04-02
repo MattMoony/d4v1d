@@ -8,6 +8,7 @@ from d4v1d.platforms.platform.bot.group import Group
 from d4v1d.platforms.platform.db import Database
 from d4v1d.platforms.platform.groups import Groups
 from d4v1d.platforms.platform.info import Info
+from d4v1d.platforms.platform.ptaskopts import PTaskOpts
 from d4v1d.platforms.platform.user import User
 
 
@@ -39,7 +40,7 @@ class Platform:
         self.name = name
         self.desc = desc
         self.groups = groups or Groups()
-    
+
     def group(self, name: str) -> Group:
         """
         Create a new group with the given name.
@@ -49,15 +50,14 @@ class Platform:
         """
         raise NotImplementedError()
 
-    def user(self, username: str, refresh: bool = False, group: Optional[Group] = None) -> Info[User]:
+    def user(self, username: str, opts: PTaskOpts = PTaskOpts()) -> Info[User]:
         """
         Get the user with the given username from
         the platform.
 
         Args:
             username (str): The user's username.
-            refresh (bool): Whether to force-refresh the user info.
-            group (Optional[Group]): Optionally, the group to use to refresh the info.
+            opts (PTaskOpts): The options for the task.
 
         Returns:
             Info[User]: The user info + the timestamp, when it was retrieved.

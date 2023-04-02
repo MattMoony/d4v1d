@@ -5,7 +5,6 @@ Removes a group
 from typing import List, Optional
 
 from prompt_toolkit.completion.nested import NestedDict
-from rich import print  # pylint: disable=redefined-builtin
 
 from d4v1d.platforms.platform.cmd import CLISessionState, Command
 from d4v1d.utils import io

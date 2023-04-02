@@ -34,7 +34,7 @@ class DebugLog(Command):
             'off': None,
         }
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, 
+    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args,
                 on_off: Optional[str] = None, **kwargs) -> None:
         """
         Executes the command.

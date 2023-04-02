@@ -6,7 +6,7 @@ common browsers for web requests.
 import random
 import time
 from functools import partialmethod
-from typing import Any, Callable, Dict, Optional
+from typing import Callable, Optional
 
 import requests as req
 from curl_cffi import CurlError
@@ -32,7 +32,7 @@ class AnonSession(req.Session):
     """The maximum number of times to retry a failed request."""
     retry_pause: int
     """The number of seconds to pause between retries."""
-    
+
     def __init__(self, *args, shapeshift: bool = False, max_retries: int = 3, retry_pause: int = 3, **kwargs) -> None:
         """
         Initialize a new "anonymous session".
@@ -58,7 +58,7 @@ class AnonSession(req.Session):
         for i in range(self.max_retries):
             if self.shapeshift:
                 self.plastic_surgery()
-            log.debug('%sing URL "%s" as "%s" ...', 
+            log.debug('%sing URL "%s" as "%s" ...',
                       args[0] if args else kwargs['method'],
                       args[1] if args else kwargs['url'],
                       self.identity.name if self.identity else 'no-profile')
@@ -71,13 +71,13 @@ class AnonSession(req.Session):
                 with ireq.Session() as s:
                     # seems a little sketchy, but it appears to be working ...
                     res: ireq.Response = s.request(*args, **kwargs, impersonate=self.identity)
-                    _res: Cookies._CookieCompatResponse = Cookies._CookieCompatResponse(res)
-                    _req: Cookies._CookieCompatRequest = Cookies._CookieCompatRequest(res.request)
+                    _res: Cookies._CookieCompatResponse = Cookies._CookieCompatResponse(res)  # pylint: disable=protected-access
+                    _req: Cookies._CookieCompatRequest = Cookies._CookieCompatRequest(res.request)  # pylint: disable=protected-access
                     self.cookies.extract_cookies(_res, _req)
                     log.debug('Number of cookies after making request: %d', len(self.cookies))
                     return res
             except CurlError as e:
-                log.warning('HTTP request (%s "%s" as "%s") failed: %s; %d retries remaining ...', 
+                log.warning('HTTP request (%s "%s" as "%s") failed: %s; %d retries remaining ...',
                             args[0] if args else kwargs['method'],
                             args[1] if args else kwargs['url'],
                             self.identity.name if self.identity else 'no-profile',
@@ -88,7 +88,7 @@ class AnonSession(req.Session):
                     time.sleep(self.retry_pause)
                     continue
                 raise e
-    
+
     head: Callable = partialmethod(request, "HEAD")
     get: Callable = partialmethod(request, "GET")
     post: Callable = partialmethod(request, "POST")

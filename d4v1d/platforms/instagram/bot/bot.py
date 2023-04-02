@@ -67,7 +67,7 @@ class InstagramBot(Bot):
         Debugs the bot - drops into interactive IPython
         session with the bot.
         """
-        bot: InstagramBot = self
+        bot: InstagramBot = self  # pylint: disable=unused-variable
         __import__('IPython').embed()
 
     def handle_error(self, r: req.Response) -> None:
@@ -81,7 +81,7 @@ class InstagramBot(Bot):
         """
         try:
             parsed: Dict[str, Any] = json.loads(r.text)
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             return
         if 'message' in parsed and 'wait' in parsed['message']:
             raise RateLimitError(parsed['message'])
@@ -112,8 +112,8 @@ class InstagramBot(Bot):
             f.write(r.content)
         u: InstagramUser = InstagramUser.loadj(_u, api=True, profile_pic=ppath)
         return Info(u, stmp)
-    
-    def posts(self, user: InstagramUser, _from: Optional[datetime.datetime] = None, 
+
+    def posts(self, user: InstagramUser, _from: Optional[datetime.datetime] = None,
               _to: Optional[datetime.datetime] = None) -> Optional[List[Info[InstagramPost]]]:
         """
         Returns a list of all posts this user has made; while caching
@@ -127,7 +127,7 @@ class InstagramBot(Bot):
         Returns:
             List[Info[InstagramPost]]: The list of posts.
         """
-        fetch: Callable[[int, Optional[str]], req.Response] = lambda _id, _after: self.session.get(f'https://www.instagram.com/graphql/query/', params={
+        fetch: Callable[[int, Optional[str]], req.Response] = lambda _id, _after: self.session.get('https://www.instagram.com/graphql/query/', params={
             'query_hash': 'e769aa130647d2354c40ea6a439bfc08',
             'variables': json.dumps({"id": _id, "first": 10, "after": _after,}),
         })
@@ -162,10 +162,10 @@ class InstagramBot(Bot):
         """
         log.info('Downloading post %s', post.value.short_code)
         p: InstagramPost = post.value
-        os.makedirs(os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code), exist_ok=True)
+        os.makedirs(os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code), exist_ok=True)  # pylint: disable=protected-access
         for i, m in enumerate(p.media):
             log.debug('Downloading media %s with %s', m.url, str(self))
-            _path = os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if m.type == MediaType.IMAGE else "mp4"}')
+            _path = os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if m.type == MediaType.IMAGE else "mp4"}')  # pylint: disable=protected-access
             # don't overwrite already downloaded files, as this is
             # probably unwanted behaviour, but could happen, if the user
             # tells d4v1d to download locally cached posts - yk
@@ -199,7 +199,7 @@ class InstagramBot(Bot):
             'headers': dict(self.session.headers),
             'creds': (self.username, self.password) if not self.anonymous else None,
         }
-    
+
     def __str__(self) -> str:
         return f'"{self.nickname}"@Instagram ({"anonymous" if self.anonymous else "authenticated"}))'
 

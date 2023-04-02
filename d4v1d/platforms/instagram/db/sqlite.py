@@ -111,8 +111,8 @@ class SQLiteDatabase(Database):
                 # crash everything - since this should DEFINITELY
                 # not happen unless someone messed with the schema
                 __burn_everything_to_the_ground(table)
-            # TODO: clean this up a little bit?! I split up 
-            # the if into multiple lines to make it at least 
+            # TODO: clean this up a little bit?! I split up
+            # the if into multiple lines to make it at least
             # a little more readable
             if any(
                 not (
@@ -125,7 +125,7 @@ class SQLiteDatabase(Database):
                         re.match(__safe, v)
                         if isinstance(v, str)
                         else all(
-                            # if the key is '.pk' - i.e. the list of primary 
+                            # if the key is '.pk' - i.e. the list of primary
                             # keys, check all key names
                             re.match(__safe, _)
                             if isinstance(_, str)
@@ -301,7 +301,7 @@ class SQLiteDatabase(Database):
         )''', location.dumpt())
         self.con.commit()
 
-    def get_user(self, username: Optional[str] = None, id: Optional[int] = None) -> Optional[Info[InstagramUser]]:
+    def get_user(self, username: Optional[str] = None, id: Optional[int] = None) -> Optional[Info[InstagramUser]]:  # pylint: disable=redefined-builtin
         """
         Gets a user from the database.
 
@@ -320,7 +320,7 @@ class SQLiteDatabase(Database):
                         following, profile_pic_local, private, number_posts,
                         category_name, pronouns
                      FROM users 
-                     WHERE {f'username = ?' if username is not None else 'id = ?'}
+                     WHERE {'username = ?' if username is not None else 'id = ?'}
                      ORDER BY timestamp DESC
                      LIMIT 1''', (username if username is not None else id,))
         row: Optional[Tuple] = c.fetchone()
@@ -367,19 +367,19 @@ class SQLiteDatabase(Database):
                         likes, owner, location
                      FROM posts p
                      WHERE owner=?
-                           {f'AND timestamp >= ? AND ' if _from is not None else ''}
-                           {f'AND timestamp <= ?' if _to is not None else ''}
+                           {'AND timestamp >= ? AND ' if _from is not None else ''}
+                           {'AND timestamp <= ?' if _to is not None else ''}
                            AND timestamp = (SELECT MAX(timestamp)
                                             FROM posts
                                             WHERE id = p.id
                                                   AND owner = p.owner)
-                     ORDER BY taken_at_timestamp DESC''', 
+                     ORDER BY taken_at_timestamp DESC''',
                      (user.id,) + ((_from.isoformat(),) if _from else ()) + ((_to.isoformat(),) if _to else ()))
         posts: List[Info[InstagramPost]] = [Info(InstagramPost(
-                                                    *row[1:4], 
-                                                    tuple(row[4:6]), 
-                                                    *row[6:8], 
-                                                    datetime.fromisoformat(row[8]), 
+                                                    *row[1:4],
+                                                    tuple(row[4:6]),
+                                                    *row[6:8],
+                                                    datetime.fromisoformat(row[8]),
                                                     *row[9:10],
                                                     owner = self.get_user(id=row[10]).value,
                                                     location = self.get_location(row[11]) if row[11] is not None else None
@@ -387,7 +387,7 @@ class SQLiteDatabase(Database):
         for p in posts:
             p.value.media = [ _.value for _ in self.get_media(p) ]
         return posts
-    
+
     def get_media(self, post: Info[InstagramPost]) -> List[Info[InstagramMedia]]:
         """
         Gets a list of media from a post
@@ -410,7 +410,7 @@ class SQLiteDatabase(Database):
             m.value.post = post.value
         return media
 
-    def get_location(self, id: int) -> Optional[InstagramLocation]:
+    def get_location(self, id: int) -> Optional[InstagramLocation]:  # pylint: disable=redefined-builtin
         """
         Gets a location from the database
 
