@@ -1,12 +1,16 @@
 <script setup>
 import UserSearch from '../components/UserSearch.vue';
+
+const handleSearch = username => {
+  console.log(username)
+}
 </script>
 
 <template>
   <main>
     <img src="@/assets/logo-cropped.png" />
     <div class="search">
-      <UserSearch />
+      <UserSearch @search="handleSearch" />
     </div>
   </main>
 </template>
@@ -26,6 +30,7 @@ main {
   align-items: center;
   width: 60vw;
   padding: 2em;
+  user-select: none;
 }
 
 img {
