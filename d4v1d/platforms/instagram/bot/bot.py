@@ -149,7 +149,7 @@ class InstagramBot(Bot):
                 return self.handle_error(r)
         return posts
 
-    def download_post(self, post: Info[InstagramPost], media_paths: Optional[DictProxy]) -> None:
+    def download_post(self, post: Info[InstagramPost], media_paths: Optional[DictProxy], ddir: Optional[str]) -> None:
         """
         Downloads the post and stores it locally.
 
@@ -159,13 +159,17 @@ class InstagramBot(Bot):
                 in case this method is called in a threaded context, this is required, as
                 due to the pass by value nature of multiprocessing, the paths wouldn't be
                 updated properly otherwise.
+            ddir (Optional[str]): Where to store the posts media; in case this method is
+                called in a threaded context, this is required, as the thread can't access
+                PCONFIG._instagram, which is accessible to its parent - fails if not specified
         """
         log.info('Downloading post %s', post.value.short_code)
+        ddir = ddir if ddir is not None else config.PCONFIG._instagram.ddir  # pylint: disable=protected-access
         p: InstagramPost = post.value
-        os.makedirs(os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code), exist_ok=True)  # pylint: disable=protected-access
+        os.makedirs(os.path.join(ddir, 'users', p.owner.username, p.short_code), exist_ok=True)
         for i, m in enumerate(p.media):
             log.debug('Downloading media %s with %s', m.url, str(self))
-            _path = os.path.join(config.PCONFIG._instagram.ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if m.type == MediaType.IMAGE else "mp4"}')  # pylint: disable=protected-access
+            _path = os.path.join(ddir, 'users', p.owner.username, p.short_code, f'{str(post.date.timestamp()).replace(".", "_")}_{i}.{"jpg" if m.type == MediaType.IMAGE else "mp4"}')
             # don't overwrite already downloaded files, as this is
             # probably unwanted behaviour, but could happen, if the user
             # tells d4v1d to download locally cached posts - yk

@@ -100,7 +100,8 @@ class InstagramGroup(Group):
                 for p in posts
             })
             with Pool(processes=config.PCONFIG._instagram.max_parallel_downloads) as pool:  # pylint: disable=protected-access
-                pool.starmap(self._download_post, [ (p, constraints, bots_lock, media_paths[p.value.short_code],) for p in posts ])
+                pool.starmap(self._download_post, [ (p, constraints, bots_lock, media_paths[p.value.short_code], config.PCONFIG._instagram.ddir,) 
+                                                    for p in posts ])
             log.info('Done downloading %d posts.', len(posts))
             # actually update the local media paths for the posts;
             # since pass by reference wasn't possible due to multiprocessing ...
@@ -119,7 +120,8 @@ class InstagramGroup(Group):
             'bots': [ b.dumpj() for b in self.bots.values() ],
         }
 
-    def _download_post(self, post: Info[InstagramPost], constraints: DictProxy, bots_lock: Lock, media_paths: DictProxy) -> None:
+    def _download_post(self, post: Info[InstagramPost], constraints: DictProxy, bots_lock: Lock, media_paths: DictProxy,
+                       ddir: str) -> None:
         """
         Downloads the given post (threaded).
 
@@ -128,10 +130,11 @@ class InstagramGroup(Group):
             constraints (DictProxy): The constraints for each bot.
             bots_lock (Lock): The lock to use for thread safety.
             media_paths (DictProxy): The media paths for the post (for parallelism; yk, cause only pass by value, etc.).
+            ddir (str): The data / output directory for the media (for parallelism as well, yk)
         """
         bot: InstagramBot = self.bot(_safety_lock=bots_lock)
         with constraints[bot.nickname]:
-            bot.download_post(post, media_paths=media_paths)
+            bot.download_post(post, media_paths=media_paths, ddir=ddir)
 
     @classmethod
     def loadj(cls, data: Dict[str, Any]) -> "InstagramGroup":
