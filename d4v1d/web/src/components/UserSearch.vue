@@ -18,7 +18,7 @@ const handleInput = e => {
   <div>
     <input @keyup="handleInput" v-model="username" type="text" placeholder="Enter a username ..." />
     <button @click="doSearch">
-      asdf
+      <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
     </button>
   </div>
 </template>
@@ -38,8 +38,9 @@ input {
   color: var(--color-text);
   padding: 1em;
   border: none;
+  border-radius: .3em 0 0 .3em;
   font-family: inherit;
-  font-size: 1em;
+  font-size: 1.1em;
 }
 
 input:focus {
@@ -49,5 +50,15 @@ input:focus {
 button {
   background-color: var(--vt-c-accent);
   color: var(--vt-c-text-dark-1);
+  font-size: 1.1em;
+  padding: .7em 1em;
+  border: none;
+  border-radius: 0 .3em .3em 0;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+button:hover {
+  filter: brightness(1.1);
 }
 </style>
