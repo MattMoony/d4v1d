@@ -1,0 +1,718 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Platforms &#8212; d4v1d</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=ccbe24c1"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'PLATFORMS';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Package" href="d4v1d.html" />
+    <link rel="prev" title="Usage" href="USAGE.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+    <p class="title logo__title">d4v1d</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="USAGE.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Platforms
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="d4v1d.html">
+                        Package
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MattMoony/d4v1d" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/d4v1d/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="USAGE.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Platforms
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="d4v1d.html">
+                        Package
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MattMoony/d4v1d" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/d4v1d/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Platforms</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="platforms">
+<h1>Platforms<a class="headerlink" href="#platforms" title="Permalink to this heading">#</a></h1>
+<blockquote>
+<div><p>This gives an overview of how platforms are implemented in d4v1d - in case you want to add your own.</p>
+</div></blockquote>
+<section id="what-are-platforms">
+<h2>1️⃣ What are platforms?<a class="headerlink" href="#what-are-platforms" title="Permalink to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> platforms are a way to <strong>abstract away the differences</strong> between different social-media platforms. They contain all the <strong>logic to interact</strong> with a specific platform, and are used by the <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> core to interact with the platform / to extract user information.</p>
+</section>
+<section id="how-are-platforms-integrated">
+<h2>2️⃣ How are platforms integrated?<a class="headerlink" href="#how-are-platforms-integrated" title="Permalink to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> is meant to be as extensible as possible, and to allow for <strong>easy addition of new platforms</strong>. To achieve this, platform-specific code is generally implemented in a <strong>separate python module</strong> following the naming convention <code class="docutils literal notranslate"><span class="pre">d4v1d_p_&lt;PLATFORM-NAME&gt;</span></code>.</p>
+<p>Only a <strong>few standard platforms</strong> that ship with <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> are implemented in the main <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> repository (under <code class="docutils literal notranslate"><span class="pre">platforms/</span></code>). All other platforms should be implemented in <strong>separate repositories</strong>, and installed as python packages.</p>
+</section>
+<section id="how-are-platforms-implemented">
+<h2>3️⃣ How are platforms implemented?<a class="headerlink" href="#how-are-platforms-implemented" title="Permalink to this heading">#</a></h2>
+<p>Each platform module has to be structured in the way that the model <code class="docutils literal notranslate"><span class="pre">platform</span></code> platform is structured.</p>
+<section id="platform-module">
+<h3>📦 Platform Module<a class="headerlink" href="#platform-module" title="Permalink to this heading">#</a></h3>
+<p>In order to allow for the easy extensibility of <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code>, some standard functions have to be implemented:</p>
+<section id="init">
+<h4><code class="docutils literal notranslate"><span class="pre">init</span></code><a class="headerlink" href="#init" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">init</span> <span class="pre">()</span> <span class="pre">-&gt;</span> <span class="pre">Platform</span></code></p>
+</div></blockquote>
+<p>This method is called by the <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> platform loader upon discovering the platform module. It is used to <strong>register the platform</strong> with the <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> core, and allows for <strong>custom initialization</strong> of the platform.</p>
+<p>It should return an instance of the <a class="reference internal" href="#%F0%9F%9A%89-platform-class"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">Platform</span></code> class</span></a>.</p>
+</section>
+</section>
+<section id="platform-class">
+<h3>🚉 Platform class<a class="headerlink" href="#platform-class" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">d4v1d.platforms.platform.Platform</span></code></p>
+</div></blockquote>
+<p>Every platform <strong>needs to extend this class</strong>, and implement at least the following methods, since <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> makes use of them, to allow for some sort of <strong>cross-platform data collection &amp; analysis</strong>:</p>
+<section id="group">
+<h4><code class="docutils literal notranslate"><span class="pre">group</span></code><a class="headerlink" href="#group" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">group</span> <span class="pre">(self,</span> <span class="pre">name:</span> <span class="pre">str)</span> <span class="pre">-&gt;</span> <span class="pre">d4v1d.platforms.platform.group.Group</span></code></p>
+</div></blockquote>
+<p>Create a new platform-specific group - i.e. a collection of bots for the platform that can be used to scrape new data.</p>
+</section>
+<section id="user">
+<h4><code class="docutils literal notranslate"><span class="pre">user</span></code><a class="headerlink" href="#user" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">user</span> <span class="pre">(self,</span> <span class="pre">username:</span> <span class="pre">str,</span> <span class="pre">refresh:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">group:</span> <span class="pre">Optional[Group]</span> <span class="pre">=</span> <span class="pre">None)</span> <span class="pre">-&gt;</span> <span class="pre">Info[User]</span></code></p>
+</div></blockquote>
+<p>Get generic information about a user of the social-media platform.</p>
+<p>Note that this returns info on a <code class="docutils literal notranslate"><span class="pre">User</span></code> object - you can, and probably should, of course use your own user classes with more platform-specific info, however, just make sure to inherit from <code class="docutils literal notranslate"><span class="pre">User</span></code> and fill all its required fields, since they represent info that should generally be available on <strong>all</strong> social-media platforms.</p>
+</section>
+<section id="users">
+<h4><code class="docutils literal notranslate"><span class="pre">users</span></code><a class="headerlink" href="#users" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">users</span> <span class="pre">(self)</span> <span class="pre">-&gt;</span> <span class="pre">List[Info[User]]</span></code></p>
+</div></blockquote>
+<p>Get all locally cached users - i.e. users, whose information has been collected and locally stored in the past.</p>
+<p>Once again, the returned <code class="docutils literal notranslate"><span class="pre">User</span></code> objects should be instances of user classes that inherited from the <code class="docutils literal notranslate"><span class="pre">User</span></code> base class.</p>
+</section>
+<section id="cmds">
+<h4><code class="docutils literal notranslate"><span class="pre">cmds</span></code><a class="headerlink" href="#cmds" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">cmds:</span> <span class="pre">Dict[str,</span> <span class="pre">Union[Command,</span> <span class="pre">Dict[str,</span> <span class="pre">Any]]]</span></code></p>
+</div></blockquote>
+<p>It <strong>isn’t required</strong> to override this attribute - use it only, if you want to add custom commands to your platform. Actually that isn’t quite true, you should to override this, in order to at least provide access
+to the <code class="docutils literal notranslate"><span class="pre">add</span> <span class="pre">bot</span></code> command, since that one can’t really be provided by <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> as bots can be very platform specific and hard to generalize the creation of.</p>
+</section>
+</section>
+<section id="info-class">
+<h3>📊 Info Class<a class="headerlink" href="#info-class" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">d4v1d.platforms.platform.info.Info</span></code></p>
+</div></blockquote>
+<p>This class is used to wrap the information that is retrieved from the platform. It contains the following attributes:</p>
+<div class="highlight-md notranslate"><div class="highlight"><pre><span></span><span class="k">-</span><span class="w"> </span>value (Any): The information
+<span class="k">-</span><span class="w"> </span>date (datetime): The date of the information
+<span class="k">-</span><span class="w"> </span>platform (Platform): The platform
+</pre></div>
+</div>
+<p>This class has been introduced, because it seems rather reasonable to assume that the information retrieved from a platform is <strong>not static</strong>, but rather <strong>changes over time</strong>.</p>
+</section>
+<section id="user-class">
+<h3>🧑 User Class<a class="headerlink" href="#user-class" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">d4v1d.platforms.platform.user.User</span></code></p>
+</div></blockquote>
+<p>This class is the base class for all kinds of social-media users of all kinds of social-media platforms.</p>
+<p>Any new platforms should define own
+user classes that extend this one and <strong>always</strong> contain values for at least the attributes defined in this class, as they’re meant to be common across social-media platforms.</p>
+</section>
+<section id="bot-class">
+<h3>🤖 Bot Class<a class="headerlink" href="#bot-class" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">d4v1d.platforms.platform.bot.Bot</span></code></p>
+</div></blockquote>
+<p>This class is the “adapter” between <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> and the social-media platform. As you might have guessed, a <em>bot</em> represents an <strong>automated user</strong> - be it someone that’s signed-in, or more preferably, if possible, someone that’s just browsing anonymously.</p>
+<p>Since the <strong>core will never call</strong> any methods of <strong>this class directly</strong>, it is not necessary to adhere to any specific naming convention for the methods of this class - just keep it clean and understandable I guess.</p>
+<p>You can find examples for what the implementation of a bot could look like in the standard platforms that ship with <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> (i.e. <a class="reference internal" href="#../platforms/instagram/"><span class="xref myst">instagram</span></a>, etc.).</p>
+</section>
+<section id="group-class">
+<h3>👥 Group Class<a class="headerlink" href="#group-class" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">d4v1d.platforms.platform.bot.Group</span></code></p>
+</div></blockquote>
+<p>Generally, in order to <strong>avoid getting banned</strong> and just to load balance in general, it seems reasonable to create groups of bots that can be used to <strong>interact with the platform</strong>. The idea being that not only one user does all the scraping, but the load is divided in order to make it less noticable.</p>
+<p>Of course, groups can also just contain a single bot - however, it’s always an option to add more.</p>
+<p>Generally, I’d recommend, you never access instances of the <code class="docutils literal notranslate"><span class="pre">Bot</span></code> class directly, but only command and control as part of a group.</p>
+</section>
+<section id="database-class">
+<h3>🗃️ Database Class<a class="headerlink" href="#database-class" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">d4v1d.platforms.platform.db.Database</span></code></p>
+</div></blockquote>
+<p>It’s up to you to decide what database format to use for your platform implementations. As long as you can provide the info that is required by the <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> core (as specified in the description of the <a class="reference internal" href="#%F0%9F%9A%89-platform-class"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">Platform</span></code> class</span></a>), you can use whatever you want.</p>
+<p>If you want, you can even let the user decide between multiple database formats and this is the reason as to why you should implement a general <code class="docutils literal notranslate"><span class="pre">Database</span></code> class - it’d probably be a good idea to go with the naming convention <code class="docutils literal notranslate"><span class="pre">&lt;PLATFORM-NAME&gt;Database</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">InstagramDatabase</span></code> - and extend it with the actual database implementations. For inspiration, you can take a look at how the standard platforms that ship with <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> are implemented (e.g. <a class="reference internal" href="#../platforms/instagram/"><span class="xref myst">instagram</span></a>).</p>
+</section>
+<section id="commands-module">
+<h3>🕹️ Commands Module<a class="headerlink" href="#commands-module" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">d4v1d.platforms.platform.cmd</span></code></p>
+</div></blockquote>
+<p>The commands module contains all the commands that are available for the platform. These commands are then used by the <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> core to grant the user access to them.</p>
+<section id="clisessionstate">
+<h4><code class="docutils literal notranslate"><span class="pre">CLISessionState</span></code><a class="headerlink" href="#clisessionstate" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">class</span> <span class="pre">CLISessionState</span> <span class="pre">(object)</span></code></p>
+</div></blockquote>
+<p>This class is used to keep track of the current state of the CLI session (as the name would suggest). It contains the following attributes:</p>
+<div class="highlight-md notranslate"><div class="highlight"><pre><span></span><span class="k">-</span><span class="w"> </span>platform (Platform): The platform that is currently being used
+</pre></div>
+</div>
+</section>
+<section id="command">
+<h4><code class="docutils literal notranslate"><span class="pre">Command</span></code><a class="headerlink" href="#command" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">class</span> <span class="pre">Command</span> <span class="pre">(object)</span></code></p>
+</div></blockquote>
+<p>This class is the base class for all commands that are available for a platform - actually, it’s also used as the base for all regular <code class="docutils literal notranslate"><span class="pre">d4v1d</span></code> commands. It’s initialized with the following arguments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">aliases</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initializes a command with the specified name, aliases and description.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the command</span>
+<span class="sd">        aliases (List[str], optional): The aliases of the command. Defaults to [].</span>
+<span class="sd">        description (str, optional): The description of the command. Defaults to &#39;&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>It only really defines one method - <code class="docutils literal notranslate"><span class="pre">execute</span></code> - which, as the name suggests, is used to execute the command. It is called with the list of arguments passed to it in the CLI and the current <code class="docutils literal notranslate"><span class="pre">CLISessionState</span></code>. The base <code class="docutils literal notranslate"><span class="pre">Command</span></code> class also implements the python magic function <code class="docutils literal notranslate"><span class="pre">__call__</span></code>, which simply calls <code class="docutils literal notranslate"><span class="pre">execute</span></code> with the passed arguments.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">CLISessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes the command with the specified arguments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ...</span>
+
+<span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">CLISessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calls the execute method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>All a specific command needs to do is to initialize the <code class="docutils literal notranslate"><span class="pre">Command</span></code> object in <code class="docutils literal notranslate"><span class="pre">__init__</span></code> and <strong>override the <code class="docutils literal notranslate"><span class="pre">execute</span></code> method</strong> - e.g. this is what the <code class="docutils literal notranslate"><span class="pre">exit</span></code> command looks like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Exit</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The exit command</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the exit command</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;quit&#39;</span><span class="p">,],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Exits the program&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">CLISessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the exit command</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="USAGE.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Usage</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="d4v1d.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-are-platforms">1️⃣ What are platforms?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-are-platforms-integrated">2️⃣ How are platforms integrated?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-are-platforms-implemented">3️⃣ How are platforms implemented?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#platform-module">📦 Platform Module</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#init"><code class="docutils literal notranslate"><span class="pre">init</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#platform-class">🚉 Platform class</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#group"><code class="docutils literal notranslate"><span class="pre">group</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#user"><code class="docutils literal notranslate"><span class="pre">user</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#users"><code class="docutils literal notranslate"><span class="pre">users</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cmds"><code class="docutils literal notranslate"><span class="pre">cmds</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#info-class">📊 Info Class</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#user-class">🧑 User Class</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bot-class">🤖 Bot Class</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#group-class">👥 Group Class</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#database-class">🗃️ Database Class</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#commands-module">🕹️ Commands Module</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#clisessionstate"><code class="docutils literal notranslate"><span class="pre">CLISessionState</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="_sources/PLATFORMS.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2023, m4ttm00ny.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
